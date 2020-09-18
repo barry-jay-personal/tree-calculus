@@ -1,0 +1,174 @@
+(**********************************************************************)
+(* This program is free software; you can redistribute it and/or      *)
+(* modify it under the terms of the GNU Lesser General Public License *)
+(* as published by the Free Software Foundation; either version 2.1   *)
+(* of the License, or (at your option) any later version.             *)
+(*                                                                    *)
+(* This program is distributed in the hope that it will be useful,    *)
+(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
+(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
+(* GNU General Public License for more details.                       *)
+(*                                                                    *)
+(* You should have received a copy of the GNU Lesser General Public   *)
+(* License along with this program; if not, write to the Free         *)
+(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
+(* 02110-1301 USA                                                     *)
+(**********************************************************************)
+
+(**********************************************************************)
+(*              Reflective Programs in Tree Calculus                  *)
+(*                Documentation of the Coq Proofs                     *)
+(*                                                                    *)
+(*                     Barry Jay                                      *)
+(*                                                                    *)
+(**********************************************************************)
+
+
+This file serves as documentation for the Coq package of proofs for
+the monograph "Reflective Programs in Tree Calculus".  Each chapter of
+the book has its own file of proofs, using the same name, with the
+following exceptions: the introduction and concluding remarks do not
+have files; and the chapter on rewriting is split in two for
+convenience. The ctual files can be seen in the _CoqProject file.
+Each named theorem, corollary or lemma in the book uses
+the same name as the corresponding result in the Coq proofs.
+
+Here are some brief remarks on the highlights. 
+
+
+The book has two parts.
+
+Part I
+~~~~~~
+
+Part I uses equational reasoning to prove the properties of
+some programs in tree calculus. The *terms* of tree calculus are given by 
+
+
+Inductive Tree:  Set :=
+  | Ref : string -> Tree  (* variables are indexed by strings *) 
+  | Node : Tree   
+  | App : Tree -> Tree -> Tree   
+.
+
+It has variables (refs) as well as the *combinations* built from Node
+(also written △) and App (also written infix as @).  Combinations
+correspond to finitely branching trees. The binary tree are the
+*programs*:
+
+Inductive program : Tree -> Prop :=
+| pr_leaf : program △
+| pr_stem : forall M, program M -> program (△ @ M)
+| pr_fork : forall M N, program M -> program N -> program (△ @ M @ N)
+.
+
+The three evaluation rules are represented as the following axioms:
+
+Axiom k_eq : forall y z, △ @ △ @ y @ z = y.
+Axiom s_eq : forall x y z, △ @ (△ @ x) @ y @ z = y@z@(x@z).
+Axiom f_eq : forall w x y z, △ @ (△ @ w @ x) @ y @ z = z@w@x.
+
+These are the only axioms in Part I. A high point of Part I is the following theorem:
+
+Theorem branch_first_eval_to_bf:
+  forall M N P, program M -> program N -> branch_first_eval M N P -> bf@M@N = P. 
+
+It asserts that if the application of M to N evaluates to P using the
+branch-first strategy then application of the program bf to M and N
+has the same value P.
+
+
+Part II
+~~~~~~~
+
+Part II uses rewriting theory to prove more properties of tree
+calculus, and to compare tree calculus to other applicative models of
+computation. No axioms are used in this part, so most of the
+definitions and results of Part I have been re-developed, even though
+the axioms of Part I would be harmless. 
+
+
+The first big theorem is a converse to the theorem above which leads to the following corollary:
+
+Corollary branch_first_eval_iff_bf :
+  forall M N P, program M -> program N -> program P -> t_red (bf @ M @ N) P <-> branch_first_eval M N P. 
+
+The rest of the part compares tree calculus to three other models of
+computation, namely combinatory logic, lambda-calculus and
+SF-calculus. These comparisons use *meaningful translations* which
+require that the computation process be preserved as well as the
+computation results. Although there is on high-level notion, the
+proofs provide a separate definition for each calculus. For example,
+when translating from tree calculus to combinatory logic use
+
+
+Definition meaningful_translation_tree_to_sk (f: Tree -> SK) :=
+  (forall M N, t_red M N ->
+               exists P, sk_red (f M) P /\        (* equivalence *) 
+                         sk_red (f N) P) /\
+  (forall M N, f(ApT M N) = App (f M) (f N)) /\  (* applications *) 
+  (forall M, programT M -> normalisable (f M)) /\ (* programs *) 
+  (forall i, f (RefT i) = Ref i)               (* variables *)
+    .
+
+The postfix "T" indicates that the definition comes from Tree and not
+SK. "Normalisable" means that the term has a normal form.
+
+Each calculus has a meaningful translation to tree calculus. In
+particular, the abstraction operator of VA-calculus can be represented
+by a tree.
+
+
+Combinatory Logic
+~~~~~~~~~~~~~~~~~
+
+The incompleteness of combinatory logic follows from 
+
+Theorem equality_of_programs_is_not_definable_in_SK:  forall eq,  not (is_equal eq). 
+
+where is_equal is a predicate describing equality programs. 
+
+Definition is_equal eq :=
+  (forall M, program M -> sk_red (eq @ M @ M @ (Ref "x") @ (Ref "y")) (Ref "x"))
+/\ 
+( forall M N, program M -> program N -> M <> N ->
+              sk_red (eq @ M @ N @ (Ref "x") @ (Ref "y")) (Ref "y")). 
+
+Also, there is no meaningful translation to tree calculus:
+
+Theorem no_translation_tree_to_sk: forall f, ~(meaningful_translation_tree_to_sk f). 
+
+
+Lambda-Calculus
+~~~~~~~~~~~~~~~~
+
+Lambda-abstraction is captured by VA-calculus, a lambda-calculus
+without any meta-theory for substitution, renaming, fresh variables
+etc, just operators V for variables and A for abstractions and some simple rules.
+
+The incompleteness of VA-calculus follows from:
+
+Theorem equality_of_programs_is_not_definable_in_va:  forall eq,  not (is_equal eq). 
+
+However, there *is* a meaningful translation from tree calculus:
+
+Theorem meaningful_translation_from_tree_to_va: meaningful_translation_tree_to_va tree_to_va. 
+
+So translations (even strong ones) need not preserve completeness.
+
+SF-Calculus
+~~~~~~~~~~~
+
+SF-Calculus has two operators, the traditional S and a factorisation
+operator F that can decompose compound combinations. SF-calculus can decide equality of programs. 
+
+Theorem equal_sf_programs: forall M,  program M -> sf_red (equal @ M @ M) Kop. 
+
+
+Theorem unequal_sf_programs:
+  forall M,  program M -> forall N, program N -> M<> N -> sf_red (equal @ M @ N) (Kop @ Iop). 
+
+Indeed, it supports pattern-matching on programs. It also has a meaningful translation from tree calculus. 
+
+
+Theorem meaningful_translation_from_tree_to_sf:  meaningful_translation_tree_to_sf tree_to_sf.

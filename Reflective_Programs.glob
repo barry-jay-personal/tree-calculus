@@ -1,0 +1,1370 @@
+DIGEST f9787c1599271a8461fe84f42d378bfa
+FReflective.Reflective_Programs
+R1697:1700 Coq.Bool.Bool <> <> lib
+R1702:1705 Coq.Lists.List <> <> lib
+R1707:1712 Coq.Strings.String <> <> lib
+R1730:1753 Reflective.Tree_Calculus <> <> lib
+R1771:1801 Reflective.Extensional_Programs <> <> lib
+R1819:1849 Reflective.Intensional_Programs <> <> lib
+ind 1928:1944 <> branch_first_eval
+constr 1981:1986 <> e_leaf
+constr 2036:2041 <> e_stem
+constr 2102:2112 <> e_fork_leaf
+constr 2166:2176 <> e_fork_stem
+constr 2339:2349 <> e_fork_fork
+R1951:1954 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1959:1962 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1967:1970 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1963:1966 Reflective.Tree_Calculus <> Tree ind
+R1955:1958 Reflective.Tree_Calculus <> Tree ind
+R1947:1950 Reflective.Tree_Calculus <> Tree ind
+binder 1997:1997 <> x:3
+R2000:2016 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2028:2030 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2025:2027 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2031:2031 Reflective.Reflective_Programs <> x:3 var
+R2022:2022 Reflective.Reflective_Programs <> x:3 var
+R2018:2020 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+binder 2052:2052 <> x:4
+binder 2054:2054 <> y:5
+R2057:2073 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2095:2096 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2091:2093 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2088:2090 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2094:2094 Reflective.Reflective_Programs <> x:4 var
+R2097:2097 Reflective.Reflective_Programs <> y:5 var
+R2085:2085 Reflective.Reflective_Programs <> y:5 var
+R2079:2081 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2076:2078 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2082:2082 Reflective.Reflective_Programs <> x:4 var
+binder 2122:2122 <> y:6
+binder 2124:2124 <> z:7
+R2127:2143 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2162:2162 Reflective.Reflective_Programs <> y:6 var
+R2160:2160 Reflective.Reflective_Programs <> z:7 var
+R2155:2156 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2149:2151 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2146:2148 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2152:2154 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2157:2157 Reflective.Reflective_Programs <> y:6 var
+binder 2186:2186 <> x:8
+binder 2188:2188 <> y:9
+binder 2190:2190 <> z:10
+binder 2192:2193 <> yz:11
+binder 2195:2196 <> xz:12
+binder 2198:2198 <> v:13
+R2229:2232 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2257:2260 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2286:2293 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2294:2310 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2335:2335 Reflective.Reflective_Programs <> v:13 var
+R2333:2333 Reflective.Reflective_Programs <> z:10 var
+R2328:2329 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2316:2319 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2327:2327 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2313:2315 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2323:2325 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2320:2322 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2326:2326 Reflective.Reflective_Programs <> x:8 var
+R2330:2330 Reflective.Reflective_Programs <> y:9 var
+R2261:2277 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2285:2285 Reflective.Reflective_Programs <> v:13 var
+R2282:2283 Reflective.Reflective_Programs <> xz:12 var
+R2279:2280 Reflective.Reflective_Programs <> yz:11 var
+R2233:2249 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2255:2256 Reflective.Reflective_Programs <> xz:12 var
+R2253:2253 Reflective.Reflective_Programs <> z:10 var
+R2251:2251 Reflective.Reflective_Programs <> x:8 var
+R2205:2221 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2227:2228 Reflective.Reflective_Programs <> yz:11 var
+R2225:2225 Reflective.Reflective_Programs <> z:10 var
+R2223:2223 Reflective.Reflective_Programs <> y:9 var
+binder 2360:2360 <> w:14
+binder 2362:2362 <> x:15
+binder 2364:2364 <> y:16
+binder 2366:2366 <> z:17
+binder 2368:2369 <> zw:18
+binder 2371:2371 <> v:19
+R2398:2401 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2426:2466 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2467:2483 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2511:2511 Reflective.Reflective_Programs <> v:19 var
+R2509:2509 Reflective.Reflective_Programs <> z:17 var
+R2504:2505 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2489:2492 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2503:2503 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2486:2488 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2500:2501 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2496:2498 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2493:2495 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R2499:2499 Reflective.Reflective_Programs <> w:14 var
+R2502:2502 Reflective.Reflective_Programs <> x:15 var
+R2506:2506 Reflective.Reflective_Programs <> y:16 var
+R2402:2418 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2425:2425 Reflective.Reflective_Programs <> v:19 var
+R2423:2423 Reflective.Reflective_Programs <> x:15 var
+R2420:2421 Reflective.Reflective_Programs <> zw:18 var
+R2374:2390 Reflective.Reflective_Programs <> branch_first_eval:1 ind
+R2396:2397 Reflective.Reflective_Programs <> zw:18 var
+R2394:2394 Reflective.Reflective_Programs <> w:14 var
+R2392:2392 Reflective.Reflective_Programs <> z:17 var
+R2548:2564 Reflective.Reflective_Programs <> branch_first_eval ind
+prf 2587:2611 <> branch_first_eval_program
+binder 2624:2624 <> M:20
+binder 2626:2626 <> N:21
+binder 2628:2628 <> P:22
+R2654:2657 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2667:2670 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2680:2683 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2684:2690 Reflective.Tree_Calculus <> program ind
+R2692:2692 Reflective.Reflective_Programs <> P:22 var
+R2671:2677 Reflective.Tree_Calculus <> program ind
+R2679:2679 Reflective.Reflective_Programs <> N:21 var
+R2658:2664 Reflective.Tree_Calculus <> program ind
+R2666:2666 Reflective.Reflective_Programs <> M:20 var
+R2631:2647 Reflective.Reflective_Programs <> branch_first_eval ind
+R2653:2653 Reflective.Reflective_Programs <> P:22 var
+R2651:2651 Reflective.Reflective_Programs <> N:21 var
+R2649:2649 Reflective.Reflective_Programs <> M:20 var
+R2747:2753 Reflective.Tree_Calculus <> program ind
+R2747:2753 Reflective.Tree_Calculus <> program ind
+R2747:2753 Reflective.Tree_Calculus <> program ind
+R2747:2753 Reflective.Tree_Calculus <> program ind
+R2747:2753 Reflective.Tree_Calculus <> program ind
+prf 2785:2813 <> branch_first_eval_program_red
+binder 2825:2825 <> M:23
+binder 2827:2827 <> N:24
+R2844:2847 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2848:2864 Reflective.Reflective_Programs <> branch_first_eval ind
+R2872:2873 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2871:2871 Reflective.Reflective_Programs <> M:23 var
+R2874:2874 Reflective.Reflective_Programs <> N:24 var
+R2868:2868 Reflective.Reflective_Programs <> N:24 var
+R2866:2866 Reflective.Reflective_Programs <> M:23 var
+R2830:2836 Reflective.Tree_Calculus <> program ind
+R2840:2841 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2839:2839 Reflective.Reflective_Programs <> M:23 var
+R2842:2842 Reflective.Reflective_Programs <> N:24 var
+R2904:2910 Reflective.Tree_Calculus <> program ind
+def 2951:2952 <> Db
+binder 2954:2954 <> x:25
+R2981:2984 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2990:2990 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2960:2963 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2980:2980 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2959:2959 Reflective.Tree_Calculus <> D def
+R2975:2977 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2965:2968 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2974:2974 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2964:2964 Reflective.Tree_Calculus <> D def
+R2970:2972 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2969:2969 Reflective.Tree_Calculus <> K def
+R2973:2973 Reflective.Reflective_Programs <> x:25 var
+R2978:2979 Reflective.Tree_Calculus <> Id def
+R2986:2988 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R2985:2985 Reflective.Tree_Calculus <> K def
+R2989:2989 Reflective.Tree_Calculus <> D def
+def 3006:3015 <> bfforkleaf
+R3032:3057 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R3039:3042 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3056:3056 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3038:3038 Reflective.Tree_Calculus <> K def
+R3044:3047 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3055:3055 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3043:3043 Reflective.Tree_Calculus <> K def
+R3048:3050 Reflective.Tree_Calculus <> Ref constr
+def 3072:3081 <> bfforkfork
+R3105:3311 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R3118:3310 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R3135:3150 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3302:3309 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3134:3134 Reflective.Tree_Calculus <> K def
+R3256:3276 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3301:3301 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3152:3172 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3235:3255 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3151:3151 Reflective.Tree_Calculus <> D def
+R3176:3201 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3234:3234 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3173:3173 Reflective.Tree_Calculus <> d def
+R3175:3175 Reflective.Tree_Calculus <> K def
+R3226:3229 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3233:3233 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3203:3206 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3225:3225 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3202:3202 Reflective.Tree_Calculus <> D def
+R3208:3211 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3224:3224 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3207:3207 Reflective.Tree_Calculus <> D def
+R3213:3215 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3212:3212 Reflective.Tree_Calculus <> K def
+R3216:3218 Reflective.Tree_Calculus <> Ref constr
+R3231:3231 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3230:3230 Reflective.Tree_Calculus <> K def
+R3232:3232 Reflective.Tree_Calculus <> D def
+R3278:3281 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3300:3300 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3277:3277 Reflective.Tree_Calculus <> K def
+R3283:3286 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3299:3299 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3282:3282 Reflective.Tree_Calculus <> D def
+R3288:3290 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3287:3287 Reflective.Tree_Calculus <> K def
+R3291:3293 Reflective.Tree_Calculus <> Ref constr
+def 3328:3337 <> bfforkstem
+binder 3339:3339 <> e:26
+R3364:3373 Reflective.Extensional_Programs <> substitute def
+R3557:3557 Reflective.Reflective_Programs <> e:26 var
+R3382:3544 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R3398:3543 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R3459:3477 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3535:3542 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3418:3421 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3458:3458 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3417:3417 Reflective.Tree_Calculus <> D def
+R3440:3443 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3457:3457 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3422:3422 Reflective.Tree_Calculus <> d def
+R3426:3427 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3438:3438 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3425:3425 Reflective.Tree_Calculus <> K def
+R3429:3430 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3428:3428 Reflective.Tree_Calculus <> K def
+R3431:3433 Reflective.Tree_Calculus <> Ref constr
+R3444:3445 Reflective.Reflective_Programs <> Db def
+R3448:3450 Reflective.Tree_Calculus <> Ref constr
+R3505:3528 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3534:3534 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3479:3482 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3504:3504 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3478:3478 Reflective.Tree_Calculus <> D def
+R3486:3489 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3503:3503 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3483:3483 Reflective.Tree_Calculus <> d def
+R3485:3485 Reflective.Tree_Calculus <> K def
+R3490:3491 Reflective.Reflective_Programs <> Db def
+R3494:3496 Reflective.Tree_Calculus <> Ref constr
+R3530:3532 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3529:3529 Reflective.Tree_Calculus <> K def
+R3533:3533 Reflective.Tree_Calculus <> D def
+def 3651:3656 <> onFork
+binder 3658:3659 <> tr:27
+R3682:3691 Reflective.Extensional_Programs <> substitute def
+R3869:3870 Reflective.Reflective_Programs <> tr:27 var
+R3700:3851 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R3805:3820 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3843:3843 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3752:3767 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3804:3804 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3718:3733 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3751:3751 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3715:3717 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R3741:3743 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3734:3740 Reflective.Intensional_Programs <> isFork2 def
+R3744:3746 Reflective.Tree_Calculus <> Ref constr
+R3789:3791 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3783:3785 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3771:3774 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3782:3782 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3768:3770 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R3775:3777 Reflective.Tree_Calculus <> Ref constr
+R3786:3788 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R3792:3794 Reflective.Tree_Calculus <> Ref constr
+R3822:3825 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3842:3842 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3821:3821 Reflective.Tree_Calculus <> K def
+R3827:3830 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3841:3841 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3826:3826 Reflective.Tree_Calculus <> K def
+R3832:3833 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3831:3831 Reflective.Tree_Calculus <> K def
+R3834:3836 Reflective.Tree_Calculus <> Ref constr
+prf 3880:3890 <> onFork_leaf
+binder 3900:3901 <> tr:28
+R3920:3922 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R3913:3915 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3904:3909 Reflective.Reflective_Programs <> onFork def
+R3911:3912 Reflective.Reflective_Programs <> tr:28 var
+R3916:3919 Reflective.Tree_Calculus <> Node constr
+R3924:3925 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3923:3923 Reflective.Tree_Calculus <> K def
+R3926:3929 Reflective.Tree_Calculus <> Node constr
+prf 3959:3969 <> onFork_stem
+binder 3980:3981 <> tr:29
+binder 3983:3983 <> x:30
+R4008:4010 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R3995:3998 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4007:4007 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3986:3991 Reflective.Reflective_Programs <> onFork def
+R3993:3994 Reflective.Reflective_Programs <> tr:29 var
+R4003:4005 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R3999:4002 Reflective.Tree_Calculus <> Node constr
+R4006:4006 Reflective.Reflective_Programs <> x:30 var
+R4012:4015 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4024:4024 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4011:4011 Reflective.Tree_Calculus <> K def
+R4020:4022 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4016:4019 Reflective.Tree_Calculus <> Node constr
+R4023:4023 Reflective.Reflective_Programs <> x:30 var
+prf 4054:4064 <> onFork_fork
+binder 4075:4076 <> tr:31
+binder 4078:4078 <> x:32
+binder 4080:4080 <> y:33
+R4109:4111 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4092:4095 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4108:4108 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4083:4088 Reflective.Reflective_Programs <> onFork def
+R4090:4091 Reflective.Reflective_Programs <> tr:31 var
+R4104:4106 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4100:4102 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4096:4099 Reflective.Tree_Calculus <> Node constr
+R4103:4103 Reflective.Reflective_Programs <> x:32 var
+R4107:4107 Reflective.Reflective_Programs <> y:33 var
+R4118:4120 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4114:4116 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4112:4113 Reflective.Reflective_Programs <> tr:31 var
+R4117:4117 Reflective.Reflective_Programs <> x:32 var
+R4121:4121 Reflective.Reflective_Programs <> y:33 var
+def 4161:4162 <> bf
+R4168:4170 Reflective.Extensional_Programs <> Y2s def
+R4173:4178 Reflective.Reflective_Programs <> onFork def
+R4181:4186 Reflective.Intensional_Programs <> triage def
+R4218:4227 Reflective.Reflective_Programs <> bfforkfork def
+R4200:4209 Reflective.Reflective_Programs <> bfforkstem def
+R4211:4215 Reflective.Intensional_Programs <> eager def
+R4188:4197 Reflective.Reflective_Programs <> bfforkleaf def
+prf 4242:4251 <> program_bf
+R4255:4261 Reflective.Tree_Calculus <> program ind
+R4263:4264 Reflective.Reflective_Programs <> bf def
+prf 4338:4344 <> bf_leaf
+R4355:4356 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4349:4351 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4347:4348 Reflective.Reflective_Programs <> bf def
+R4352:4354 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4357:4359 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+prf 4393:4399 <> bf_stem
+binder 4409:4409 <> x:34
+R4426:4428 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4414:4417 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4425:4425 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4412:4413 Reflective.Reflective_Programs <> bf def
+R4421:4423 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4418:4420 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4424:4424 Reflective.Reflective_Programs <> x:34 var
+R4432:4434 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4429:4431 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4435:4435 Reflective.Reflective_Programs <> x:34 var
+prf 4468:4474 <> bf_fork
+binder 4484:4484 <> x:35
+binder 4486:4486 <> y:36
+R4507:4509 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4491:4494 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4506:4506 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4489:4490 Reflective.Reflective_Programs <> bf def
+R4502:4504 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4498:4500 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4495:4497 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4501:4501 Reflective.Reflective_Programs <> x:35 var
+R4505:4505 Reflective.Reflective_Programs <> y:36 var
+R4567:4569 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4563:4565 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4510:4510 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4558:4561 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4511:4516 Reflective.Intensional_Programs <> triage def
+R4548:4557 Reflective.Reflective_Programs <> bfforkfork def
+R4530:4539 Reflective.Reflective_Programs <> bfforkstem def
+R4541:4545 Reflective.Intensional_Programs <> eager def
+R4518:4527 Reflective.Reflective_Programs <> bfforkleaf def
+R4562:4562 Reflective.Reflective_Programs <> x:35 var
+R4566:4566 Reflective.Reflective_Programs <> y:36 var
+R4570:4571 Reflective.Reflective_Programs <> bf def
+prf 4604:4615 <> bf_fork_leaf
+binder 4626:4626 <> y:37
+binder 4628:4628 <> z:38
+R4651:4653 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4647:4649 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4633:4636 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4646:4646 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4631:4632 Reflective.Reflective_Programs <> bf def
+R4644:4644 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4640:4640 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4637:4639 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4641:4643 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4645:4645 Reflective.Reflective_Programs <> y:37 var
+R4650:4650 Reflective.Reflective_Programs <> z:38 var
+R4654:4654 Reflective.Reflective_Programs <> y:37 var
+prf 4688:4699 <> bf_fork_stem
+binder 4711:4711 <> x:39
+binder 4713:4713 <> y:40
+binder 4715:4715 <> z:41
+R4743:4745 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4739:4741 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4720:4723 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4738:4738 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4718:4719 Reflective.Reflective_Programs <> bf def
+R4735:4736 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4727:4728 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4734:4734 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4724:4726 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4732:4732 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4729:4731 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4733:4733 Reflective.Reflective_Programs <> x:39 var
+R4737:4737 Reflective.Reflective_Programs <> y:40 var
+R4742:4742 Reflective.Reflective_Programs <> z:41 var
+R4766:4769 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4787:4787 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4751:4754 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4765:4765 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4746:4750 Reflective.Intensional_Programs <> eager def
+R4761:4763 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4757:4759 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4755:4756 Reflective.Reflective_Programs <> bf def
+R4760:4760 Reflective.Reflective_Programs <> x:39 var
+R4764:4764 Reflective.Reflective_Programs <> z:41 var
+R4772:4775 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4786:4786 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4770:4771 Reflective.Reflective_Programs <> bf def
+R4782:4784 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4778:4780 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4776:4777 Reflective.Reflective_Programs <> bf def
+R4781:4781 Reflective.Reflective_Programs <> y:40 var
+R4785:4785 Reflective.Reflective_Programs <> z:41 var
+R4817:4823 Reflective.Reflective_Programs <> bf_fork thm
+R4834:4844 Reflective.Intensional_Programs <> triage_stem thm
+R4854:4863 Reflective.Reflective_Programs <> bfforkstem def
+R4866:4867 Reflective.Reflective_Programs <> Db def
+R4870:4874 Reflective.Intensional_Programs <> eager def
+R4904:4907 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R4911:4914 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R4915:4917 Coq.Init.Datatypes <> nil constr
+R4817:4823 Reflective.Reflective_Programs <> bf_fork thm
+R4817:4823 Reflective.Reflective_Programs <> bf_fork thm
+R4834:4844 Reflective.Intensional_Programs <> triage_stem thm
+R4834:4844 Reflective.Intensional_Programs <> triage_stem thm
+R4904:4907 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R4911:4914 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R4915:4917 Coq.Init.Datatypes <> nil constr
+prf 4941:4952 <> bf_fork_fork
+binder 4964:4964 <> w:42
+binder 4966:4966 <> x:43
+binder 4968:4968 <> y:44
+binder 4970:4970 <> z:45
+R5000:5002 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R4996:4998 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4975:4978 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4995:4995 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4973:4974 Reflective.Reflective_Programs <> bf def
+R4992:4993 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4982:4983 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4991:4991 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4979:4981 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4989:4989 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4987:4987 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R4984:4986 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R4988:4988 Reflective.Reflective_Programs <> w:42 var
+R4990:4990 Reflective.Reflective_Programs <> x:43 var
+R4994:4994 Reflective.Reflective_Programs <> y:44 var
+R4999:4999 Reflective.Reflective_Programs <> z:45 var
+R5020:5021 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5005:5008 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5019:5019 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5003:5004 Reflective.Reflective_Programs <> bf def
+R5015:5017 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5011:5013 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5009:5010 Reflective.Reflective_Programs <> bf def
+R5014:5014 Reflective.Reflective_Programs <> z:45 var
+R5018:5018 Reflective.Reflective_Programs <> w:42 var
+R5022:5022 Reflective.Reflective_Programs <> x:43 var
+R5050:5056 Reflective.Reflective_Programs <> bf_fork thm
+R5067:5077 Reflective.Intensional_Programs <> triage_fork thm
+R5087:5096 Reflective.Reflective_Programs <> bfforkfork def
+R5099:5099 Reflective.Tree_Calculus <> d def
+R5120:5124 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R5129:5133 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R5134:5136 Coq.Init.Datatypes <> nil constr
+R5050:5056 Reflective.Reflective_Programs <> bf_fork thm
+R5050:5056 Reflective.Reflective_Programs <> bf_fork thm
+R5067:5077 Reflective.Intensional_Programs <> triage_fork thm
+R5067:5077 Reflective.Intensional_Programs <> triage_fork thm
+R5120:5124 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R5129:5133 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R5134:5136 Coq.Init.Datatypes <> nil constr
+prf 5196:5218 <> branch_first_eval_to_bf
+binder 5230:5230 <> M:46
+binder 5232:5232 <> N:47
+binder 5234:5234 <> P:48
+R5246:5249 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5259:5262 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5286:5289 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5296:5298 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R5294:5294 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5292:5292 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5290:5291 Reflective.Reflective_Programs <> bf def
+R5293:5293 Reflective.Reflective_Programs <> M:46 var
+R5295:5295 Reflective.Reflective_Programs <> N:47 var
+R5299:5299 Reflective.Reflective_Programs <> P:48 var
+R5263:5279 Reflective.Reflective_Programs <> branch_first_eval ind
+R5285:5285 Reflective.Reflective_Programs <> P:48 var
+R5283:5283 Reflective.Reflective_Programs <> N:47 var
+R5281:5281 Reflective.Reflective_Programs <> M:46 var
+R5250:5256 Reflective.Tree_Calculus <> program ind
+R5258:5258 Reflective.Reflective_Programs <> N:47 var
+R5237:5243 Reflective.Tree_Calculus <> program ind
+R5245:5245 Reflective.Reflective_Programs <> M:46 var
+R5408:5414 Reflective.Reflective_Programs <> bf_leaf thm
+R5429:5435 Reflective.Reflective_Programs <> bf_stem thm
+R5450:5461 Reflective.Reflective_Programs <> bf_fork_leaf thm
+R5476:5487 Reflective.Reflective_Programs <> bf_fork_stem thm
+R5546:5564 Reflective.Intensional_Programs <> eager_of_factorable thm
+R5594:5616 Reflective.Intensional_Programs <> programs_are_factorable thm
+R5632:5656 Reflective.Reflective_Programs <> branch_first_eval_program thm
+R5671:5682 Reflective.Reflective_Programs <> bf_fork_fork thm
+R5739:5763 Reflective.Reflective_Programs <> branch_first_eval_program thm
+R5378:5384 Reflective.Tree_Calculus <> program ind
+R5378:5384 Reflective.Tree_Calculus <> program ind
+R5378:5384 Reflective.Tree_Calculus <> program ind
+R5378:5384 Reflective.Tree_Calculus <> program ind
+R5378:5384 Reflective.Tree_Calculus <> program ind
+R5408:5414 Reflective.Reflective_Programs <> bf_leaf thm
+R5408:5414 Reflective.Reflective_Programs <> bf_leaf thm
+R5429:5435 Reflective.Reflective_Programs <> bf_stem thm
+R5429:5435 Reflective.Reflective_Programs <> bf_stem thm
+R5450:5461 Reflective.Reflective_Programs <> bf_fork_leaf thm
+R5450:5461 Reflective.Reflective_Programs <> bf_fork_leaf thm
+R5476:5487 Reflective.Reflective_Programs <> bf_fork_stem thm
+R5476:5487 Reflective.Reflective_Programs <> bf_fork_stem thm
+R5546:5564 Reflective.Intensional_Programs <> eager_of_factorable thm
+R5546:5564 Reflective.Intensional_Programs <> eager_of_factorable thm
+R5546:5564 Reflective.Intensional_Programs <> eager_of_factorable thm
+R5594:5616 Reflective.Intensional_Programs <> programs_are_factorable thm
+R5632:5656 Reflective.Reflective_Programs <> branch_first_eval_program thm
+R5632:5656 Reflective.Reflective_Programs <> branch_first_eval_program thm
+R5632:5656 Reflective.Reflective_Programs <> branch_first_eval_program thm
+R5671:5682 Reflective.Reflective_Programs <> bf_fork_fork thm
+R5671:5682 Reflective.Reflective_Programs <> bf_fork_fork thm
+R5739:5763 Reflective.Reflective_Programs <> branch_first_eval_program thm
+prf 5790:5800 <> bf_identity
+binder 5810:5810 <> z:49
+R5824:5826 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R5820:5822 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5815:5817 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R5813:5814 Reflective.Reflective_Programs <> bf def
+R5818:5819 Reflective.Tree_Calculus <> Id def
+R5823:5823 Reflective.Reflective_Programs <> z:49 var
+R5827:5827 Reflective.Reflective_Programs <> z:49 var
+R5866:5877 Reflective.Reflective_Programs <> bf_fork_stem thm
+R5888:5894 Reflective.Reflective_Programs <> bf_leaf thm
+R5905:5911 Reflective.Reflective_Programs <> bf_stem thm
+R5928:5946 Reflective.Intensional_Programs <> eager_of_factorable thm
+R5965:5976 Reflective.Reflective_Programs <> bf_fork_leaf thm
+R5866:5877 Reflective.Reflective_Programs <> bf_fork_stem thm
+R5866:5877 Reflective.Reflective_Programs <> bf_fork_stem thm
+R5888:5894 Reflective.Reflective_Programs <> bf_leaf thm
+R5888:5894 Reflective.Reflective_Programs <> bf_leaf thm
+R5905:5911 Reflective.Reflective_Programs <> bf_stem thm
+R5905:5911 Reflective.Reflective_Programs <> bf_stem thm
+R5928:5946 Reflective.Intensional_Programs <> eager_of_factorable thm
+R5928:5946 Reflective.Intensional_Programs <> eager_of_factorable thm
+R5928:5946 Reflective.Intensional_Programs <> eager_of_factorable thm
+R5965:5976 Reflective.Reflective_Programs <> bf_fork_leaf thm
+R5965:5976 Reflective.Reflective_Programs <> bf_fork_leaf thm
+def 6025:6034 <> meta_quote
+binder 6036:6036 <> M:50
+R6048:6048 Reflective.Reflective_Programs <> M:50 var
+R6060:6061 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6089:6092 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6106:6106 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6071:6074 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6088:6088 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6068:6070 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R6075:6084 Reflective.Reflective_Programs <> meta_quote:51 def
+R6093:6102 Reflective.Reflective_Programs <> meta_quote:51 def
+R6116:6116 Reflective.Reflective_Programs <> M:50 var
+prf 6131:6163 <> meta_quote_preserves_combinations
+binder 6175:6175 <> M:53
+R6191:6194 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6195:6205 Reflective.Extensional_Programs <> combination ind
+R6208:6217 Reflective.Reflective_Programs <> meta_quote def
+R6219:6219 Reflective.Reflective_Programs <> M:53 var
+R6178:6188 Reflective.Extensional_Programs <> combination ind
+R6190:6190 Reflective.Reflective_Programs <> M:53 var
+def 6306:6310 <> quote
+R6317:6318 Reflective.Extensional_Programs <> Y2 def
+R6325:6836 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R6338:6835 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R6548:6564 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6834:6834 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6385:6401 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6531:6547 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6360:6376 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6384:6384 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6354:6359 Reflective.Tree_Calculus <> isStem def
+R6377:6379 Reflective.Tree_Calculus <> Ref constr
+R6467:6488 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6530:6530 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6443:6463 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6405:6426 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6442:6442 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6402:6404 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R6427:6427 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6435:6438 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6428:6430 Reflective.Tree_Calculus <> Ref constr
+R6439:6441 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R6464:6466 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R6489:6529 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R6497:6499 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6528:6528 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6496:6496 Reflective.Tree_Calculus <> K def
+R6501:6504 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6527:6527 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6500:6500 Reflective.Tree_Calculus <> K def
+R6505:6505 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6513:6517 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6526:6526 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6506:6508 Reflective.Tree_Calculus <> Ref constr
+R6518:6520 Reflective.Tree_Calculus <> Ref constr
+R6622:6643 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6833:6833 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6598:6618 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6568:6589 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6597:6597 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6565:6567 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R6590:6592 Reflective.Tree_Calculus <> Ref constr
+R6619:6621 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R6644:6832 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R6674:6831 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R6770:6802 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6825:6825 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6710:6742 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6769:6769 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6707:6709 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R6744:6745 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6768:6768 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6743:6743 Reflective.Tree_Calculus <> K def
+R6746:6746 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6754:6758 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6767:6767 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6747:6749 Reflective.Tree_Calculus <> Ref constr
+R6759:6761 Reflective.Tree_Calculus <> Ref constr
+R6803:6803 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6811:6815 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6824:6824 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R6804:6806 Reflective.Tree_Calculus <> Ref constr
+R6816:6818 Reflective.Tree_Calculus <> Ref constr
+R6866:6870 Reflective.Reflective_Programs <> quote def
+R6881:6886 Reflective.Extensional_Programs <> Y2_red def
+R6894:6898 Reflective.Reflective_Programs <> quote def
+R6915:6918 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6923:6926 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6930:6933 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6937:6940 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R6941:6943 Coq.Init.Datatypes <> nil constr
+prf 6954:6962 <> quote_red
+binder 6972:6972 <> M:54
+R6984:6987 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6999:7001 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6988:6990 Reflective.Tree_Calculus <> App constr
+R6998:6998 Reflective.Reflective_Programs <> M:54 var
+R6992:6996 Reflective.Reflective_Programs <> quote def
+R7002:7011 Reflective.Reflective_Programs <> meta_quote def
+R7013:7013 Reflective.Reflective_Programs <> M:54 var
+R6975:6981 Reflective.Tree_Calculus <> program ind
+R6983:6983 Reflective.Reflective_Programs <> M:54 var
+R7121:7121 Reflective.Tree_Calculus <> d def
+R7200:7200 Reflective.Tree_Calculus <> d def
+ind 7281:7289 <> root_eval
+constr 7318:7324 <> sh_leaf
+constr 7348:7359 <> sh_fork_leaf
+constr 7430:7441 <> sh_fork_stem
+constr 7548:7569 <> sh_fork_fork_fork_leaf
+constr 7692:7713 <> sh_fork_fork_fork_stem
+constr 7883:7904 <> sh_fork_fork_fork_fork
+R7296:7299 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7304:7307 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7300:7303 Reflective.Tree_Calculus <> Tree ind
+R7292:7295 Reflective.Tree_Calculus <> Tree ind
+R7328:7336 Reflective.Reflective_Programs <> root_eval:55 ind
+R7342:7344 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7338:7340 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+binder 7370:7370 <> f:57
+binder 7372:7372 <> z:58
+R7390:7393 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7394:7402 Reflective.Reflective_Programs <> root_eval:55 ind
+R7422:7424 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7419:7421 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7425:7425 Reflective.Reflective_Programs <> z:58 var
+R7412:7414 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7408:7410 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7405:7407 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7411:7411 Reflective.Reflective_Programs <> f:57 var
+R7415:7415 Reflective.Reflective_Programs <> z:58 var
+R7375:7383 Reflective.Reflective_Programs <> root_eval:55 ind
+R7387:7389 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7385:7385 Reflective.Reflective_Programs <> f:57 var
+binder 7451:7451 <> f:59
+binder 7453:7453 <> z:60
+binder 7455:7455 <> t:61
+R7479:7508 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7509:7517 Reflective.Reflective_Programs <> root_eval:55 ind
+R7540:7542 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7536:7538 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7533:7535 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7539:7539 Reflective.Reflective_Programs <> t:61 var
+R7543:7543 Reflective.Reflective_Programs <> z:60 var
+R7526:7528 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7522:7524 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7519:7521 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7525:7525 Reflective.Reflective_Programs <> f:59 var
+R7529:7529 Reflective.Reflective_Programs <> z:60 var
+R7458:7466 Reflective.Reflective_Programs <> root_eval:55 ind
+R7474:7476 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7471:7473 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7477:7477 Reflective.Reflective_Programs <> t:61 var
+R7468:7468 Reflective.Reflective_Programs <> f:59 var
+binder 7580:7580 <> f:62
+binder 7582:7582 <> z:63
+binder 7584:7584 <> t:64
+binder 7586:7586 <> y:65
+binder 7588:7588 <> v:66
+R7620:7623 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7639:7642 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7656:7664 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7665:7673 Reflective.Reflective_Programs <> root_eval:55 ind
+R7688:7688 Reflective.Reflective_Programs <> v:66 var
+R7682:7684 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7678:7680 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7675:7677 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7681:7681 Reflective.Reflective_Programs <> f:62 var
+R7685:7685 Reflective.Reflective_Programs <> z:63 var
+R7643:7651 Reflective.Reflective_Programs <> root_eval:55 ind
+R7655:7655 Reflective.Reflective_Programs <> v:66 var
+R7653:7653 Reflective.Reflective_Programs <> y:65 var
+R7624:7632 Reflective.Reflective_Programs <> root_eval:55 ind
+R7636:7638 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7634:7634 Reflective.Reflective_Programs <> t:64 var
+R7595:7603 Reflective.Reflective_Programs <> root_eval:55 ind
+R7615:7617 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7611:7613 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7608:7610 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7614:7614 Reflective.Reflective_Programs <> t:64 var
+R7618:7618 Reflective.Reflective_Programs <> y:65 var
+R7605:7605 Reflective.Reflective_Programs <> f:62 var
+binder 7723:7723 <> f:67
+binder 7725:7725 <> z:68
+binder 7727:7727 <> t:69
+binder 7729:7729 <> y:70
+binder 7731:7731 <> x:71
+binder 7733:7733 <> v:72
+R7765:7768 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7790:7797 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7847:7855 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7856:7864 Reflective.Reflective_Programs <> root_eval:55 ind
+R7879:7879 Reflective.Reflective_Programs <> v:72 var
+R7873:7875 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7869:7871 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7866:7868 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7872:7872 Reflective.Reflective_Programs <> f:67 var
+R7876:7876 Reflective.Reflective_Programs <> z:68 var
+R7798:7806 Reflective.Reflective_Programs <> root_eval:55 ind
+R7846:7846 Reflective.Reflective_Programs <> v:72 var
+R7828:7831 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7843:7843 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7812:7815 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7827:7827 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7809:7811 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7823:7825 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7819:7821 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7816:7818 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7822:7822 Reflective.Reflective_Programs <> y:70 var
+R7826:7826 Reflective.Reflective_Programs <> z:68 var
+R7839:7841 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7835:7837 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7832:7834 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7838:7838 Reflective.Reflective_Programs <> x:71 var
+R7842:7842 Reflective.Reflective_Programs <> z:68 var
+R7769:7777 Reflective.Reflective_Programs <> root_eval:55 ind
+R7785:7787 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7782:7784 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7788:7788 Reflective.Reflective_Programs <> x:71 var
+R7779:7779 Reflective.Reflective_Programs <> t:69 var
+R7740:7748 Reflective.Reflective_Programs <> root_eval:55 ind
+R7760:7762 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7756:7758 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7753:7755 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7759:7759 Reflective.Reflective_Programs <> t:69 var
+R7763:7763 Reflective.Reflective_Programs <> y:70 var
+R7750:7750 Reflective.Reflective_Programs <> f:67 var
+binder 7914:7914 <> f:73
+binder 7916:7916 <> z:74
+binder 7918:7918 <> t:75
+binder 7920:7920 <> y:76
+binder 7922:7922 <> w:77
+binder 7924:7924 <> x:78
+binder 7926:7926 <> v:79
+R7959:7962 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7988:7995 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8033:8041 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8042:8050 Reflective.Reflective_Programs <> root_eval:55 ind
+R8065:8065 Reflective.Reflective_Programs <> v:79 var
+R8059:8061 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8055:8057 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8052:8054 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8058:8058 Reflective.Reflective_Programs <> f:73 var
+R8062:8062 Reflective.Reflective_Programs <> z:74 var
+R7996:8004 Reflective.Reflective_Programs <> root_eval:55 ind
+R8032:8032 Reflective.Reflective_Programs <> v:79 var
+R8026:8028 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8010:8013 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8025:8025 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8007:8009 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8021:8023 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8017:8019 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8014:8016 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8020:8020 Reflective.Reflective_Programs <> z:74 var
+R8024:8024 Reflective.Reflective_Programs <> w:77 var
+R8029:8029 Reflective.Reflective_Programs <> x:78 var
+R7963:7971 Reflective.Reflective_Programs <> root_eval:55 ind
+R7983:7985 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7979:7981 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7976:7978 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7982:7982 Reflective.Reflective_Programs <> w:77 var
+R7986:7986 Reflective.Reflective_Programs <> x:78 var
+R7973:7973 Reflective.Reflective_Programs <> t:75 var
+R7934:7942 Reflective.Reflective_Programs <> root_eval:55 ind
+R7954:7956 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7950:7952 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R7947:7949 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R7953:7953 Reflective.Reflective_Programs <> t:75 var
+R7957:7957 Reflective.Reflective_Programs <> y:76 var
+R7944:7944 Reflective.Reflective_Programs <> f:73 var
+R8102:8110 Reflective.Reflective_Programs <> root_eval ind
+def 8166:8170 <> rootl
+R8175:8212 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8181:8211 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8187:8210 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8200:8202 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8193:8195 Reflective.Tree_Calculus <> Ref constr
+R8203:8205 Reflective.Tree_Calculus <> Ref constr
+def 8227:8231 <> roots
+R8254:8352 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8260:8351 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8266:8350 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8272:8349 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8285:8288 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8348:8348 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8278:8280 Reflective.Tree_Calculus <> Ref constr
+R8320:8323 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8347:8347 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8292:8295 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8319:8319 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8289:8291 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8309:8311 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8299:8301 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8296:8298 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8302:8304 Reflective.Tree_Calculus <> Ref constr
+R8312:8314 Reflective.Tree_Calculus <> Ref constr
+R8337:8339 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8327:8329 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8324:8326 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8330:8332 Reflective.Tree_Calculus <> Ref constr
+R8340:8342 Reflective.Tree_Calculus <> Ref constr
+def 8367:8371 <> rootf
+R8392:8478 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8397:8477 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8403:8476 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8409:8475 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8415:8474 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8428:8431 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8473:8473 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8421:8423 Reflective.Tree_Calculus <> Ref constr
+R8463:8465 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8435:8438 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8462:8462 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8432:8434 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8452:8454 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8442:8444 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8439:8441 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8445:8447 Reflective.Tree_Calculus <> Ref constr
+R8455:8457 Reflective.Tree_Calculus <> Ref constr
+R8466:8468 Reflective.Tree_Calculus <> Ref constr
+def 8494:8498 <> root1
+R8519:8612 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8525:8611 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8531:8610 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8598:8601 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8609:8609 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8585:8588 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8597:8597 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8562:8565 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8584:8584 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8538:8543 Reflective.Intensional_Programs <> triage def
+R8557:8561 Reflective.Reflective_Programs <> rootf def
+R8551:8555 Reflective.Reflective_Programs <> roots def
+R8545:8549 Reflective.Reflective_Programs <> rootl def
+R8574:8576 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8566:8568 Reflective.Tree_Calculus <> Ref constr
+R8577:8579 Reflective.Tree_Calculus <> Ref constr
+R8589:8591 Reflective.Tree_Calculus <> Ref constr
+R8602:8604 Reflective.Tree_Calculus <> Ref constr
+def 8627:8630 <> root
+R8637:8638 Reflective.Extensional_Programs <> Y2 def
+R8641:8730 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8646:8729 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8671:8674 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8728:8728 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8665:8667 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8655:8657 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8652:8654 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8658:8660 Reflective.Tree_Calculus <> Ref constr
+R8668:8670 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R8675:8727 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R8715:8718 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8726:8726 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8693:8696 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8714:8714 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8681:8686 Reflective.Reflective_Programs <> onFork def
+R8688:8692 Reflective.Reflective_Programs <> root1 def
+R8704:8706 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R8697:8699 Reflective.Tree_Calculus <> Ref constr
+R8707:8709 Reflective.Tree_Calculus <> Ref constr
+R8719:8721 Reflective.Tree_Calculus <> Ref constr
+prf 8776:8787 <> root_program
+R8790:8796 Reflective.Tree_Calculus <> program ind
+R8798:8801 Reflective.Reflective_Programs <> root def
+prf 8836:8856 <> root_eval_combination
+binder 8868:8868 <> M:80
+binder 8870:8870 <> N:81
+R8886:8889 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8903:8906 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8907:8917 Reflective.Extensional_Programs <> combination ind
+R8919:8919 Reflective.Reflective_Programs <> N:81 var
+R8890:8900 Reflective.Extensional_Programs <> combination ind
+R8902:8902 Reflective.Reflective_Programs <> M:80 var
+R8873:8881 Reflective.Reflective_Programs <> root_eval ind
+R8885:8885 Reflective.Reflective_Programs <> N:81 var
+R8883:8883 Reflective.Reflective_Programs <> M:80 var
+R9030:9040 Reflective.Extensional_Programs <> combination ind
+R9050:9052 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9046:9048 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9043:9045 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R9120:9130 Reflective.Extensional_Programs <> combination ind
+R9137:9139 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9133:9136 Reflective.Tree_Calculus <> Node constr
+R9179:9189 Reflective.Extensional_Programs <> combination ind
+R9200:9202 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9196:9198 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9192:9195 Reflective.Tree_Calculus <> Node constr
+R9242:9252 Reflective.Extensional_Programs <> combination ind
+R9263:9265 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9259:9261 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9255:9258 Reflective.Tree_Calculus <> Node constr
+R8972:8982 Reflective.Extensional_Programs <> combination ind
+R8972:8982 Reflective.Extensional_Programs <> combination ind
+R8972:8982 Reflective.Extensional_Programs <> combination ind
+R8972:8982 Reflective.Extensional_Programs <> combination ind
+R8972:8982 Reflective.Extensional_Programs <> combination ind
+R8972:8982 Reflective.Extensional_Programs <> combination ind
+R9030:9040 Reflective.Extensional_Programs <> combination ind
+R9050:9052 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9046:9048 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9043:9045 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R9030:9040 Reflective.Extensional_Programs <> combination ind
+R9050:9052 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9046:9048 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9043:9045 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R9030:9040 Reflective.Extensional_Programs <> combination ind
+R9050:9052 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9046:9048 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9043:9045 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R9120:9130 Reflective.Extensional_Programs <> combination ind
+R9137:9139 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9133:9136 Reflective.Tree_Calculus <> Node constr
+R9179:9189 Reflective.Extensional_Programs <> combination ind
+R9200:9202 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9196:9198 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9192:9195 Reflective.Tree_Calculus <> Node constr
+R9242:9252 Reflective.Extensional_Programs <> combination ind
+R9263:9265 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9259:9261 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9255:9258 Reflective.Tree_Calculus <> Node constr
+prf 9343:9359 <> root_eval_to_root
+binder 9369:9369 <> M:82
+binder 9371:9371 <> P:83
+R9387:9390 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9399:9401 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R9395:9397 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9391:9394 Reflective.Reflective_Programs <> root def
+R9398:9398 Reflective.Reflective_Programs <> M:82 var
+R9402:9402 Reflective.Reflective_Programs <> P:83 var
+R9374:9382 Reflective.Reflective_Programs <> root_eval ind
+R9386:9386 Reflective.Reflective_Programs <> P:83 var
+R9384:9384 Reflective.Reflective_Programs <> M:82 var
+R9462:9465 Reflective.Reflective_Programs <> root def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9489:9492 Reflective.Reflective_Programs <> root def
+R9502:9507 Reflective.Reflective_Programs <> onFork def
+R9510:9510 Reflective.Tree_Calculus <> d def
+R9527:9530 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9534:9537 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9541:9544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9545:9547 Coq.Init.Datatypes <> nil constr
+R9632:9636 Reflective.Reflective_Programs <> root1 def
+R9668:9673 Reflective.Intensional_Programs <> triage def
+R9676:9680 Reflective.Reflective_Programs <> rootf def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9476:9481 Reflective.Extensional_Programs <> Y2_red def
+R9489:9492 Reflective.Reflective_Programs <> root def
+R9489:9492 Reflective.Reflective_Programs <> root def
+R9489:9492 Reflective.Reflective_Programs <> root def
+R9489:9492 Reflective.Reflective_Programs <> root def
+R9489:9492 Reflective.Reflective_Programs <> root def
+R9489:9492 Reflective.Reflective_Programs <> root def
+R9527:9530 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9534:9537 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9541:9544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9545:9547 Coq.Init.Datatypes <> nil constr
+R9527:9530 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9534:9537 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9541:9544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9545:9547 Coq.Init.Datatypes <> nil constr
+R9527:9530 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9534:9537 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9541:9544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9545:9547 Coq.Init.Datatypes <> nil constr
+R9527:9530 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9534:9537 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9541:9544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9545:9547 Coq.Init.Datatypes <> nil constr
+R9527:9530 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9534:9537 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9541:9544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9545:9547 Coq.Init.Datatypes <> nil constr
+R9527:9530 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9534:9537 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9541:9544 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R9545:9547 Coq.Init.Datatypes <> nil constr
+ind 9782:9788 <> rb_eval
+constr 9818:9825 <> rsh_leaf
+constr 9874:9880 <> rb_stem
+constr 9960:9966 <> rb_fork
+R9796:9799 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9804:9807 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9800:9803 Reflective.Tree_Calculus <> Tree ind
+R9792:9795 Reflective.Tree_Calculus <> Tree ind
+binder 9836:9836 <> x:86
+R9854:9857 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9858:9864 Reflective.Reflective_Programs <> rb_eval:84 ind
+R9868:9870 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R9866:9866 Reflective.Reflective_Programs <> x:86 var
+R9839:9847 Reflective.Reflective_Programs <> root_eval ind
+R9851:9853 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R9849:9849 Reflective.Reflective_Programs <> x:86 var
+binder 9891:9891 <> x:87
+binder 9893:9893 <> y:88
+binder 9895:9895 <> v:89
+R9919:9922 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9934:9937 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9938:9944 Reflective.Reflective_Programs <> rb_eval:84 ind
+R9952:9954 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9949:9951 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R9955:9955 Reflective.Reflective_Programs <> v:89 var
+R9946:9946 Reflective.Reflective_Programs <> x:87 var
+R9923:9929 Reflective.Reflective_Programs <> rb_eval:84 ind
+R9933:9933 Reflective.Reflective_Programs <> v:89 var
+R9931:9931 Reflective.Reflective_Programs <> y:88 var
+R9898:9906 Reflective.Reflective_Programs <> root_eval ind
+R9914:9916 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R9911:9913 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R9917:9917 Reflective.Reflective_Programs <> y:88 var
+R9908:9908 Reflective.Reflective_Programs <> x:87 var
+binder 9977:9977 <> x:90
+binder 9979:9979 <> y:91
+binder 9981:9981 <> z:92
+binder 9983:9983 <> v:93
+binder 9985:9985 <> w:94
+R10012:10015 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10027:10030 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10042:10081 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10082:10088 Reflective.Reflective_Programs <> rb_eval:84 ind
+R10100:10101 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10096:10098 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10093:10095 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10099:10099 Reflective.Reflective_Programs <> v:93 var
+R10102:10102 Reflective.Reflective_Programs <> w:94 var
+R10090:10090 Reflective.Reflective_Programs <> x:90 var
+R10031:10037 Reflective.Reflective_Programs <> rb_eval:84 ind
+R10041:10041 Reflective.Reflective_Programs <> w:94 var
+R10039:10039 Reflective.Reflective_Programs <> z:92 var
+R10016:10022 Reflective.Reflective_Programs <> rb_eval:84 ind
+R10026:10026 Reflective.Reflective_Programs <> v:93 var
+R10024:10024 Reflective.Reflective_Programs <> y:91 var
+R9988:9996 Reflective.Reflective_Programs <> root_eval ind
+R10008:10009 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10004:10006 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10001:10003 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10007:10007 Reflective.Reflective_Programs <> y:91 var
+R10010:10010 Reflective.Reflective_Programs <> z:92 var
+R9998:9998 Reflective.Reflective_Programs <> x:90 var
+def 10210:10211 <> rb
+R10218:10219 Reflective.Extensional_Programs <> Y2 def
+R10222:10463 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R10228:10462 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R10415:10438 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10455:10455 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10234:10239 Reflective.Intensional_Programs <> triage def
+R10345:10413 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R10351:10412 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R10386:10389 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10411:10411 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10360:10363 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10385:10385 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10357:10359 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10364:10364 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10372:10376 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10384:10384 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10365:10367 Reflective.Tree_Calculus <> Ref constr
+R10377:10379 Reflective.Tree_Calculus <> Ref constr
+R10390:10390 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10398:10402 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10410:10410 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10391:10393 Reflective.Tree_Calculus <> Ref constr
+R10403:10405 Reflective.Tree_Calculus <> Ref constr
+R10286:10321 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R10295:10298 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10320:10320 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10292:10294 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10299:10299 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10307:10311 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10319:10319 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10300:10302 Reflective.Tree_Calculus <> Ref constr
+R10312:10314 Reflective.Tree_Calculus <> Ref constr
+R10261:10263 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10443:10446 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10454:10454 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10439:10442 Reflective.Reflective_Programs <> root def
+R10447:10449 Reflective.Tree_Calculus <> Ref constr
+prf 10479:10496 <> rb_eval_implies_rb
+binder 10509:10509 <> M:95
+binder 10511:10511 <> P:96
+R10525:10528 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10542:10545 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10552:10554 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R10548:10550 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10546:10547 Reflective.Reflective_Programs <> rb def
+R10551:10551 Reflective.Reflective_Programs <> M:95 var
+R10555:10555 Reflective.Reflective_Programs <> P:96 var
+R10529:10539 Reflective.Extensional_Programs <> combination ind
+R10541:10541 Reflective.Reflective_Programs <> M:95 var
+R10514:10520 Reflective.Reflective_Programs <> rb_eval ind
+R10524:10524 Reflective.Reflective_Programs <> P:96 var
+R10522:10522 Reflective.Reflective_Programs <> M:95 var
+R10658:10660 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R10654:10656 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10650:10653 Reflective.Reflective_Programs <> root def
+R10661:10663 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10679:10695 Reflective.Reflective_Programs <> root_eval_to_root thm
+R10721:10723 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R10717:10719 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10713:10716 Reflective.Reflective_Programs <> root def
+R10727:10728 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10724:10726 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10745:10761 Reflective.Reflective_Programs <> root_eval_to_root thm
+R10789:10791 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R10785:10787 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10781:10784 Reflective.Reflective_Programs <> root def
+R10798:10798 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10795:10796 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10792:10794 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10812:10828 Reflective.Reflective_Programs <> root_eval_to_root thm
+R10854:10855 Reflective.Reflective_Programs <> rb def
+R10866:10871 Reflective.Extensional_Programs <> Y2_red def
+R10879:10880 Reflective.Reflective_Programs <> rb def
+R10892:10897 Reflective.Intensional_Programs <> triage def
+R10913:10916 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10920:10923 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10927:10930 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10934:10937 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10938:10940 Coq.Init.Datatypes <> nil constr
+R10989:10999 Reflective.Extensional_Programs <> combination ind
+R11005:11007 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11002:11004 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R11023:11043 Reflective.Reflective_Programs <> root_eval_combination thm
+R11109:11119 Reflective.Extensional_Programs <> combination ind
+R11129:11129 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11125:11127 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11122:11124 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R11145:11165 Reflective.Reflective_Programs <> root_eval_combination thm
+R10658:10660 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R10654:10656 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10650:10653 Reflective.Reflective_Programs <> root def
+R10661:10663 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10679:10695 Reflective.Reflective_Programs <> root_eval_to_root thm
+R10721:10723 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R10717:10719 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10713:10716 Reflective.Reflective_Programs <> root def
+R10727:10728 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10724:10726 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10745:10761 Reflective.Reflective_Programs <> root_eval_to_root thm
+R10789:10791 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R10785:10787 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10781:10784 Reflective.Reflective_Programs <> root def
+R10798:10798 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10795:10796 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R10792:10794 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R10812:10828 Reflective.Reflective_Programs <> root_eval_to_root thm
+R10866:10871 Reflective.Extensional_Programs <> Y2_red def
+R10866:10871 Reflective.Extensional_Programs <> Y2_red def
+R10866:10871 Reflective.Extensional_Programs <> Y2_red def
+R10866:10871 Reflective.Extensional_Programs <> Y2_red def
+R10866:10871 Reflective.Extensional_Programs <> Y2_red def
+R10866:10871 Reflective.Extensional_Programs <> Y2_red def
+R10879:10880 Reflective.Reflective_Programs <> rb def
+R10879:10880 Reflective.Reflective_Programs <> rb def
+R10879:10880 Reflective.Reflective_Programs <> rb def
+R10913:10916 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10920:10923 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10927:10930 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10934:10937 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10938:10940 Coq.Init.Datatypes <> nil constr
+R10913:10916 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10920:10923 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10927:10930 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10934:10937 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10938:10940 Coq.Init.Datatypes <> nil constr
+R10913:10916 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10920:10923 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10927:10930 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10934:10937 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R10938:10940 Coq.Init.Datatypes <> nil constr
+R10989:10999 Reflective.Extensional_Programs <> combination ind
+R11005:11007 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11002:11004 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R11023:11043 Reflective.Reflective_Programs <> root_eval_combination thm
+R11065:11075 Reflective.Extensional_Programs <> combination ind
+R11109:11119 Reflective.Extensional_Programs <> combination ind
+R11129:11129 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11125:11127 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11122:11124 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R11145:11165 Reflective.Reflective_Programs <> root_eval_combination thm
+R11181:11191 Reflective.Extensional_Programs <> combination ind
+def 11291:11297 <> rf_eval
+binder 11299:11299 <> M:97
+binder 11301:11301 <> N:98
+binder 11303:11303 <> P:99
+R11308:11314 Reflective.Reflective_Programs <> rb_eval ind
+R11336:11336 Reflective.Reflective_Programs <> P:99 var
+R11317:11326 Reflective.Reflective_Programs <> meta_quote def
+R11330:11331 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11329:11329 Reflective.Reflective_Programs <> M:97 var
+R11332:11332 Reflective.Reflective_Programs <> N:98 var
+def 11353:11354 <> rf
+R11361:11364 Reflective.Extensional_Programs <> wait def
+R11451:11455 Reflective.Reflective_Programs <> quote def
+R11366:11448 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R11372:11447 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R11378:11446 Reflective.Extensional_Programs <> ::tree_scope:'\' not
+R11386:11389 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11445:11445 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11384:11385 Reflective.Reflective_Programs <> rb def
+R11419:11422 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11444:11444 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11393:11396 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11418:11418 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11390:11392 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R11397:11397 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11405:11409 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11417:11417 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11398:11400 Reflective.Tree_Calculus <> Ref constr
+R11410:11412 Reflective.Tree_Calculus <> Ref constr
+R11423:11423 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11431:11435 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11443:11443 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11424:11426 Reflective.Tree_Calculus <> Ref constr
+R11436:11438 Reflective.Tree_Calculus <> Ref constr
+prf 11531:11551 <> root_first_eval_to_rf
+binder 11561:11561 <> M:100
+binder 11563:11563 <> N:101
+binder 11565:11565 <> P:102
+R11581:11584 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11594:11597 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11607:11610 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11618:11621 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R11616:11616 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11613:11614 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11611:11612 Reflective.Reflective_Programs <> rf def
+R11615:11615 Reflective.Reflective_Programs <> M:100 var
+R11617:11617 Reflective.Reflective_Programs <> N:101 var
+R11622:11622 Reflective.Reflective_Programs <> P:102 var
+R11598:11604 Reflective.Tree_Calculus <> program ind
+R11606:11606 Reflective.Reflective_Programs <> N:101 var
+R11585:11591 Reflective.Tree_Calculus <> program ind
+R11593:11593 Reflective.Reflective_Programs <> M:100 var
+R11568:11574 Reflective.Reflective_Programs <> rf_eval def
+R11580:11580 Reflective.Reflective_Programs <> P:102 var
+R11578:11578 Reflective.Reflective_Programs <> N:101 var
+R11576:11576 Reflective.Reflective_Programs <> M:100 var
+R11663:11664 Reflective.Reflective_Programs <> rf def
+R11676:11686 Reflective.Extensional_Programs <> combination ind
+R11704:11728 Reflective.Extensional_Programs <> programs_are_combinations thm
+R11740:11750 Reflective.Extensional_Programs <> combination ind
+R11768:11792 Reflective.Extensional_Programs <> programs_are_combinations thm
+R11804:11814 Reflective.Extensional_Programs <> combination ind
+R11816:11817 Reflective.Reflective_Programs <> rb def
+R11830:11854 Reflective.Extensional_Programs <> programs_are_combinations thm
+R11884:11887 Reflective.Extensional_Programs <> wait def
+R11890:11890 Reflective.Tree_Calculus <> d def
+R11906:11909 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R11913:11916 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R11920:11923 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R11924:11926 Coq.Init.Datatypes <> nil constr
+R11942:11950 Reflective.Reflective_Programs <> quote_red thm
+R11990:11993 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R12006:12006 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11973:11976 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11989:11989 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11970:11972 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R11977:11986 Reflective.Reflective_Programs <> meta_quote def
+R11994:12003 Reflective.Reflective_Programs <> meta_quote def
+R12015:12024 Reflective.Reflective_Programs <> meta_quote def
+R12028:12029 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R12052:12058 Reflective.Reflective_Programs <> rf_eval def
+R12072:12089 Reflective.Reflective_Programs <> rb_eval_implies_rb thm
+R12106:12138 Reflective.Reflective_Programs <> meta_quote_preserves_combinations thm
+R11676:11686 Reflective.Extensional_Programs <> combination ind
+R11704:11728 Reflective.Extensional_Programs <> programs_are_combinations thm
+R11740:11750 Reflective.Extensional_Programs <> combination ind
+R11768:11792 Reflective.Extensional_Programs <> programs_are_combinations thm
+R11804:11814 Reflective.Extensional_Programs <> combination ind
+R11816:11817 Reflective.Reflective_Programs <> rb def
+R11830:11854 Reflective.Extensional_Programs <> programs_are_combinations thm
+R11906:11909 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R11913:11916 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R11920:11923 Coq.Init.Datatypes <> ::list_scope:x_'::'_x not
+R11924:11926 Coq.Init.Datatypes <> nil constr
+R11942:11950 Reflective.Reflective_Programs <> quote_red thm
+R11942:11950 Reflective.Reflective_Programs <> quote_red thm
+R11942:11950 Reflective.Reflective_Programs <> quote_red thm
+R11942:11950 Reflective.Reflective_Programs <> quote_red thm
+R11942:11950 Reflective.Reflective_Programs <> quote_red thm
+R11942:11950 Reflective.Reflective_Programs <> quote_red thm
+R11990:11993 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R12006:12006 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11973:11976 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11989:11989 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R11970:11972 Reflective.Tree_Calculus <> ::tree_scope:'△' not
+R11977:11986 Reflective.Reflective_Programs <> meta_quote def
+R11994:12003 Reflective.Reflective_Programs <> meta_quote def
+R12015:12024 Reflective.Reflective_Programs <> meta_quote def
+R12028:12029 Reflective.Tree_Calculus <> ::tree_scope:x_'@'_x not
+R12072:12089 Reflective.Reflective_Programs <> rb_eval_implies_rb thm
+R12106:12138 Reflective.Reflective_Programs <> meta_quote_preserves_combinations thm
