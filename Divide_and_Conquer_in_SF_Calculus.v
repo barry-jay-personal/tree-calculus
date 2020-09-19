@@ -46,14 +46,14 @@ Declare Scope sf_scope.
 Open Scope sf_scope.
 
 Ltac caseEq f := generalize (refl_equal f); pattern f at -1; case f. 
-Ltac auto_t:= eauto with SFHintDb. 
-Ltac eapply2 H := eapply H; auto_t; try lia.
+Ltac auto_sf:= eauto with SFHintDb. 
+Ltac eapply2 H := eapply H; auto_sf; try lia.
 Ltac split_all := simpl; intros; 
 match goal with 
 | H : _ /\ _ |- _ => inversion_clear H; split_all
 | H : exists _, _ |- _ => inversion H; clear H; split_all 
 | _ =>  try (split; split_all); try contradiction
-end; try congruence; auto_t.
+end; try congruence; auto_sf.
 Ltac exist x := exists x; split_all.
 
 (* 10.2: SF-Calculus *) 
@@ -161,27 +161,20 @@ forall M M', red M M' -> forall N N', red N N' -> red (App M N) (App M' N').
 
 Lemma preserves_appl_multi_step : 
 forall (red: SF -> SF -> Prop), preserves_appl red -> preserves_appl (multi_step red). 
-Proof.
-red. intros red p M N M' r; induction r; intros; simpl;  auto with *.
-eapply succ_red; [ eapply2 p |];  auto.
-Qed.
+Proof. red; intros red p M N M' r; induction r; intros; simpl;  auto_sf. Qed.
 
 Lemma preserves_appr_multi_step : 
 forall (red: SF -> SF -> Prop), preserves_appr red -> preserves_appr (multi_step red). 
 Proof.
-red. intros red p M N M' r; induction r; intros; simpl;  auto with *.
-eapply succ_red; [ eapply2 p |];  auto.
-Qed.
+red; intros red p M N M' r; induction r; intros; simpl;  auto_sf. Qed.
 
 Lemma preserves_app_multi_step : 
 forall (red: SF -> SF -> Prop), 
 preserves_appl red -> preserves_appr red -> 
 preserves_app (multi_step red). 
 Proof.
-red. intros red al ar M M' rM N N' rN.  
-apply transitive_red with (App M' N). 
-apply preserves_appl_multi_step; auto.
-apply preserves_appr_multi_step; auto.
+  red; intros red al ar M M' rM N N' rN; apply transitive_red with (App M' N);
+    [ eapply2 preserves_appl_multi_step | eapply2 preserves_appr_multi_step].
 Qed.
 
 
@@ -191,18 +184,17 @@ Qed.
 Definition sf_red := multi_step sf_red1. 
 
 Lemma preserves_appl_sf_red : preserves_appl sf_red.
-Proof. apply preserves_appl_multi_step. red; auto with *. Qed.
+Proof. apply preserves_appl_multi_step; red; auto_sf. Qed.
 
 Lemma preserves_appr_sf_red : preserves_appr sf_red.
-Proof. apply preserves_appr_multi_step. red; auto with *. Qed.
+Proof. apply preserves_appr_multi_step; red; auto_sf. Qed.
 
 Lemma preserves_app_sf_red : preserves_app sf_red.
-Proof. apply preserves_app_multi_step;  red; auto with *. Qed.
+Proof. apply preserves_app_multi_step;  red; auto_sf. Qed.
 
 
 Ltac eval_sf := 
-intros; unfold_op; 
-repeat (eapply succ_red ; [ auto 10 with *; fail|]); try eapply zero_red.
+intros; unfold_op; repeat (eapply succ_red ; [ auto 10 with SFHintDb; fail|]); try eapply zero_red.
 
 Ltac zerotac := try eapply2 zero_red.
 Ltac succtac :=
@@ -317,7 +309,7 @@ Inductive combination : SF -> Prop :=
 Hint Constructors program combination: SFHintDb. 
 
 Lemma programs_are_combinations: forall M, program M -> combination M.
-Proof.  induction M; intro p; inversion p; subst; repeat eapply2 is_App; auto with *. Qed. 
+Proof.  induction M; intro p; inversion p; subst; repeat eapply2 is_App; auto_sf. Qed. 
 
 Hint Resolve programs_are_combinations: SFHintDb.
 
@@ -372,10 +364,9 @@ Proof. intro; unfold star, occurs; rewrite eqb_refl; auto. Qed.
 
 Lemma star_occurs_false: forall M x, occurs x M = false -> \x M = App Kop M. 
 Proof.
-  induction M; intros x occ; simpl in *; auto.
-  match goal with H0 : ?b = false |- _ =>   rewrite H0; auto end.
-  rewrite occ. rewrite orb_false_iff in occ; elim occ. intros occ1 occ2; rewrite occ1.
-  caseEq M2; intros; subst; simpl in *; auto. rewrite occ2; auto. 
+  induction M as [ | | | M1 ? M2]; intros x occ; simpl in *;  rewrite ? occ; auto;
+  caseEq M2; intros; subst; simpl in *; auto; 
+  rewrite orb_false_iff in occ; inversion occ as ( occ1 & occ2); rewrite occ2; rewrite occ1; auto. 
 Qed.
 
 
@@ -386,21 +377,21 @@ Lemma star_occurs_true:
   forall M1 M2 x, occurs x (App M1 M2) = true -> M2 <> Ref x ->
                   \x (App M1 M2) = App (App Sop (\x M1)) (\x M2).
 Proof.
-  intros M1 M2 x occ ne; unfold star at 1; fold star.
-  caseEq M2; intros; subst; simpl in *. 
+  intros M1 M2 x occ ne; unfold star at 1; fold star;
+  caseEq M2; intros; subst; simpl in *; rewrite ? occ; auto. 
   match goal with
-    H: Ref ?s <> Ref x |- _ => assert(neb: eqb x s = false) by (eapply2 eqb_neq; congruence)
-  end. 
-  rewrite neb in *.   rewrite orb_false_r in *. all: rewrite occ; auto. 
+    H: Ref ?s <> Ref x |- _ =>
+    assert(neb: eqb x s = false) by (eapply2 eqb_neq; congruence); rewrite neb in *;
+      rewrite orb_false_r in *; rewrite occ; auto end. 
 Qed.
 
 
 
 Ltac startac x :=
-  repeat ( (rewrite (star_occurs_true _ _ x); [| unfold_op; unfold occurs; fold occurs; rewrite ? orb_true_r; simpl; auto with *; fail| cbv; discriminate]) || 
-          (rewrite eta_red; [| ((eapply2 occurs_combination; fail) || cbv; auto with *; fail)]) ||
+  repeat ( (rewrite (star_occurs_true _ _ x); [| unfold_op; unfold occurs; fold occurs; rewrite ? orb_true_r; simpl; auto_sf; fail| cbv; discriminate]) || 
+          (rewrite eta_red; [| ((eapply2 occurs_combination; fail) || cbv; auto_sf; fail)]) ||
           rewrite star_id || 
-          (rewrite (star_occurs_false _ x); [| unfold_op; unfold occurs; fold occurs; auto with *; ((rewrite ! occurs_combination; cbv; auto with *; fail) || cbv; auto with *; fail)])
+          (rewrite (star_occurs_false _ x); [| unfold_op; unfold occurs; fold occurs; auto_sf; ((rewrite ! occurs_combination; cbv; auto_sf; fail) || cbv; auto_sf; fail)])
          ).
 
 Ltac starstac1 xs :=
@@ -635,36 +626,36 @@ Qed.
 
 
 Lemma equal_comb_S_S : sf_red (App (App equal Sop) Sop) Kop.
-Proof. eapply transitive_red. eapply2 equal_red. eval_sf. Qed.
+Proof. eapply transitive_red; [ eapply2 equal_red | eval_sf]. Qed.
 
 
 Lemma equal_comb_S_F : sf_red (App (App equal Sop) Fop) (Kop@Iop).
-Proof. eapply transitive_red. eapply2 equal_red. eval_sf. Qed.
+Proof. eapply transitive_red; [ eapply2 equal_red | eval_sf]. Qed.
 
 
 Lemma equal_comb_F_S : sf_red (App (App equal Fop) Sop) (Kop@Iop).
-Proof. eapply transitive_red. eapply2 equal_red. eval_sf. Qed.
+Proof. eapply transitive_red; [ eapply2 equal_red | eval_sf]. Qed.
 
 
 Lemma equal_comb_F_F : sf_red (App (App equal Fop) Fop) Kop.
-Proof. eapply transitive_red. eapply2 equal_red. eval_sf. Qed.
+Proof. eapply transitive_red; [ eapply2 equal_red | eval_sf]. Qed.
 
 Lemma unequal_S_compound : 
 forall M, compound M -> combination M -> sf_red (App (App equal Sop) M) (App Kop Iop). 
-Proof. intros M cp cb.  eapply transitive_red.  eapply2 equal_red. inversion cp; subst; eval_sf. Qed. 
+Proof. intros M cp cb;   eapply transitive_red; [eapply2 equal_red | inversion cp; subst; eval_sf]. Qed. 
 
 Lemma unequal_F_compound : 
 forall M, compound M -> combination M -> sf_red (App (App equal Fop) M) (App Kop Iop). 
-Proof. intros M cp cb.  eapply transitive_red.  eapply2 equal_red. inversion cp; subst; eval_sf. Qed. 
+Proof. intros M cp cb;  eapply transitive_red; [  eapply2 equal_red | inversion cp; subst; eval_sf]. Qed. 
 
 
 Lemma unequal_compound_S : 
 forall M, combination M -> compound M ->  sf_red (App (App equal M) Sop) (App Kop Iop). 
-Proof. intros M cp cb. eapply transitive_red.  eapply2 equal_red.  inversion cb; subst; eval_sf. Qed. 
+Proof. intros M cp cb; eapply transitive_red; [  eapply2 equal_red | inversion cb; subst; eval_sf]. Qed. 
 
 Lemma unequal_compound_F : 
 forall M, combination M -> compound M ->  sf_red (App (App equal M) Fop) (App Kop Iop). 
-Proof. intros M cp cb. eapply transitive_red.  eapply2 equal_red.  inversion cb; subst; eval_sf. Qed. 
+Proof. intros M cp cb;  eapply transitive_red; [ eapply2 equal_red |  inversion cb; subst; eval_sf]. Qed. 
 
 Lemma equal_compounds : 
 forall M N, compound M -> compound N -> combination M -> combination N -> 
@@ -673,8 +664,8 @@ forall M N, compound M -> compound N -> combination M -> combination N ->
 (App (App equal (right_component M)) (right_component N)))
  (App Kop Iop)). 
 Proof.
-  intros M N cM cN; intros.  eapply transitive_red.  eapply2 equal_red.
-  inversion cM; inversion cN; subst; eval_sf. Qed.
+  intros M N cM cN; intros; eapply transitive_red;
+    [  eapply2 equal_red | inversion cM; inversion cN; subst; eval_sf]. Qed.
 
 
 Ltac equal_tac :=
@@ -752,14 +743,6 @@ Definition kernel :=
 Compute (term_size kernel). 
  *)
 
-(* 
-Definition RefSF := Ref. 
-Definition AppSF := App.
-Definition programSF := program.
-Definition combinationSF := combination.
-Ltac combinationSF_tac := Divide_and_Conquer_in_SF_Calculus.combination_tac.  
-
-*) 
 
 Definition meaningful_translation_tree_to_sf (f: Rewriting_partI.Tree -> SF) := 
   (forall M N, t_red1 M N -> sf_red (f M) (f N)) /\ (* strong version *) 
@@ -999,7 +982,7 @@ Fixpoint sf_to_tree M :=
 
 Lemma sf_to_tree_preserves_combinations:
   forall M, Divide_and_Conquer_in_SF_Calculus.combination M -> combination (sf_to_tree M). 
-Proof.  induction M; intro c; inversion c. 1,2: cbv; auto 1000 with *. repeat eapply2 is_App. Qed.
+Proof.  induction M; intro c; inversion c; [| | repeat eapply2 is_App]; cbv; auto 1000 with TreeHintDb. Qed.
 
 Ltac sf2tree_tac :=  
   unfold tag in *; repeat eexists;

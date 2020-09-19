@@ -193,7 +193,7 @@ Proof. tree_red. Qed.
 Ltac zerotac := try apply zero_red; auto.
 Ltac succtac :=
   repeat (eapply transitive_red;
-  [ eapply succ_red ; auto_t; 
+  [ eapply2 succ_red ; 
     match goal with
     | |- multi_step t_red1 _ _ => idtac
     | _ => fail (*gone too far ! *)
