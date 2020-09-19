@@ -597,14 +597,13 @@ Notation "\" := star : va_scope.
 Theorem star_beta: forall M x N, va_red (\x M @ N) (substitute M x N).
 Proof.
   induction M; split_all; unfold star, star_body; fold star_body;
-  [ caseEq (s=? x); split_all; cbv; succtac
-  | cbv; succtac
-  | cbv; succtac
+  [ caseEq (s=? x); split_all
+  | |
   | caseEq (occurs x (M1 @ M2)); split_all; succtac; 
     [ aptac; [ eapply2 IHM1 | eapply2 IHM2 | zerotac]
     | succtac; rewrite orb_false_iff in *; split_all;
-      rewrite ! substitute_occurs_false; auto; cbv; succtac
-  ]].
+      rewrite ! substitute_occurs_false; auto
+  ]]; cbv; succtac.
 Qed. 
 
 
@@ -924,22 +923,21 @@ Lemma pentagon_id_red_s_ranked:
                            exists p Q1 Q2 n,  s_ranked p P Q1 /\ id_red Q1 Q2 /\
                                               s_ranked n N Q2 .
 Proof.
-  induction m; intros M P r N ir; inversion r; clear r; subst; eauto.
-  { exists 0, P, N; exist 0. } 
-  (* 1 *)
-  assert(pent: exists Q1 Q2,  s_red N0 Q1 /\ id_red Q1 Q2 /\  s_red N Q2) by 
-  eapply2 pentagon_id_red_s_red1.
-  elim pent; intros x x0; clear pent; split_all. 
-  assert(ppr: exists n, s_ranked n N0 x) by (eapply s_red_implies_s_ranked; eauto).
-  elim ppr; intro m1; clear ppr;   split_all.
-  assert(d: exists Q, s_ranked m x Q /\ s_ranked m1 P Q) by eapply2 diamond_s_ranked. 
-  elim d; intros x2;  clear d; split_all.
-  assert(pent2: exists p Q1 Q2 n,  s_ranked p x2 Q1 /\ id_red Q1 Q2 /\ s_ranked n x1 Q2). 
-  eapply IHm; eauto.
-  elim(pent2). intros p; clear pent2; intros pent3; split_all.
-  assert(ppr2: exists q, s_ranked q N x1) by eapply2 s_red_implies_s_ranked.
-  elim(ppr2); intro q; clear ppr2; split_all.
-  exists (m1 + p); exists x0; exists x3; exist (q + x4); eapply transitive_s_ranked; eauto. 
+  induction m; intros M P r N ir; inversion r; clear r; subst; eauto;
+    [ exists 0, P, N; exist 0
+    | 
+    assert(pent: exists Q1 Q2,  s_red N0 Q1 /\ id_red Q1 Q2 /\  s_red N Q2) by 
+        eapply2 pentagon_id_red_s_red1;  elim pent; intros x x0; clear pent; split_all; 
+    assert(ppr: exists n, s_ranked n N0 x) by (eapply s_red_implies_s_ranked; eauto);
+    elim ppr; intro m1; clear ppr;   split_all;
+    assert(d: exists Q, s_ranked m x Q /\ s_ranked m1 P Q) by eapply2 diamond_s_ranked; 
+    elim d; intros x2;  clear d; split_all;
+    assert(pent2: exists p Q1 Q2 n,  s_ranked p x2 Q1 /\ id_red Q1 Q2 /\ s_ranked n x1 Q2) by 
+        eapply2 IHm; eauto; elim(pent2); intros p; clear pent2; intros pent3; split_all;
+    assert(ppr2: exists q, s_ranked q N x1) by eapply2 s_red_implies_s_ranked; 
+    elim(ppr2); intro q; clear ppr2; split_all; 
+    exists (m1 + p); exists x0; exists x3; exist (q + x4); eapply transitive_s_ranked; eauto
+    ]. 
 Qed.
 
 Lemma pentagon_id_red_s_red:
@@ -1352,11 +1350,15 @@ Definition V_t := Y2_t (K@KI) V_0.
 
 Lemma Lam_t1_red: forall x, t_red  (Lam_t @ x) (tag (lamtag1 @ Lam_t @ x) (lamtagged2 @ Lam_t @x)).
 Proof.
-  intros. eapply transitive_red. eapply2 Y2_red.  fold Lam_t.
-  replace Lam_0 with (\"f" (\"x"
-     (tag
-        (lamtag1 @ Ref "f" @ Ref "x") (lamtagged2 @ Ref "f" @ Ref "x")))) by auto.
-  unfold tag; starstac ("x" :: "f" :: nil). 
+  intros; eapply transitive_red;
+    [ eapply2 Y2_red
+    |  fold Lam_t;
+       replace Lam_0 with (\"f" (\"x"
+                                  (tag
+                                     (lamtag1 @ Ref "f" @ Ref "x") (lamtagged2 @ Ref "f" @ Ref "x"))))
+         by auto;
+       unfold tag; starstac ("x" :: "f" :: nil)
+    ]. 
 Qed.
 
 
@@ -1380,8 +1382,12 @@ Qed.
 Lemma Lam_t3_red:
   forall x y z, t_red (Lam_t @ x @ y @ z) (getTag1 x @ (K@(K@ Lam_t)) @ y @ z).
 Proof.
-  intros. aptac. eapply2 Lam_t2_red. zerotac.
-  eapply transitive_red. eapply2 tag_apply.    unfold useTag; starstac ("y" :: "x" :: "f" :: nil). 
+  intros; aptac;
+    [ eapply2 Lam_t2_red
+    | zerotac
+    | eapply transitive_red;
+      [ eapply2 tag_apply
+      | unfold useTag; starstac ("y" :: "x" :: "f" :: nil)]]. 
  Qed.
 
 
@@ -1402,14 +1408,28 @@ Lemma programmable_Lamt2:
   forall M N, programmable M -> programmable N -> programmable (getTag1 M @ (K @ (K @ Lam_t)) @ N) ->
               programmable (Lam_t @ M @ N).
  Proof.
-   unfold programmable; split_all;  repeat eexists.  
-   eapply transitive_red. eapply2 Lam_t2_red.
-   eapply transitive_red.
-   unfold tag. aptac. zerotac. aptac. aptac. zerotac. aptac. zerotac. aptac. 
-   instantiate(1:=getTag1 M @ (K @ (K @ Lam_t))). unfold useTag; trtac. 
-   zerotac. eassumption. zerotac. zerotac. zerotac. zerotac.
-   unfold lamtag2; starstac ("y" :: "x" :: "f" :: nil).
-   ap2tac; zerotac.  program_tac.
+   unfold programmable; split_all;  repeat eexists;  
+     [ eapply transitive_red;
+       [ eapply2 Lam_t2_red
+       | unfold tag; eapply transitive_red; 
+         [ aptac;
+           [ zerotac
+           |  aptac;
+              [ aptac;
+                [ zerotac
+                | aptac;
+                  [ zerotac
+                  | aptac;
+                    [ instantiate(1:=getTag1 M @ (K @ (K @ Lam_t)));  unfold useTag; trtac
+                    | zerotac
+                    | eassumption
+                    ]
+                  | zerotac]
+                | zerotac]
+              | |]; zerotac
+           | unfold lamtag2; starstac ("y" :: "x" :: "f" :: nil)]
+         | ap2tac; zerotac]]
+     | program_tac].
 Qed. 
  
 
@@ -1417,18 +1437,27 @@ Qed.
 Lemma programmable_getTag1_Lamt1:
   forall M, programmable M -> programmable (getTag1 (Lam_t @ M) @ (K @ (K @ Lam_t))).
 Proof.
-  unfold programmable; split_all; repeat eexists.
-  aptac. eapply getTag1_preserves_t_red.   eapply Lam_t1_red. zerotac.
-eapply transitive_red. unfold getTag1, tag, lamtag1; trtac. ap2tac; zerotac. program_tac.    
+  unfold programmable; split_all; repeat eexists;
+    [ aptac;
+      [ eapply getTag1_preserves_t_red; eapply Lam_t1_red
+      | zerotac
+      | eapply transitive_red; [ unfold getTag1, tag, lamtag1;  trtac | ap2tac; zerotac]]
+    | program_tac].    
 Qed. 
 
 Lemma programmable_getTag1_Lamt1_app:
   forall M N, programmable M -> programmable N -> programmable (getTag1 (Lam_t @ M) @ (K @ (K @ Lam_t)) @N).
 Proof.
-  unfold programmable; split_all; repeat eexists.
-  aptac. aptac. eapply getTag1_preserves_t_red.   eapply Lam_t1_red. zerotac.
-  eapply transitive_red. unfold getTag1, tag, lamtag1; trtac. ap2tac; zerotac. eassumption.  trtac.
-  program_tac.    
+  unfold programmable; split_all; repeat eexists;
+  [ aptac;
+    [ aptac;
+      [ eapply getTag1_preserves_t_red; eapply Lam_t1_red
+      | zerotac
+      | eapply transitive_red; [ unfold getTag1, tag, lamtag1; trtac | ap2tac; zerotac]
+      ]
+    | eassumption
+    |  trtac]
+  | program_tac].    
 Qed. 
 
 
