@@ -33,7 +33,7 @@ convenience. The ctual files can be seen in the _CoqProject file.
 Each named theorem, corollary or lemma in the book uses
 the same name as the corresponding result in the Coq proofs.
 
-Here are some brief remarks on the highlights. 
+Here are some brief remarks on the highlights.  
 
 
 The book has two parts.
