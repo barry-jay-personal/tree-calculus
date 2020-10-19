@@ -1,18 +1,25 @@
 (**********************************************************************)
-(* This program is free software; you can redistribute it and/or      *)
-(* modify it under the terms of the GNU Lesser General Public License *)
-(* as published by the Free Software Foundation; either version 2.1   *)
-(* of the License, or (at your option) any later version.             *)
-(*                                                                    *)
-(* This program is distributed in the hope that it will be useful,    *)
-(* but WITHOUT ANY WARRANTY; without even the implied warranty of     *)
-(* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the      *)
-(* GNU General Public License for more details.                       *)
-(*                                                                    *)
-(* You should have received a copy of the GNU Lesser General Public   *)
-(* License along with this program; if not, write to the Free         *)
-(* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA *)
-(* 02110-1301 USA                                                     *)
+(* Copyright 2020 Barry Jay                                           *)
+(*                                                                    *) 
+(* Permission is hereby granted, free of charge, to any person        *) 
+(* obtaining a copy of this software and associated documentation     *) 
+(* files (the "Software"), to deal in the Software without            *) 
+(* restriction, including without limitation the rights to use, copy, *) 
+(* modify, merge, publish, distribute, sublicense, and/or sell copies *) 
+(* of the Software, and to permit persons to whom the Software is     *) 
+(* furnished to do so, subject to the following conditions:           *) 
+(*                                                                    *) 
+(* The above copyright notice and this permission notice shall be     *) 
+(* included in all copies or substantial portions of the Software.    *) 
+(*                                                                    *) 
+(* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,    *) 
+(* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF *) 
+(* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND              *) 
+(* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT        *) 
+(* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,       *) 
+(* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, *) 
+(* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER      *) 
+(* DEALINGS IN THE SOFTWARE.                                          *) 
 (**********************************************************************)
 
 (**********************************************************************)
@@ -30,6 +37,18 @@ Require Import Reflective.Rewriting_partI.
 
 Set Default Proof Using "Type".
 
+
+Ltac auto_t := eauto with TreeHintDb.
+Ltac eapply2 H := eapply H; auto_t.
+
+Ltac split_all := simpl; intros; 
+match goal with 
+| H : _ /\ _ |- _ => inversion_clear H; split_all
+| H : exists _, _ |- _ => inversion H; clear H; split_all 
+| _ =>  try (split; split_all); try contradiction
+end; try congruence; auto_t.
+
+Ltac exist x := exists x; split_all.
 
 (* Section 9.2: VA-Calculus *) 
 
@@ -330,7 +349,10 @@ Proof.  intros M N R; induction R; split_all. Qed.
 
 
 Lemma va_red_to_s_red: implies_red va_red s_red. 
-Proof. eapply2 implies_red_multi_step; red; split_all; one_step; eapply2 va_red1_to_s_red1. Qed. 
+Proof. 
+eapply2 implies_red_multi_step. 
+red; split_all; one_step; eapply2 va_red1_to_s_red1. 
+Qed. 
 
 Lemma to_va_red_multi_step: forall red, implies_red red va_red -> implies_red (multi_step red) va_red. 
 Proof. 
@@ -377,58 +399,16 @@ Proof. red; split_all; eapply2 diamond_va_red. Qed.
 
 
 Ltac zerotac := try eapply2 zero_red.
-Ltac succ1tac := repeat (eapply transitive_red; [ eapply2 succ_red ; fail (*gone too far ! *) | ]). 
-Ltac succtac := succ1tac; zerotac.
-Ltac aptac := eapply transitive_red; [ eapply preserves_app_va_red |].
-
-Ltac ap2tac:=
-  unfold va_red; 
-  eassumption || eapply2 Y2_red || 
-              match goal with
-              | |- multi_step _ (_ @ _) _ => try aptac; [ap2tac | ap2tac | ]
-              | _ => idtac
-              end. 
-Ltac vatac :=
-  unfold va_red; succ1tac; 
-  match goal with
-  | |- multi_step va_red1 Vop _ => zerotac
-  | |- multi_step va_red1 Lam _ => zerotac
-  | |- multi_step va_red1 (Vop @ _ @ _ @ _) _ => succtac
-  | |- multi_step va_red1 (Lam @ _ @ _ @ _) _ =>
-    eapply transitive_red;
-    [ eapply preserves_app_va_red ;
-      [ eapply preserves_app_va_red ;
-        [ eapply preserves_app_va_red ; [| vatac ] (* reduce the argument of △ *) 
-        | ]
-      | ]
-     |] ;
-    zerotac; (* put the "redex" back together *) 
+Ltac succtac :=
+  repeat (eapply transitive_red;
+  [ eapply2 succ_red ;
     match goal with
-   | |- multi_step va_red1 (Lam @ ?arg @ _ @ _) _ =>
-      match arg with
-      | Lam  => vatac (* made progress so recurse *) 
-      | Lam @ _  => vatac (* made progress so recurse *) 
-      | Lam @ _ @ _ => vatac (* made progress so recurse *) 
-      | _ => idtac (* no progress so stop *)
-      end
-    | _ => vatac (* for safety ? *) 
-    end 
-  | |- multi_step va_red1 (_ @ _) _ => (* not a ternary tree *) 
-    eapply transitive_red; [ eapply preserves_app_va_red ; vatac |] ; (* so reduce the function *)
-    match goal with
-    | |- multi_step va_red1 (Lam @ ?arg @ _ @ _) _ =>
-      match arg with
-      | Lam  => vatac (* made progress so recurse *) 
-      | Lam @ _  => vatac (* made progress so recurse *) 
-      | Lam @ _ @ _ => vatac (* made progress so recurse *) 
-      | _ => idtac (* no progress so stop *)
-      end
-    | _ => idtac
+    | |- multi_step va_red1 _ _ => idtac
+    | _ => fail (*gone too far ! *)
     end
-  | _ => idtac (* the head is not △ *) 
-  end;
-  zerotac; succtac; zerotac. 
-      
+  | ]); zerotac
+.
+Ltac aptac := eapply transitive_red; [ eapply preserves_app_va_red |].
 
 
 
@@ -597,13 +577,14 @@ Notation "\" := star : va_scope.
 Theorem star_beta: forall M x N, va_red (\x M @ N) (substitute M x N).
 Proof.
   induction M; split_all; unfold star, star_body; fold star_body;
-  [ caseEq (s=? x); split_all
-  | |
+  [ caseEq (s=? x); split_all; cbv; succtac
+  | cbv; succtac
+  | cbv; succtac
   | caseEq (occurs x (M1 @ M2)); split_all; succtac; 
     [ aptac; [ eapply2 IHM1 | eapply2 IHM2 | zerotac]
     | succtac; rewrite orb_false_iff in *; split_all;
-      rewrite ! substitute_occurs_false; auto
-  ]]; cbv; succtac.
+      rewrite ! substitute_occurs_false; auto; cbv; succtac
+  ]].
 Qed. 
 
 
@@ -679,8 +660,34 @@ Proof. intros; cbv; succtac. Qed.
 Lemma k_red : forall M N, va_red (Kop @ M @ N) M. 
 Proof.  intros; cbv; succtac. Qed. 
 
+
 Lemma sop_red: forall M N P, va_red (Sop @ M @ N @ P) (M@P@(N@P)). 
-Proof.  intros; cbv; vatac. Qed.
+Proof.
+  intros; cbv; succtac.
+  aptac;
+    [ aptac;
+      [ aptac;
+        [ aptac;
+          [ aptac; [ succtac | succtac | succtac]
+          | succtac
+          | zerotac]
+        | zerotac
+        | succtac]
+      | zerotac
+      | succtac]
+    | zerotac
+    | zerotac];
+    succtac; succtac; eapply2 preserves_app_va_red; aptac;
+      [ aptac;
+        [ aptac;
+          [ aptac;
+            [ zerotac | succtac | succtac]
+          | zerotac
+          | succtac]
+        | zerotac
+        | succtac] | |];
+      zerotac. 
+Qed.
 
 
   
@@ -688,8 +695,7 @@ Definition meaningful_translation_SK_to_VA f :=
   (forall M N, sk_red1 M N -> va_red (f M) (f N)) /\ (* strong version *) 
   (forall M N, f (Incompleteness_of_Combinatory_Logic.App M N) = App (f M) (f N)) /\  (* applications *) 
   (forall M, Incompleteness_of_Combinatory_Logic.program M -> valuable (f M)) /\ (* programs *) 
-  (forall i, f (Incompleteness_of_Combinatory_Logic.Ref i) = Ref i)               (* variables *) 
-.
+  (forall i, f (Incompleteness_of_Combinatory_Logic.Ref i) = Ref i) .              (* variables *) 
 
 Fixpoint sk_to_va M :=
   match M with
@@ -727,19 +733,24 @@ Proof.
     | intros M prM; induction prM].   
   { exists Sop;   split; [ apply zero_red | cbv; auto; program_tac]. }
   {
-  elim IHprM; split_all; repeat eexists;  
-    [ eapply transitive_red; [ap2tac; zerotac | unfold Sop, v, env_comb; vatac ]
-    | program_tac].
+  elim IHprM; intro x; split_all. repeat eexists. 
+  unfold Sop, v, env_comb. aptac. 2: eassumption. zerotac.
+  aptac. succtac.   zerotac. aptac.  aptac. aptac. zerotac. succtac. succtac. succtac. succtac.
+  succtac. eapply transitive_red.  succtac.
+  aptac. zerotac. succtac. succtac. program_tac.
   }{
-  elim IHprM1;split_all;  elim IHprM2; split_all;  repeat eexists; 
-    [ eapply transitive_red; [ap2tac; zerotac | unfold Sop, v, env_comb; vatac ]
-    | program_tac].
+  elim IHprM1; intro x; split_all; elim IHprM2; intro x0; split_all. 
+   red. repeat eexists.  aptac. aptac. zerotac. eassumption. zerotac. eassumption. 
+  unfold Sop, v, env_comb. aptac. aptac. aptac. aptac. zerotac. succtac. succtac. zerotac.
+  succtac.   zerotac. succtac. zerotac.
+  aptac. aptac. zerotac. aptac. aptac. zerotac. succtac. succtac. succtac. succtac. succtac. zerotac.
+  eapply transitive_red. succtac.  aptac. zerotac. aptac. aptac. zerotac. aptac. zerotac. aptac. succtac.
+  succtac. succtac. succtac. succtac. succtac. succtac. succtac. program_tac. 
   }
   {exist Kop; unfold Kop, v; cbv; program_tac. }
   {
-    elim IHprM; split_all; repeat eexists;
-    [ eapply transitive_red; [ap2tac; zerotac | unfold Kop; vatac ]
-    | program_tac].
+    elim IHprM; intro x; split_all; repeat eexists;
+      [ aptac; [ zerotac | eassumption | unfold Kop, v; succtac] |  program_tac].
   }
 Qed.
 
@@ -923,21 +934,23 @@ Lemma pentagon_id_red_s_ranked:
                            exists p Q1 Q2 n,  s_ranked p P Q1 /\ id_red Q1 Q2 /\
                                               s_ranked n N Q2 .
 Proof.
-  induction m; intros M P r N ir; inversion r; clear r; subst; eauto;
-    [ exists 0, P, N; exist 0
-    | 
-    assert(pent: exists Q1 Q2,  s_red N0 Q1 /\ id_red Q1 Q2 /\  s_red N Q2) by 
-        eapply2 pentagon_id_red_s_red1;  elim pent; intros x x0; clear pent; split_all; 
-    assert(ppr: exists n, s_ranked n N0 x) by (eapply s_red_implies_s_ranked; eauto);
-    elim ppr; intro m1; clear ppr;   split_all;
-    assert(d: exists Q, s_ranked m x Q /\ s_ranked m1 P Q) by eapply2 diamond_s_ranked; 
-    elim d; intros x2;  clear d; split_all;
-    assert(pent2: exists p Q1 Q2 n,  s_ranked p x2 Q1 /\ id_red Q1 Q2 /\ s_ranked n x1 Q2) by 
-        eapply2 IHm; eauto; elim(pent2); intros p; clear pent2; intros pent3; split_all;
-    assert(ppr2: exists q, s_ranked q N x1) by eapply2 s_red_implies_s_ranked; 
-    elim(ppr2); intro q; clear ppr2; split_all; 
-    exists (m1 + p); exists x0; exists x3; exist (q + x4); eapply transitive_s_ranked; eauto
-    ]. 
+  induction m; intros M P r N ir; inversion r; clear r; subst; eauto.
+  (* 2 *)
+  exists 0; exists P; exist N; exist 0; repeat split; auto. 
+  (* 1 *)
+  assert(pent: exists Q1 Q2,  s_red N0 Q1 /\ id_red Q1 Q2 /\  s_red N Q2) by 
+  eapply2 pentagon_id_red_s_red1.
+  elim pent; intros x x0; clear pent; split_all. 
+  assert(ppr: exists n, s_ranked n N0 x) by (eapply s_red_implies_s_ranked; eauto).
+  elim ppr; intro m1; clear ppr;   split_all.
+  assert(d: exists Q, s_ranked m x Q /\ s_ranked m1 P Q) by eapply2 diamond_s_ranked. 
+  elim d; intros x2;  clear d; split_all.
+  assert(pent2: exists p Q1 Q2 n,  s_ranked p x2 Q1 /\ id_red Q1 Q2 /\ s_ranked n x1 Q2). 
+  eapply IHm; eauto.
+  elim(pent2). intros p; clear pent2; intros pent3; split_all.
+  assert(ppr2: exists q, s_ranked q N x1) by eapply2 s_red_implies_s_ranked.
+  elim(ppr2); intro q; clear ppr2; split_all.
+  exists (m1 + p); exists x0; exists x3; exist (q + x4); eapply transitive_s_ranked; eauto. 
 Qed.
 
 Lemma pentagon_id_red_s_red:
@@ -946,13 +959,14 @@ Lemma pentagon_id_red_s_red:
                          exists Q1 Q2,  s_red P Q1 /\ id_red Q1 Q2 /\
                                         s_red N Q2 .
 Proof.
-  intros M P r N idr; 
-  elim(s_red_implies_s_ranked _ _ r); intros;    
+  intros M P r N idr. 
+  elim(s_red_implies_s_ranked _ _ r); intros.   
   assert(pent: exists p Q1 Q2 n,  s_ranked p P Q1 /\ id_red Q1 Q2 /\ s_ranked n N Q2)
-    by eapply2 pentagon_id_red_s_ranked; 
-  elim pent;  intros p; clear pent;  intro pent2; elim pent2; intros Q1 pent3; clear pent2; 
-  elim pent3; intros Q2 n; clear pent3;  split_all;  
-  exists Q1; exist Q2; eapply2 s_ranked_implies_s_red. 
+    by eapply2 pentagon_id_red_s_ranked.
+  elim pent. intros p; clear pent. intro pent2; elim pent2; intros Q1 pent3; clear pent2.
+  elim pent3; intros Q2 n; clear pent3;  split_all. 
+  exists Q1; exist Q2.
+  all: eapply2 s_ranked_implies_s_red. 
 Qed.
 
   (* 
@@ -967,32 +981,32 @@ Lemma triangle_id_red_s_red_ref:
             forall N, id_red M N ->
                       s_red N (Ref x) .
 Proof.
-  intros M x r N ir;
+  intros M x r N ir.
   assert(pent: exists Q1 Q2,  s_red (Ref x) Q1 /\ id_red Q1 Q2 /\
-                              s_red N Q2) by  eapply2 pentagon_id_red_s_red;
-  elim pent; intros Q1 pent2; clear pent;
-  elim pent2; intro Q2; clear pent2; split_all;
-  assert(Q1 = Ref x) by eapply2 refs_are_stable; subst;
+                              s_red N Q2) by  eapply2 pentagon_id_red_s_red.
+  elim pent. intros Q1 pent2; clear pent.
+  elim pent2; intro Q2; clear pent2; split_all.
+  assert(Q1 = Ref x) by eapply2 refs_are_stable; subst.
   inv id_red.   
 Qed.
 
 
 Theorem equality_of_programs_is_not_definable_in_va:  forall eq,  not (is_equal eq). 
 Proof.
-  intros; intro premise; inversion premise as (eq0 & eq1); 
-  assert(r: s_red (eq @ Iop @ (Lam @ Vop @ Iop) @ (Ref "x") @ (Ref "y")) (Ref "y")) by  
-  (eapply va_red_to_s_red; eapply2 premise; [cbv; program_tac | cbv; program_tac | discriminate]);  
+  intros; intro premise; inversion premise as (eq0 & eq1). 
+  assert(r: s_red (eq @ Iop @ (Lam @ Vop @ Iop) @ (Ref "x") @ (Ref "y")) (Ref "y")).
+  eapply va_red_to_s_red. eapply2 premise. cbv; program_tac. cbv; program_tac. discriminate. 
   elim(pentagon_id_red_s_red (eq @ Iop @ (Lam @ Vop @ Iop) @ (Ref "x") @ (Ref "y")) (Ref "y")
-                                  r (eq @ Iop @ Iop @ (Ref "x") @ (Ref "y"))); split_all;
-    [
-      assert(x = Ref "y") by eapply2 refs_are_stable;  subst;  inv id_red;   
-      assert (r2: s_red (eq @ Iop @ Iop @ (Ref "x") @ (Ref "y")) (Ref "x")) by
-          (eapply2 va_red_to_s_red;  eapply2 eq0; cbv; program_tac); 
-      elim(diamond_s_red _ _ r2 (Ref "y")); auto;  intros x (?&?); 
-      assert(x = Ref "x") by eapply2 refs_are_stable; 
-      assert(x = Ref "y") by eapply2 refs_are_stable; subst; discriminate
-    | repeat eapply2 id_app; eapply2 id_red_refl
-    ]. 
+                                  r (eq @ Iop @ Iop @ (Ref "x") @ (Ref "y"))); split_all. 
+  2: repeat eapply2 id_app; eapply2 id_red_refl. 
+  assert(x = Ref "y") by eapply2 refs_are_stable. subst. 
+  inv id_red.   
+  assert (r2: s_red (eq @ Iop @ Iop @ (Ref "x") @ (Ref "y")) (Ref "x")).
+  eapply2 va_red_to_s_red.
+  eapply2 eq0. cbv; program_tac. 
+  elim(diamond_s_red _ _ r2 (Ref "y")); auto.  intros x (s1&s2).
+  assert(x = Ref "x") by eapply2 refs_are_stable. 
+  assert(x = Ref "y") by eapply2 refs_are_stable. subst; discriminate. 
 Qed.
 
 
@@ -1017,11 +1031,18 @@ Definition getTag := (* \"" (Lam @ (Ref "") @ Iop @ KI @ Lam). *)
 
 
 Lemma tag_apply : forall t f x, va_red (tag t f @ x) (f @ x).
-Proof.  intros; cbv; vatac. Qed.
+Proof.
+  intros.  unfold tag, ndx. succtac. aptac. aptac. aptac.  eapply2 env_zero_red.
+  zerotac. eapply2 env_zero_red. aptac. eapply2 env_succ_red. zerotac.
+  aptac. eapply2 env_nil_red. all: zerotac. unfold Kop;  succtac. 
+Qed.
 
 
 Lemma getTag_tag : forall t f, va_red (getTag @ (tag t f)) t.
-Proof.  intros;  cbv; vatac. Qed.
+Proof.
+  intros. cbv; succtac. aptac. aptac. aptac. aptac. aptac. succtac.  succtac. succtac.
+  succtac. succtac.  succtac. succtac.  succtac. succtac. succtac. succtac.
+Qed.
 
 Lemma tag_preserves_substitute:
   forall t f x N, substitute (tag t f) x N = tag (substitute t x N) (substitute f x N). 
@@ -1043,17 +1064,36 @@ Definition stem x :=
 
    
 Lemma stem_red : forall x y z,  va_red (App (App (stem x) y) z) (App (App y z) (App x z)).
-Proof.  intros; cbv; vatac. Qed. 
+Proof.
+  intros; cbv; succtac. aptac. aptac. aptac. aptac. aptac. succtac. succtac. succtac.
+  zerotac.  succtac. zerotac. succtac. zerotac. zerotac. succtac.
+  eapply2 preserves_app_va_red.
+  aptac. aptac. aptac. aptac. zerotac. succtac. succtac. zerotac. succtac. zerotac. succtac.
+  all: zerotac.
+Qed. 
 
 Lemma valuable_stem: forall x, valuable x -> valuable (stem x).
 Proof.
-  unfold valuable; split_all; exist (stem x0); cbv; [repeat eapply2 preserves_app_va_red | program_tac]. 
+  unfold valuable; split_all. exist (stem x0).
+  cbv; repeat eapply2 preserves_app_va_red. cbv; program_tac. 
 Qed.
 
-Definition fork x y := Lam @  (Lam @ (v (v (ndx 0) @ (v x)) @ (v y)) @ Iop) @ Iop. 
+Definition fork x y :=
+  Lam
+    @  (Lam
+          @ (v (v (ndx 0) @ (v x)) @ (v y))
+          @ Iop
+       )
+    @ Iop
+    . 
 
+
+  
 Lemma fork_red: forall w x y z, va_red (App (App (fork w x) y) z) (App (App z w) x).
-Proof.  intros; cbv; vatac. Qed.  
+Proof.
+  intros; unfold fork, ndx, env_comb; succtac.
+  eapply2 preserves_app_va_red. eapply2 preserves_app_va_red. all: cbv; succtac.
+Qed.  
 
 Lemma substitution_stem :
   forall f x N, (substitute (stem f) x N) = stem (substitute f x N).
@@ -1067,7 +1107,8 @@ Proof. intros; cbv; auto. Qed.
 
 Lemma valuable_fork: forall x y, valuable x -> valuable y -> valuable (fork x y).
 Proof.
-  unfold valuable; split_all; exist (fork x1 x0); cbv; [repeat eapply2 preserves_app_va_red | program_tac]. 
+  unfold valuable; split_all. exist (fork x1 x0).
+  cbv; repeat eapply2 preserves_app_va_red. cbv; program_tac. 
 Qed.
 
 
@@ -1079,10 +1120,10 @@ Lemma substitute_preserves_va_red:
   forall M M', va_red M M' -> forall x N, va_red (substitute M x N) (substitute M' x N).
 Proof.
   cut(forall red M M', multi_step red M M' -> red = va_red1 ->
-                       forall x N, va_red  (substitute M x N) (substitute M' x N)); 
-  [ intro aux;  intros;  eapply2 aux
-  | intros red M M' r; induction r; split_all; subst; 
-    eapply succ_red; [ eapply2 substitute_preserves_va_red1 | eapply2 IHr]].
+                       forall x N, va_red  (substitute M x N) (substitute M' x N)).
+  intro aux;  intros.  eapply2 aux.
+  intros red M M' r; induction r; split_all; subst.
+  eapply succ_red. eapply2 substitute_preserves_va_red1. eapply2 IHr.
 Qed.
 
 (* 
@@ -1123,7 +1164,12 @@ Lemma kernel1_red :
                    "x" x))
  
 .
-Proof.  intros; cbv; vatac.  Qed.
+Proof.
+  intros x; unfold kernel; succtac. eapply transitive_red. eapply2 tag_apply.
+  eapply transitive_red.  eapply2 star_beta. 
+  rewrite ! tag_preserves_substitute.    rewrite substitution_stem. unfold substitute; fold substitute.
+  rewrite eqb_refl.  zerotac. 
+Qed.
 
 
 Lemma kernel2_red :
@@ -1137,45 +1183,45 @@ Lemma kernel2_red :
      (Lam @ Vop @ Lam))
           ).
 Proof.
-  intros x y;   aptac;
-    [ eapply2 kernel1_red
-    | zerotac
-    | eapply transitive_red;
-      [ eapply2 tag_apply
-      | unfold tag, fork, star, star_body; fold star_body;  simpl; succtac; 
-        repeat ( eapply2 preserves_app_va_red; succtac)]].
+  intros x y.   aptac. eapply2 kernel1_red.   zerotac.
+  eapply transitive_red. eapply2 tag_apply.
+  unfold tag, fork, star, star_body; fold star_body. simpl.  
+  succtac. eapply2 preserves_app_va_red.   succtac. eapply2 preserves_app_va_red.
+  eapply2 preserves_app_va_red.   eapply2 preserves_app_va_red. succtac. 
+  eapply2 preserves_app_va_red.   eapply2 preserves_app_va_red. succtac. 
+  eapply2 preserves_app_va_red.   eapply2 preserves_app_va_red. succtac. 
+  eapply2 preserves_app_va_red.   succtac. eapply2 preserves_app_va_red. succtac.
+  eapply2 preserves_app_va_red.   succtac.
+  eapply2 preserves_app_va_red.   eapply2 preserves_app_va_red.   succtac. eapply2 preserves_app_va_red.
+  succtac.   eapply2 preserves_app_va_red.   succtac. eapply2 preserves_app_va_red. succtac. 
 Qed.
 
 
 Lemma kernel3_red:  forall x y z, va_red (kernel @ x @ y @ z) (getTag @ x @ y @ z).
 Proof.
-  intros x y z;  aptac;
-    [eapply2 kernel2_red
-    | zerotac
-    | eapply transitive_red;
-      [ eapply2 tag_apply
-      | succtac;  eapply2 preserves_app_va_red; eapply2 preserves_app_va_red;  succtac]]. 
+  intros x y z.  aptac. eapply2 kernel2_red. zerotac.
+  eapply transitive_red. eapply2 tag_apply. succtac. eapply2 preserves_app_va_red.
+  eapply2 preserves_app_va_red. succtac. 
 Qed.
 
 
 Lemma get_tag_kernel_red:
   forall y z, va_red (App (App (App getTag kernel) y) z) y.
-Proof. intros x y; unfold kernel;  aptac; [ aptac; [eapply2 getTag_tag | |] | |]; zerotac; cbv; succtac. Qed. 
+Proof. intros x y; unfold kernel.  aptac. aptac.  eapply2 getTag_tag. all: zerotac. cbv; succtac. Qed. 
 
 Lemma get_tag_stem_red:
   forall x y z, va_red (getTag @ (kernel @ x) @ y @ z) (y @ z @ (x @ z)). 
 Proof.
-  intros x y z; intros; aptac;
-    [aptac; [aptac; [zerotac | eapply2 kernel1_red | eapply2 getTag_tag] | |] | |];
-    zerotac; eapply2 stem_red.   
+  intros x y z; intros; aptac. aptac. aptac. zerotac. eapply2 kernel1_red.
+  eapply2 getTag_tag. all: zerotac. eapply2 stem_red.   
 Qed.
 
 
 Lemma get_tag_fork_red:
   forall w x y z, va_red (getTag @ (kernel @ w @ x) @ y @ z) (z @ w @ x). 
 Proof.
-  intros w x y z; intros; aptac; [ aptac; [ aptac; [zerotac | eapply2 kernel2_red | ] | |] | |]; zerotac; 
-  cbv; repeat eapply2 is_App;   aptac; [ aptac; [ eapply2 getTag_tag | |] | |]; zerotac; cbv; succtac.   
+  intros w x y z. intros. aptac. aptac. aptac.  zerotac. eapply2 kernel2_red. all: zerotac.
+  cbv; repeat eapply2 is_App.   aptac. aptac.   eapply2 getTag_tag. all: zerotac.   cbv; succtac.   
 Qed.
 
 
@@ -1198,25 +1244,23 @@ Fixpoint tree_to_va M :=
 Lemma preserves_reduction1_tree_to_va:
   forall M N, t_red1 M N -> va_red (tree_to_va M) (tree_to_va N).
 Proof.
-  assert(combination getTag) by repeat eapply2 is_App;  
+  assert(combination getTag) by repeat eapply2 is_App. 
   intros M N r; induction r; subst; split_all.
-  { eapply transitive_red; [ eapply2 kernel3_red |  eapply2 get_tag_kernel_red]. } 
-  {
-    eapply transitive_red;
-      [ eapply2 kernel3_red
-      | aptac; [ aptac; [ aptac; [ zerotac | eapply2 kernel1_red | eapply2 getTag_tag] | |] | |];
-        zerotac;  eapply2 stem_red].
-    }
-  {
-    eapply transitive_red;
-      [ eapply2 kernel3_red
-      | aptac; [ aptac; [ aptac; [ zerotac | eapply2 kernel2_red | eapply2 getTag_tag] | |] | |]; zerotac];
-      cbv; succtac.
-  }
- all: eapply2 preserves_app_va_red. 
+  (* 5 *) 
+  4,5: eapply2 preserves_app_va_red.
+  (* 3 *)
+  eapply transitive_red. eapply2 kernel3_red.  eapply2 get_tag_kernel_red. 
+  (* 2 *) 
+  eapply transitive_red. eapply2 kernel3_red.
+  aptac. aptac. aptac.    zerotac. eapply2 kernel1_red. 
+  eapply2 getTag_tag.   all: zerotac. eapply2 stem_red.   
+  (* 1 *)
+  eapply transitive_red. eapply2 kernel3_red.
+  aptac. aptac. aptac.    zerotac. eapply2 kernel2_red. 
+  eapply2 getTag_tag.   all: zerotac.  cbv; succtac. 
 Qed.
 
-(* clean proofs to here *) 
+
 
 Lemma preserves_reduction_tree_to_va:
   forall M N, t_red M N -> va_red (tree_to_va M) (tree_to_va N).
@@ -1252,13 +1296,11 @@ Proof.
   cbv; program_tac.
   eauto.
   (* 1 *)
-  subst; repeat eexists;
-    [eapply transitive_red;
-     [ap2tac; zerotac
-     | eapply transitive_red;
-       [eapply2 kernel2_red
-       | eapply va_red_preserves_tags; [ zerotac | vatac]]]
-    | cbv; program_tac].
+  subst. repeat eexists. 
+  aptac. aptac. zerotac. eassumption.  zerotac. eassumption.
+  eapply transitive_red. eapply2 kernel2_red.  eapply va_red_preserves_tags. zerotac.
+  aptac. aptac. zerotac. aptac. aptac. zerotac. aptac. zerotac. succtac. all: zerotac.
+  cbv; program_tac.
 Qed.
 
 
@@ -1266,7 +1308,11 @@ Qed.
   
 Theorem meaningful_translation_from_tree_to_va:
   meaningful_translation_tree_to_va tree_to_va. 
-Proof. split_all; [eapply2 preserves_reduction1_tree_to_va |elim(valuable_trees M); split_all; exist x]. Qed.
+Proof.
+  split_all. 
+  eapply2 preserves_reduction1_tree_to_va.
+  elim(valuable_trees M); split_all.   exist x. 
+Qed.
 
 (* 
 Compute (term_size kernel). = 200 
@@ -1350,15 +1396,11 @@ Definition V_t := Y2_t (K@KI) V_0.
 
 Lemma Lam_t1_red: forall x, t_red  (Lam_t @ x) (tag (lamtag1 @ Lam_t @ x) (lamtagged2 @ Lam_t @x)).
 Proof.
-  intros; eapply transitive_red;
-    [ eapply2 Y2_red
-    |  fold Lam_t;
-       replace Lam_0 with (\"f" (\"x"
-                                  (tag
-                                     (lamtag1 @ Ref "f" @ Ref "x") (lamtagged2 @ Ref "f" @ Ref "x"))))
-         by auto;
-       unfold tag; starstac ("x" :: "f" :: nil)
-    ]. 
+  intros. eapply transitive_red. eapply2 Y2_red.  fold Lam_t.
+  replace Lam_0 with (\"f" (\"x"
+     (tag
+        (lamtag1 @ Ref "f" @ Ref "x") (lamtagged2 @ Ref "f" @ Ref "x")))) by auto.
+  unfold tag; starstac ("x" :: "f" :: nil). 
 Qed.
 
 
@@ -1382,12 +1424,8 @@ Qed.
 Lemma Lam_t3_red:
   forall x y z, t_red (Lam_t @ x @ y @ z) (getTag1 x @ (K@(K@ Lam_t)) @ y @ z).
 Proof.
-  intros; aptac;
-    [ eapply2 Lam_t2_red
-    | zerotac
-    | eapply transitive_red;
-      [ eapply2 tag_apply
-      | unfold useTag; starstac ("y" :: "x" :: "f" :: nil)]]. 
+  intros. aptac. eapply2 Lam_t2_red. zerotac.
+  eapply transitive_red. eapply2 tag_apply.    unfold useTag; starstac ("y" :: "x" :: "f" :: nil). 
  Qed.
 
 
@@ -1408,28 +1446,14 @@ Lemma programmable_Lamt2:
   forall M N, programmable M -> programmable N -> programmable (getTag1 M @ (K @ (K @ Lam_t)) @ N) ->
               programmable (Lam_t @ M @ N).
  Proof.
-   unfold programmable; split_all;  repeat eexists;  
-     [ eapply transitive_red;
-       [ eapply2 Lam_t2_red
-       | unfold tag; eapply transitive_red; 
-         [ aptac;
-           [ zerotac
-           |  aptac;
-              [ aptac;
-                [ zerotac
-                | aptac;
-                  [ zerotac
-                  | aptac;
-                    [ instantiate(1:=getTag1 M @ (K @ (K @ Lam_t)));  unfold useTag; trtac
-                    | zerotac
-                    | eassumption
-                    ]
-                  | zerotac]
-                | zerotac]
-              | |]; zerotac
-           | unfold lamtag2; starstac ("y" :: "x" :: "f" :: nil)]
-         | ap2tac; zerotac]]
-     | program_tac].
+   unfold programmable; split_all;  repeat eexists.  
+   eapply transitive_red. eapply2 Lam_t2_red.
+   eapply transitive_red.
+   unfold tag. aptac. zerotac. aptac. aptac. zerotac. aptac. zerotac. aptac. 
+   instantiate(1:=getTag1 M @ (K @ (K @ Lam_t))). unfold useTag; trtac. 
+   zerotac. eassumption. zerotac. zerotac. zerotac. zerotac.
+   unfold lamtag2; starstac ("y" :: "x" :: "f" :: nil).
+   ap2tac; zerotac.  program_tac.
 Qed. 
  
 
@@ -1437,27 +1461,18 @@ Qed.
 Lemma programmable_getTag1_Lamt1:
   forall M, programmable M -> programmable (getTag1 (Lam_t @ M) @ (K @ (K @ Lam_t))).
 Proof.
-  unfold programmable; split_all; repeat eexists;
-    [ aptac;
-      [ eapply getTag1_preserves_t_red; eapply Lam_t1_red
-      | zerotac
-      | eapply transitive_red; [ unfold getTag1, tag, lamtag1;  trtac | ap2tac; zerotac]]
-    | program_tac].    
+  unfold programmable; split_all; repeat eexists.
+  aptac. eapply getTag1_preserves_t_red.   eapply Lam_t1_red. zerotac.
+eapply transitive_red. unfold getTag1, tag, lamtag1; trtac. ap2tac; zerotac. program_tac.    
 Qed. 
 
 Lemma programmable_getTag1_Lamt1_app:
   forall M N, programmable M -> programmable N -> programmable (getTag1 (Lam_t @ M) @ (K @ (K @ Lam_t)) @N).
 Proof.
-  unfold programmable; split_all; repeat eexists;
-  [ aptac;
-    [ aptac;
-      [ eapply getTag1_preserves_t_red; eapply Lam_t1_red
-      | zerotac
-      | eapply transitive_red; [ unfold getTag1, tag, lamtag1; trtac | ap2tac; zerotac]
-      ]
-    | eassumption
-    |  trtac]
-  | program_tac].    
+  unfold programmable; split_all; repeat eexists.
+  aptac. aptac. eapply getTag1_preserves_t_red.   eapply Lam_t1_red. zerotac.
+  eapply transitive_red. unfold getTag1, tag, lamtag1; trtac. ap2tac; zerotac. eassumption.  trtac.
+  program_tac.    
 Qed. 
 
 
@@ -1466,13 +1481,32 @@ Lemma programmable_getTag1_Lamt2:
               programmable (getTag1 (Lam_t @ M@N) @ (K @ (K @ Lam_t))).
 Proof.
   unfold programmable; split_all; repeat eexists;
-    [ eapply transitive_red;
-      [ ap2tac; zerotac
-      | assert(t_red (Lam_t @ M) (Lam_0 @ Lam_t @ x2)) by
-          (eapply transitive_red; [eapply2 Y2_red | ap2tac; zerotac]); 
-        unfold getTag1; eapply transitive_red; [ ap2tac; zerotac |]];
-      eapply transitive_red; [ unfold Lam_0; trtac | aptac; [ trtac | trtac | trtac]]
-    | program_tac].
+      [ eapply transitive_red;
+        [unfold getTag1; eapply transitive_red;
+           [aptac;
+            [aptac;
+             [ aptac;
+               [ aptac;
+                 [ zerotac
+                 | aptac;
+                   [ aptac;
+                     [ aptac;
+                       [ aptac;
+                         [ zerotac
+                         | aptac; [ eapply2 Y2_red | zerotac | zerotac]; trtac
+                         | fold Lam_t;  unfold Lam_0; trtac]                 
+                       | | ]
+                     | |]
+                   | |]
+                 | ]
+               | |]
+             | |]
+            | |]; 
+            zerotac; trtac
+           | aptac; [ trtac | zerotac | zerotac]]  
+        | aptac;  [ trtac | zerotac | eapply transitive_red; [ trtac | ap2tac; zerotac]]
+        ]
+      | program_tac].
 Qed.
 
 Lemma programmable_getTag1_Lamt2_app:
@@ -1493,9 +1527,6 @@ Qed.
 
 
 
-Ltac Vt_tac x :=
-  assert(t_red (V_t @ x) (V_0 @ V_t @ x)) by eapply2 Y2_t_red;
-  unfold getTag1; eapply transitive_red; [ ap2tac; zerotac | unfold V_0; trtac];  trtac. 
 
 
 
@@ -1507,40 +1538,95 @@ Proof. intros; cbv; trtac. Qed.
 Lemma V_t1_red :
   forall x f sigma,
     t_red (getTag1 (V_t @ x) @ f @ sigma) (d (K@ x) @ (K@sigma)). 
-Proof.  intro x; intros; Vt_tac x. Qed.
+Proof.
+  intros; unfold getTag1; trtac;
+    aptac;
+    [aptac;
+     [aptac;
+      [ aptac;
+        [ aptac;
+          [ zerotac
+          | aptac;
+            [ aptac;
+              [ aptac;
+                [ aptac;
+                  [ zerotac
+                  | eapply2 Y2_t_red
+                  | fold V_t;  unfold V_0; trtac]                 
+                | | ]
+              | |]
+            | |]
+          | ]
+        | |]
+      | |]
+     | |]
+    | |]; 
+    zerotac; trtac. 
+Qed.
 
 Lemma V_t2_red :
   forall x y sigma,
     t_red (getTag1 (V_t @ x @ y) @ (K@(K@ Lam_t)) @ sigma)
           (d (Lam_t @ y @ sigma) @ (Lam_t @ x @ sigma)). 
-Proof.  intro x; intros; Vt_tac x. Qed.
-
+Proof.
+  intros; unfold getTag1; trtac;
+    aptac;
+    [aptac;
+     [aptac;
+      [ aptac;
+        [ aptac;
+          [ zerotac
+          | aptac;
+            [ aptac;
+              [ aptac;
+                [ aptac;
+                  [ zerotac
+                  | aptac;
+                    [ eapply2 Y2_t_red
+                    | zerotac
+                    | fold V_t;  unfold V_0; trtac]
+                  |]
+                | | ]
+              | |]
+            | |]
+          | ]
+        | |]
+      | |]
+     | |]
+    | |]; 
+    zerotac; trtac. 
+Qed.
 
 
 Lemma V_t3_red: forall x y z, t_red (V_t @ x @ y @ z) (V_t @ (V_t @ x @ y) @ z). 
-Proof.  intro x; intros; Vt_tac x. Qed.
+Proof.
+  intros. aptac. aptac. eapply2 Y2_t_red. zerotac.  fold V_t. unfold V_0. 
+  do 5 (eapply transitive_red; [eapply2 succ_red | ]).
+  aptac. aptac. aptac. aptac. zerotac. trtac. all: zerotac.  trtac.
+Qed.
 
 
 Lemma Lam_t_V_t0_red : forall y z, t_red (Lam_t @ V_t @ y @ z) z.
-Proof.  intros; eapply transitive_red; [ eapply2 Lam_t3_red | unfold V_t, Y2_t, tag, getTag1, d; trtac]. Qed.
+Proof.  intros. eapply transitive_red. eapply2 Lam_t3_red. unfold V_t, Y2_t, tag, getTag1, d;  trtac. Qed.
 
 Lemma Lam_t_V_t_red : forall x y z, t_red (Lam_t @ (V_t @ x) @ y @ z) (y@x).
 Proof.
-  intros; eapply transitive_red;
-    [ eapply2 Lam_t3_red
-    | unfold V_t, Y2_t, tag, getTag1, d; trtac; unfold wait, self_apply, d, V_0; trtac; 
-      aptac; [ trtac | zerotac | trtac]].
+  intros. eapply transitive_red. eapply2 Lam_t3_red.  unfold V_t, Y2_t, getTag1, tag, d.  trtac.
+    aptac. aptac. aptac. aptac. aptac. aptac. zerotac. aptac. aptac. aptac. aptac. zerotac.
+    eapply2 wait_red. unfold self_apply. trtac. all: zerotac.
+    unfold V_0 at 1; unfold tag_wait; trtac.
+    aptac. aptac. aptac. aptac. aptac. aptac. zerotac. trtac. all: zerotac. trtac.
 Qed.
 
 Lemma Lam_t_V_t2_red :
   forall x y z w, t_red (Lam_t @ (V_t @ w @ x) @ y @ z) (Lam_t @ w @ y @ z @ (Lam_t @ x @ y @ z)).
 Proof.
-  intros; eapply transitive_red;
-    [ eapply2 Lam_t3_red
-    | unfold V_t, Y2_t, tag, getTag1, d; trtac; unfold wait, self_apply, d, V_0; trtac; 
-      aptac; [ trtac | zerotac | trtac]].
+  intros. eapply transitive_red. eapply2 Lam_t3_red.  unfold V_t, Y2_t, getTag1, tag, d.  trtac.
+    aptac. aptac. aptac. aptac. aptac. aptac. zerotac. aptac. aptac. aptac. aptac. zerotac.
+    aptac.  eapply2 wait_red. all: zerotac.  unfold self_apply.  starstac ("x" :: nil).
+     unfold V_0 at 1; unfold tag_wait; trtac.
+    aptac. aptac. aptac. aptac. aptac. aptac. zerotac. trtac. all: zerotac. trtac.
 Qed.
-
 
 
 
@@ -1555,25 +1641,30 @@ Fixpoint va_to_tree M :=
     
 Lemma preserves_combination_ac_to_tree:
   forall M, Lambda_Abstraction_in_VA_Calculus.combination M -> combination (va_to_tree M).
-Proof.  intros M c; induction c; zerotac; cbv; auto 1000 with TreeHintDb. Qed.
+Proof.  intros M c; induction c; zerotac; cbv; auto 1000 with *. Qed.
 
 
 Lemma preserves_reduction1_va_to_tree:
   forall M N, va_red1 M N -> t_red (va_to_tree M) (va_to_tree N).
 Proof.
   intros M N r; induction r; subst; split_all;
-    try (eapply2 preserves_app_t_red; zerotac; fail);
-  [
-    eapply2 V_t3_red 
-  | eapply2 Lam_t_V_t0_red
-  | eapply2 Lam_t_V_t_red
-  | eapply2 Lam_t_V_t2_red
-  | eapply transitive_red; [ eapply2 Lam_t3_red |  cbv; trtac] | |];
-  (eapply transitive_red;
-  [eapply2 Lam_t3_red
-  | unfold getTag1;  
-    assert(t_red (Lam_t @ (va_to_tree M)) (Lam_0 @ Lam_t@ va_to_tree M)) by eapply2  Y2_red; 
-    eapply transitive_red; [ ap2tac; zerotac |  unfold Lam_0; trtac; aptac; [ trtac | zerotac | trtac]]]).
+    try (eapply2 preserves_app_t_red; zerotac; fail).
+  (* 7 *)
+  eapply2 V_t3_red. 
+  eapply2 Lam_t_V_t0_red.
+  eapply2 Lam_t_V_t_red.
+  eapply2 Lam_t_V_t2_red.
+  (* 3 *) 
+  eapply transitive_red. eapply2 Lam_t3_red. aptac. aptac. aptac. instantiate(1:= Id). cbv; trtac.
+  zerotac. trtac.  trtac. trtac. trtac. trtac.
+  (* 2 *)
+  eapply transitive_red. eapply2 Lam_t3_red. aptac. aptac. aptac. aptac. aptac. aptac.
+  zerotac. aptac. aptac. aptac. aptac. zerotac. 
+  eapply2 Y2_red.   fold Lam_t. unfold Lam_0; trtac. all: zerotac. trtac.
+  (* 1 *)
+  eapply transitive_red. eapply2 Lam_t3_red. aptac. aptac. aptac. aptac. aptac. aptac.
+  zerotac. aptac. aptac. aptac. aptac. zerotac.  aptac. 
+  eapply2 Y2_red.   zerotac. fold Lam_t. unfold Lam_0; trtac. all: zerotac. trtac.
 Qed.
 
 Ltac prog_aux_tac :=  repeat eexists;
@@ -1597,11 +1688,30 @@ Lemma programmable_getTag1_Vt1:
   forall M, programmable M -> programmable (getTag1 (V_t @ M) @ (K @ (K @ Lam_t))).
 Proof.
   intros M prM; inversion prM as [M1 (?&?)]; repeat eexists; 
-    [ assert(t_red (V_t @ M) (V_0 @V_t@ M1)) by
-        (eapply transitive_red; [eapply2  Y2_t_red | ap2tac; zerotac]);   
-      unfold getTag1; eapply transitive_red;
-      [ap2tac; zerotac
-      | eapply transitive_red;  [ unfold V_0; trtac | aptac; [ trtac | zerotac | trtac]]]
+    [ unfold getTag1; eapply transitive_red;
+      [ap2tac; zerotac  
+      | eapply transitive_red;
+        [aptac;
+         [aptac;
+          [ aptac;
+            [ aptac;
+              [ zerotac
+              | aptac;
+                [ aptac;
+                  [ aptac;
+                    [ aptac;
+                      [ zerotac
+                      | eapply2 Y2_t_red
+                      | fold V_t;  unfold V_0; trtac]                 
+                    | | ]
+                  | |]
+                | |]
+              | ]
+            | |]
+          | |]
+         | |]; 
+         zerotac; trtac
+        | aptac; [ trtac | zerotac | trtac]]]
     | program_tac]. 
 Qed. 
 
@@ -1616,12 +1726,15 @@ Qed.
 Lemma programmable_Vt2: forall M N, programmable M -> programmable N -> programmable (V_t @ M@ N).
 Proof.
   intros M N prM prN; inversion prM as [M1 (?&?)]; inversion prN as [N1 (?&?)]; repeat eexists;  
-    [ assert(t_red (V_t @ M) (V_0 @V_t@ M1)) by
-        (eapply transitive_red; [eapply2  Y2_t_red | ap2tac; zerotac]);   
-      unfold getTag1; eapply transitive_red;
-      [ap2tac; zerotac
-      | eapply transitive_red;  [ unfold V_0; trtac | aptac; [ trtac | zerotac | trtac]]]
-    | program_tac]. 
+    [ ap2tac;
+      [zerotac
+      |zerotac  
+      | eapply transitive_red;
+        [ aptac;
+          [ eapply2 Y2_t_red | zerotac | fold V_t; unfold V_0; trtac]
+        | aptac; [ trtac | zerotac | trtac]
+      ] ]
+    |  program_tac ]. 
 Qed. 
 
 
@@ -1630,15 +1743,34 @@ Lemma programmable_getTag1_Vt2:
               programmable (getTag1 (V_t @ M@N) @ (K @ (K @ Lam_t))).
 Proof.
   intros M N prM prN;
-    inversion prM as [M1 (?&?)]; inversion prN as [N1 (?&?)]; repeat eexists; 
-    [ assert(t_red (V_t @ M) (V_0 @V_t@ M)) by eapply2  Y2_t_red;   
-      unfold getTag1; eapply transitive_red;
-      [ap2tac; zerotac
-      | eapply transitive_red;
-        [ unfold V_0; trtac
-        | eapply transitive_red;
-          [aptac; [ trtac | zerotac | trtac]
-          | ap2tac; zerotac]]]
+    inversion prM as [M1 (?&?)]; inversion prN as [N1 (?&?)]; repeat eexists;
+      [ eapply transitive_red;
+        [unfold getTag1; eapply transitive_red;
+         [ap2tac; zerotac  
+         | eapply transitive_red;
+           [aptac;
+            [aptac;
+             [ aptac;
+               [ aptac;
+                 [ zerotac
+                 | aptac;
+                   [ aptac;
+                     [ aptac;
+                       [ aptac;
+                         [ zerotac
+                         | aptac; [ eapply2 Y2_t_red | zerotac | zerotac]; trtac
+                         | fold V_t;  unfold V_0; trtac]                 
+                       | | ]
+                     | |]
+                   | |]
+                 | ]
+               | |]
+             | |]
+            | |]; 
+            zerotac; trtac
+           | aptac; [ trtac | zerotac | zerotac]]]  
+        | aptac;  [ trtac | zerotac | eapply transitive_red; [ trtac | ap2tac; zerotac]]
+        ]
       | program_tac].
 Qed. 
 
@@ -1693,4 +1825,8 @@ Definition meaningful_translation_ac_to_tree (f: VA -> Tree) :=
   
 Theorem meaningful_translation_from_ac_to_tree:
   meaningful_translation_ac_to_tree va_to_tree. 
-Proof. split_all; [eapply2 preserves_reduction1_va_to_tree | eapply2 preserves_programs_va_to_tree]. Qed.
+Proof.
+  split_all. 
+  eapply2 preserves_reduction1_va_to_tree.
+  eapply2 preserves_programs_va_to_tree. 
+Qed.
