@@ -1,0 +1,374 @@
+
+    let t4 = tree! (~);
+    println!("The parsed leaf is: {}", t4);
+    
+    let t5 = tree! (~(~));
+    println!("The parsed stem is: {}", t5);
+    let t6 = tree! (~(~,~));
+    println!("The parsed fork is: {}", t6);
+
+/// fixpoints as per the separate crate fixpoints
+
+
+type Lazy<'a, T> = Box<dyn FnOnce() -> T + 'a>;
+
+// fix: (Lazy<T> -> T) -> T
+fn fix<'a, T, F>(f: F) -> T
+where F: Fn(Lazy<'a, T>) -> T + Copy + 'a
+{
+    f(Box::new(move || fix(f)))
+}
+
+
+impl Tree {
+
+    pub fn eval (t:Tree) -> Tree {
+ 
+        fn f(ev: Lazy<'static, Box<dyn FnOnce(Tree) -> Tree >>) -> Box<dyn FnOnce(Tree) -> Tree > {
+            Box::new(move |t| {
+                match t {
+                    Tree::Value (v) =>  Tree::Value(v), 
+                    Tree::Application(t1,t2) => {
+                        match &*t1 { // borrow the value of t1 
+                            Tree::Application(_,_) => Tree::Application(Box::new(ev()(*t1)),t2), 
+                            Tree::Value(v1) => {
+                                match &*t2 { //borrow the value of t2 
+                                    Tree::Application(_,_) => 
+                                        Tree::Application(t1,Box::new(ev()(*t2))), 
+                                    Tree::Value(v2) => {
+                                        let v3 = Rc::clone(v2) ; 
+                                        match &**v1 { 
+                                            Program::Leaf => Tree::Value(Rc::new(Program::Stem(v3))), 
+                                            Program::Stem(v11) =>
+                                                Tree::Value(Rc::new(Program::Fork(Rc::clone(v11),v3))),
+                                            Program::Fork(v11,v12) =>
+                                                ev()(Program::apply_rules(Rc::clone(v11),Rc::clone(v12),v3)),
+                                        }
+                                    }                                            
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        }        
+        fix(f)(t)
+    }
+}
+
+
+    let v4 = Tree::eval (Tree::app (Tree::app (Tree::app (Tree::node(),Tree::node()) ,Tree::node()) ,Tree::node()));
+     println!("eval ~~~~ is: {}", v4);
+
+
+
+Config::step(c)
+
+    pub fn is_value(c:Config)-> bool {
+	match c.graft {
+	    Tree::Value(_) => c.host.len() == 0,
+	    _ => false
+	}
+    }
+
+	
+
+    }
+
+
+
+
+    pub fn step (mut c:Config) {
+	match c.host.pop() {
+	    Some(Kin::Parent(f)) => {
+		c.host.push(Kin::Child(Tree::Value(c.graft)));
+		c.graft = f;
+		},
+	    Some(Kin::Child(t1)) => {
+		match t1 {
+		    Tree::Value(v2) => {
+			c.graft = Tree::apply_values(c.graft,v2);
+			Config::strip_args(graft,c.host);
+			match graft {
+			    Tree::Value(v) => c.graft = v,
+			    _ => (),
+			}
+		    }
+		    _ => {				
+			c.host.push(Kin::Parent(c.graft));
+			let mut graft = t1;
+			Config::strip_args(graft,c.host);
+			match graft {
+			    Tree::Value(v) => c.graft = v,
+			    _ => (),
+			}
+		    },
+		}
+	    },
+	    None => (),		    
+	}
+    }
+
+
+
+	// push the children of the graft, until it is a value
+	while let Tree::Application(t1,t2) = c.graft {
+	    c.graft = *t1;
+	    c.host.push(Kin::Child(*t2));
+	};
+
+
+    pub fn apply_rules(v1:Rc<Program>,v2:<Program>,v3:<Program>) -> Tree {
+        match v1 {
+            Program::Leaf => Tree::Value(Rc::new(v2)),
+            Program::Stem(v11) => {
+		Tree::app(Tree::app(Tree::Value(v2),Tree::Value(Rc::clone(&v3))),
+			  Tree::app(Tree::Value(Rc::clone(v11)),Tree::Value(Rc::clone(&v3)))
+		)
+	    }, 
+            Program::Fork(v11,v12) => {
+		Tree::app(Tree::app(Tree::Value(v3),Tree::Value(Rc::clone(&v11))),
+			  Tree::Value(Rc::clone(&v12)))
+	    },
+        }
+    }
+
+
+
+
+/*
+
+
+/* 
+impl Program {
+
+    pub fn eval (v1:Program, v2:Program) -> Program {
+
+	Kin::eval_kin(v1,host)
+    }
+}
+
+
+
+impl fmt::Display for Program {
+
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Leaf => write!(f, "~"), 
+            Stem(v) => write!(f,"~({})",*v),
+            Fork(v1,v2) => write!(f,"~({},{})", *v1, *v2),
+        }
+    }
+}
+
+
+impl Program {
+    pub fn leaf () -> Program {
+        Leaf 
+    }
+
+    pub fn stem(t:Program) -> Program {
+        Stem(Box::new(t))
+    }
+
+    pub fn fork(t1:Program,t2:Program) -> Program {
+        Fork(Box::new(t1),Box::new(t2))
+    }
+
+ }
+
+impl fmt::Display for Tree {
+
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Value(v) =>  write!(f, "({})",*v), 
+            Application(t1,t2) => write!(f,"{}{}",  *t1, *t2),
+        }
+    }
+}
+
+// fix!
+// impl Parse for Tree {
+//    fn parse(input: ParseStream) -> Result<Tree> {
+//        let content;
+//        parenthesized!(content in input);
+//        dbg!(content.to_string());
+//        dbg!(input.is_empty());
+//        Ok(A {})
+//    }
+// }
+
+
+#[macro_export]
+macro_rules! tree {
+    ( ~ ( ( $t1:expr ,  $t2:expr ) ) ) => {  Application(Box::new(t1), Box::new(t2)) } ;
+    ( ~ ( ( $t:expr ) ) ) => {  Application(Value(Leaf), Box::new(t)) } ;
+    (~) => { Value(Box::new(Leaf)) };
+}
+
+
+*/
+
+
+
+use std::fmt;
+use std::rc::Rc;
+// use syn::{parse_str, parenthesized, bracketed, braced};
+// use syn::parse::{Parse, ParseStream, Result};
+
+
+/// Programs may be a leaf, stem or fork, with branches that are values, 
+/// i.e. programs with reference counters.
+#[derive(Debug)]
+pub enum Program { 
+    Leaf,
+    Stem(Rc<Program>),
+    Fork(Rc<Program>, Rc<Program>),
+}
+
+use crate::Program::{Leaf, Stem, Fork};
+
+/// Trees are either values (i.e. programs), or applications. 
+#[derive(Debug)]
+pub struct Tree {
+    head: Link,
+}
+
+enum Link {
+    Value(Program),
+    Application(BoxOption<Box<Node>>;
+
+struct Node {
+    elem : Program,
+    left: Link,
+    right: Link 
+    Label: Program,
+    Children: Option<Box<Branches>>
+}
+
+#[derive(Debug)]
+struct Branches {
+    Left: Tree,
+    Right: Tree,
+}
+
+use crate::Tree::{Label, Children};
+use crate::Branches::{Left, Right};
+
+
+impl Tree {
+     pub fn app (t1:Tree,t2:Tree) -> Tree {
+        Application (Box::new(t1),Box::new(t2))
+     }
+}
+
+
+impl Tree {
+   // apply_values takes two programs and produces a tree.
+    
+    pub fn apply_values(v1:Program,v2:Program) -> Tree {
+        match v1 {
+            Leaf => Value(Rc::new(Stem(Rc::new(v2)))),
+            Stem(v11) => Value(Rc::new(Fork(Rc::clone(&v11),Rc::new(v2)))),
+            Fork(v11,v12) => {
+		match &*Rc::clone(&v11) {
+		    Leaf => Value(Rc::clone(&v12)),  // k-rule 
+		    Stem(v111) => {                  // s-rule
+			let v2c: Rc<Program> = Rc::new(v2); 
+			Tree::app(Tree::app(Value(Rc::clone(&v12)),Value(Rc::clone(&v2c))),
+				  Tree::app(Value(Rc::clone(&v111)),Value(Rc::clone(&v2c)))
+			)
+		    }, 
+		    Fork(v111,v112) => {            // f-rule
+			Tree::app(Tree::app(Value(Rc::new(v2)),Value(Rc::clone(&v111))),
+				  Value(Rc::clone(&v112)))
+		    },
+		}
+	    }
+	}
+    }
+}
+
+    fn val (t:Tree) -> Rc<Program> {
+	match t {
+	    Value(v) => v,
+	    _ => panic! {"this tree is not a value"}
+	}
+    }}
+
+
+ 
+
+     */
+
+
+
+
+/// a program is a binary trees, i.e. a leaf, stem or fork.
+pub enum Program { 
+    Leaf,
+    Stem(Rc<Program>),
+    Fork(Rc<Program>,Rc<Program>)
+}
+
+use crate::Factorable::{Leaf, Stem, Fork};
+
+/// Trees have zero, one or two branches 
+
+#[derive(Debug)]
+pub enum Tree {
+    Value : Rc<Program>,
+    Application: App head : Link
+}
+
+/// None represents a leaf 
+pub type Link = Option<Box<App>>;
+
+/// other trees are (boxed) applications
+#[derive(Debug)]
+pub struct App {
+    left: Rc<Tree>,
+    right: Rc<Tree>,
+}
+
+impl Tree {
+
+    pub fn new() -> Self {
+        Tree { head: None }
+    }
+
+    pub fn app (t1:Rc<Tree>, t2:Rc<Tree>) -> Tree {
+	Tree { head: Some(App {left:t1,right:t2})}
+    }
+ 
+}
+
+impl Factorable {
+
+    pub fn tree2factorable (t:Tree) -> Self {
+	match t.head { 
+	    None => Leaf, 
+	    Some(mut node) => {
+		let nr = mem::replace(&mut node.right, Tree::new());
+		match node.left.head  {
+		    None => Factorable::Stem(nr),
+		    Some(mut node1) => {
+			let nr1 = mem::replace(&mut node1.right, Tree::new());
+			match node1.left.head  {
+			    None => Factorable::Fork(nr1,nr),
+			    Some(_) => panic! {"tree2factorable failed"},
+			}
+		    },		    
+		}
+	    }
+	}
+    }
+    
+    pub fn factorable2tree (v:Factorable) -> Tree {
+	match v { 
+	    Leaf => Tree::new(), 
+	    Stem(v1) => Tree { head: Some(Box::new(App {left:Tree::new(), right: v1})) },
+	    Fork(v1,v2) => Tree { head: Some(Box::new(App {left:Tree::new(), right: v1})) },
+	}
+    }
+}
