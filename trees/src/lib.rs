@@ -90,6 +90,25 @@ pub struct Config {
 }
 
 
+impl Config {
+
+ 
+    pub fn new(g:Rc<Program>, h:Vec<Kin>) -> Self {
+	Config { graft:g, host:h} 
+    }
+
+    pub fn enforce_invariant(mut graft:Tree, mut host:Vec<Kin>) -> Self {
+	while let Apply(t1,t2) = graft {
+	    graft = *t1;
+	    host.push(Kin {parent:false, tree:*t2} );
+	}; 
+	if let Value(v) = graft {
+	    Config::new(v,host)
+	}
+	else { panic! {"enforce_invariant"} }
+    }
+}
+
 impl Tree {
 	
     pub fn val(v:Rc<Program>) -> Self {
@@ -163,70 +182,6 @@ impl Tree {
 
 
 
-}
-
-impl Config {
-
- 
-    pub fn new(g:Rc<Program>, h:Vec<Kin>) -> Self {
-	Config { graft:g, host:h} 
-    }
-
-    pub fn enforce_invariant(mut graft:Tree, mut host:Vec<Kin>) -> Self {
-	while let Apply(t1,t2) = graft {
-	    graft = *t1;
-	    host.push(Kin {parent:false, tree:*t2} );
-	}; 
-	if let Value(v) = graft {
-	    Config::new(v,host)
-	}
-	else { panic! {"enforce_invariant"} }
-    }
-    pub fn apply_graft_to_value(mut self, v:Rc<Program>) -> Self {
-	
-	match &*Rc::clone(&self.graft) {
-	    Leaf => {
-		self.graft = Rc::new(Stem(v)); 
-		self
-	    },
-	    Stem (v1) => {
-		self.graft = Rc::new(Fork(Rc::clone(v1),v));
-		self
-	    },
-	    Fork (v1,v2) => {
-		match &*Rc::clone(&v1) {
-		    Leaf => { // K-rule 
-			self.graft = Rc::clone(&v2);
-			self
-		    },
-		    Stem (v11) => { // S-rule
- 			self.host.push( Kin {
-			    parent:false,
-			    tree: Tree::app(Tree::val(Rc::clone(&v11)),Tree::val(Rc::clone(&v)))
-			});
-			self.host.push( Kin {
-			    parent:false,
-			    tree:Tree::val(v)
-			});
-			self.graft = Rc::clone(v2);
-			self
-		    },
-		    Fork (v11,v12) => { // F-rule
-			self.host.push( Kin {
-			    parent:false,
-			    tree: Tree::val(Rc::clone(v12))
-			});
-			self.host.push( Kin {
-			    parent:false,
-			    tree:Tree::val(Rc::clone(v11))
-			});
-			self.graft = v;
-			self
-		    },
-		}
-	    }
-	}
-    }
 }
 
 // Display of programs and trees 
