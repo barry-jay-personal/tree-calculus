@@ -109,7 +109,7 @@ impl Config {
     }
 }
 
-kimpl Tree {
+impl Tree {
 	
     pub fn val(v:Rc<Program>) -> Self {
         Value(v) }
