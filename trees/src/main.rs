@@ -30,15 +30,15 @@
 /*                                                                    */
 /**********************************************************************/
 
-// A tail-recursive implementation of tree calculus
-//
-// Trees are represented by a configuration consisting of a program (a binary tree) and its kin.
+/// A tail-recursive implementation of tree calculus
+///
+/// Trees are represented by a configuration consisting of a program (a binary tree) and its kin.
 /// The kin form a list of parent programs and child trees.
 /// If the next of kin is a child that is a program then a reduction rule is applied to produce a new tree,
 /// and then a new configuration,
 /// else the program and child are swapped, to produce a new configuration.
 
-/// The functionality is developedin lib.rs.
+/// The functionality is developed in lib.rs.
 /// A leaf is given by "~" so that K is "~~". Application is left-associative. 
 /// main.rs can be adapted to try experiments. 
 
