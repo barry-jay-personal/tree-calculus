@@ -109,11 +109,11 @@ Definition onFork tr :=
       ))
       "triage" tr.
 
-Lemma onFork_leaf: forall tr, onFork tr @ Node = K@ Node.
+Lemma onFork_leaf: forall tr, onFork tr @ Node === K@ Node.
 Proof. tree_eq. Qed.
-Lemma onFork_stem : forall tr x, onFork tr @ (Node @ x) = K @ (Node @ x).
+Lemma onFork_stem : forall tr x, onFork tr @ (Node @ x) === K @ (Node @ x).
 Proof. tree_eq. Qed.
-Lemma onFork_fork : forall tr x y, onFork tr @ (Node @ x @ y) = tr @ x @ y. 
+Lemma onFork_fork : forall tr x y, onFork tr @ (Node @ x @ y) === tr @ x @ y. 
 Proof. tree_eq. Qed.
 
   
@@ -129,31 +129,33 @@ Compute(term_size bf). 514.
 *) 
 
 
-Lemma bf_leaf: bf @ △= △.  
+Lemma bf_leaf: bf @ △ === △.  
 Proof. tree_eq. Qed.
 
 
-Lemma bf_stem: forall x, bf @ (△ @ x) = △ @ x.  
+Lemma bf_stem: forall x, bf @ (△ @ x) === △ @ x.  
 Proof. tree_eq. Qed.
 
-Lemma bf_fork: forall x y, bf @ (△ @ x @ y) = (triage bfforkleaf (bfforkstem eager) bfforkfork) @ x @ y @ bf.  
+Lemma bf_fork:
+  forall x y, bf @ (△ @ x @ y) === (triage bfforkleaf (bfforkstem eager) bfforkfork) @ x @ y @ bf.  
 Proof. tree_eq. Qed.
 
-Lemma bf_fork_leaf:  forall y z, bf @ (△@△@y) @ z = y.
+Lemma bf_fork_leaf:  forall y z, bf @ (△@△@y) @ z === y.
 Proof.  tree_eq. Qed. 
 
 
 Lemma bf_fork_stem:
-  forall x y z, bf @ (△@(△@x) @y) @ z = eager @ (bf @ x @ z) @ (bf @ (bf @ y @ z)). 
+  forall x y z, bf @ (△@(△@x) @y) @ z === eager @ (bf @ x @ z) @ (bf @ (bf @ y @ z)). 
 Proof. 
-  intros; rewrite bf_fork; rewrite triage_stem; unfold bfforkstem, Db, eager; eqtac;   
+  intros; unfold eq_q; rewrite quotient_app; rewrite bf_fork.
+  rewrite quotient_app.  rewrite quotient_app.   rewrite triage_stem; unfold bfforkstem, Db, eager; eqtac;   
     starstac ("f" :: "z" :: nil); auto. 
 Qed. 
 
 Lemma bf_fork_fork:
-  forall w x y z, bf @ (△@(△@w@x) @y) @ z = bf @ (bf @ z @ w) @x.
+  forall w x y z, bf @ (△@(△@w@x) @y) @ z === bf @ (bf @ z @ w) @x.
 Proof.
-  intros; rewrite bf_fork; rewrite triage_fork; unfold bfforkfork, d;
+  intros; unfold eq_q; rewrite quotient_app; rewrite bf_fork; rewrite quotient_app; rewrite quotient_app; rewrite triage_fork; unfold bfforkfork, d;
     starstac ("xf"  :: "wf"  :: nil); auto.  
 Qed. 
 
@@ -162,24 +164,31 @@ Compute (term_size bf).
 *) 
 
 Theorem branch_first_eval_to_bf:
-  forall M N P, program M -> program N -> branch_first_eval M N P -> bf@M@N = P. 
+  forall M N P, program M -> program N -> branch_first_eval M N P -> bf@M@N === P. 
 Proof.
-  intros M N P prM prN ev; induction ev; intros; simpl; subst; inv1 program; subst;  
-  [ rewrite bf_leaf 
-  | rewrite bf_stem 
-  | rewrite bf_fork_leaf 
-  | rewrite bf_fork_stem; rewrite IHev1; auto;  rewrite IHev2; auto; 
-    rewrite eager_of_factorable; [apply IHev3; auto | apply programs_are_factorable]; 
-    eapply branch_first_eval_program 
-  | rewrite bf_fork_fork; rewrite IHev1; auto;  rewrite IHev2; auto;
-    eapply branch_first_eval_program
-  ]; eauto .
+  intros M N P prM prN ev; induction ev; intros; simpl; subst; inv1 program; subst; unfold eq_q.   
+  rewrite quotient_app;  rewrite bf_leaf ; auto.
+  rewrite quotient_app; rewrite bf_stem ; auto. 
+   rewrite bf_fork_leaf ; auto. 
+   rewrite bf_fork_stem. rewrite quotient_app. rewrite quotient_app. rewrite IHev2; auto.
+   rewrite quotient_app;  rewrite IHev1; auto. 
+   rewrite <- quotient_app. rewrite <- quotient_app. rewrite <- quotient_app.
+   rewrite eager_of_factorable.  apply IHev3; auto.  
+    eapply branch_first_eval_program; eauto . 
+    eapply branch_first_eval_program; eauto . 
+    apply programs_are_factorable.     eapply branch_first_eval_program; eauto . 
+    rewrite bf_fork_fork. rewrite quotient_app. rewrite quotient_app. rewrite IHev1; auto.
+    rewrite <- quotient_app. rewrite <- quotient_app. rewrite IHev2; auto;
+    eapply branch_first_eval_program; eauto .
 Qed.
 
-Lemma bf_identity: forall z, bf @ Id @ z = z.
+Lemma bf_identity: forall z, bf @ Id @ z === z.
 Proof.
-  intros; unfold_op; rewrite bf_fork_stem; rewrite bf_leaf; rewrite bf_stem;
-      rewrite eager_of_factorable; auto_t; rewrite bf_fork_leaf; auto. 
+  intros; unfold_op; unfold eq_q.  rewrite bf_fork_stem. rewrite quotient_app.
+  rewrite quotient_app.  rewrite quotient_app.
+  rewrite bf_leaf. rewrite quotient_app. rewrite quotient_app.  rewrite bf_stem.
+  repeat rewrite <- quotient_app.
+  rewrite eager_of_factorable; auto_t; rewrite bf_fork_leaf; auto. 
 Qed.   
 
 
@@ -217,14 +226,18 @@ Definition quote :=
                              @ ((Ref "q") @ (Ref "x2"))
     ))))))).
 
-Ltac quote_tac := unfold quote; rewrite Y2_red; fold quote; starstac ("x2" :: "x1" :: "x" :: "q" :: nil).
+Ltac quote_tac :=
+  unfold quote, eq_q; rewrite Y2_red; fold quote; starstac ("x2" :: "x1" :: "x" :: "q" :: nil);
+  unfold d; eqtac.
 
-Lemma quote_red: forall M, program M -> App quote M = meta_quote M.
+Lemma quote_red: forall M, program M -> App quote M === meta_quote M.
 Proof.
-  intros M prM; induction prM; intros;
-    [ tree_eq
-    | quote_tac; rewrite IHprM; auto; unfold d; eqtac; auto 
-    | quote_tac; rewrite IHprM1; rewrite IHprM2; auto;  unfold d; eqtac; auto]. 
+  intros M prM; induction prM; intros; [
+    tree_eq |
+    quote_tac; rewrite <- quotient_app;  rewrite IHprM; auto |
+    quote_tac; rewrite <- quotient_app; rewrite <- quotient_app;
+    rewrite IHprM1; rewrite IHprM2; auto
+    ].  
 Qed.
 
 
@@ -291,12 +304,16 @@ Proof.
 Qed.
 
        
-Theorem root_eval_to_root: forall M P, root_eval M P -> root @ M = P.
+Theorem root_eval_to_root: forall M P, root_eval M P -> root @ M === P.
 Proof.
   intros M P ev; induction ev; intros;
-    unfold root; rewrite Y2_red; fold root; unfold onFork, d;  starstac ("f" :: "a" :: "r" :: nil);  
-      eqtac; auto; rewrite ? IHev; eqtac; auto ;
-        rewrite IHev1; unfold root1; eqtac; rewrite IHev2; unfold triage, rootf; eqtac; auto. 
+    unfold root, eq_q; rewrite Y2_red; fold root; unfold onFork, d;  starstac ("f" :: "a" :: "r" :: nil);  
+      eqtac; auto; rewrite ? IHev; eqtac; auto;
+  rewrite <- quotient_app; rewrite ? IHev; eqtac; auto;
+  rewrite <- quotient_app;   rewrite IHev1; eqtac; auto;
+  unfold root1; eqtac; rewrite <- quotient_app; rewrite IHev2; unfold triage, rootf; eqtac; auto. 
+
+
 Qed.
 
 (* 
@@ -326,20 +343,22 @@ Definition rb :=
 
   
 Lemma rb_eval_implies_rb :
-  forall M P, rb_eval M P -> combination M -> rb @ M = P. 
+  forall M P, rb_eval M P -> combination M -> rb @ M === P. 
 Proof.
-  intros M P e; induction e as [x | x y | x y z]; intro c; subst; 
-    [ assert(re: root @ x = △) by now apply root_eval_to_root
-    | assert(re:root @ x = △@ y) by now apply root_eval_to_root 
-    | assert(re: root @ x = △@ y@z) by (apply root_eval_to_root; auto)
+  intros M P e; induction e as [x | x y | x y z]; intro c; subst; unfold eq_q; [ 
+     assert(re: root @ x === △) by now apply root_eval_to_root 
+    | assert(re:root @ x === △@ y) by now apply root_eval_to_root 
+    | assert(re: root @ x === △@ y@z) by (apply root_eval_to_root; auto)
     ]; 
   unfold rb; rewrite Y2_red; fold rb;
   unfold triage; starstac ("z" :: "y" :: "x" :: "r" :: nil); 
-  rewrite re;   eqtac; auto;  
-    [ assert(combination (△ @ y)) by (eapply root_eval_combination; eauto);
-      inv1 combination; rewrite IHe; auto
-    | assert(combination (△ @ y@z)) by (eapply root_eval_combination; eauto); inv1 combination; subst;
-      rewrite IHe1; rewrite ? IHe2; eauto].
+    rewrite <- quotient_app.
+  rewrite re;   eqtac; auto.  
+ assert(combination (△ @ y)) by (eapply root_eval_combination; eauto); inv1 combination;
+  rewrite re;   eqtac; auto; rewrite <- quotient_app; rewrite IHe; auto.
+ assert(combination (△ @ y@z)) by (eapply root_eval_combination; eauto);inv1 combination; subst; 
+  rewrite re; eqtac; auto; rewrite <- quotient_app; rewrite IHe1; auto;   
+  rewrite <- quotient_app; rewrite IHe2; auto. 
 Qed.
 
 (* Root-First Evaluation *)
@@ -354,14 +373,18 @@ Definition rf :=
 
 
   
-Theorem root_first_eval_to_rf: forall M N P, rf_eval M N P -> program M -> program N -> rf @M@N  = P .
+Theorem root_first_eval_to_rf:
+  forall M N P, rf_eval M N P -> program M -> program N -> rf @M@N  === P .
 Proof.
   (intros M N P r ? ?; unfold rf;
   assert(combination M) by now apply programs_are_combinations;
   assert(combination N) by now apply programs_are_combinations;
-  assert(combination rb) by (apply programs_are_combinations; program_tac));  
-  (unfold wait, d; starstac ("z" :: "f" :: "q" :: nil);   rewrite ! quote_red; auto;
-  replace (△ @ (meta_quote M) @ (meta_quote N)) with (meta_quote (M@ N)) by auto;
+  assert(combination rb) by (apply programs_are_combinations; program_tac)).  
+  unfold wait, d, eq_q; starstac ("z" :: "f" :: "q" :: nil).
+  rewrite <- quotient_app; rewrite ! quote_red; auto.
+  rewrite <- quotient_app; rewrite ! quote_red; auto.  
+  replace Noq with (quotient Node) by auto. repeat rewrite <- quotient_app. 
+  replace (△ @ (meta_quote M) @ (meta_quote N)) with (meta_quote (M@ N)) by auto.
   unfold rf_eval in *; apply rb_eval_implies_rb; auto;
-  apply meta_quote_preserves_combinations; auto_t). 
+  apply meta_quote_preserves_combinations; auto_t. 
 Qed.

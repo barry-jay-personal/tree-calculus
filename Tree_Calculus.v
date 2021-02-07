@@ -56,13 +56,6 @@ Hint Constructors Tree : TreeHintDb.
 Notation "△" := Node : tree_scope.
 Notation "x @ y" := (App x y) (at level 65, left associativity) : tree_scope.
 
-
-Axiom k_eq : forall y z, △ @ △ @ y @ z = y.
-Axiom s_eq : forall x y z, △ @ (△ @ x) @ y @ z = y@z@(x@z).
-Axiom f_eq : forall w x y z, △ @ (△ @ w @ x) @ y @ z = z@w@x. 
-
-Ltac tree_eq := intros; cbv; repeat (rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq); auto. 
-
 Definition K := △ @ △. 
 Definition Id := △ @ (△ @ △) @ (△ @ △).
 Definition KI := K@Id. 
@@ -79,6 +72,36 @@ match goal with
 | _ => auto
  end.
 
+(* Equational Theory *)
+
+Axiom Tree_q: Set.
+Axiom Req : string -> Tree_q. 
+Axiom Noq : Tree_q.
+Axiom Apq : Tree_q -> Tree_q -> Tree_q.
+
+
+Axiom k_eq : forall y z, Apq (Apq (Apq Noq Noq) y) z = y. 
+Axiom s_eq : forall x y z, Apq (Apq (Apq Noq (Apq Noq x)) y) z = Apq (Apq y z) (Apq x z). 
+Axiom f_eq : forall w x y z, Apq (Apq (Apq Noq (Apq (Apq Noq w) x)) y) z = Apq (Apq z w) x. 
+
+Ltac tree_eq := intros; cbv; repeat (rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq); auto. 
+
+
+
+Fixpoint quotient M :=
+  match M with
+  | Ref x => Req x
+  | Node => Noq
+  | M1 @ M2 => Apq (quotient M1) (quotient M2)
+  end.
+
+Definition eq_q x y := quotient x = quotient y. 
+
+Notation "x === y" := (eq_q x y) (at level 85) : tree_scope.
+
+
+Lemma quotient_app: forall M1 M2, quotient (M1 @ M2) = Apq (quotient M1) (quotient M2).
+  Proof. auto_t. Qed. 
 
 
 (* Section 3.4: Programs *) 
@@ -103,7 +126,7 @@ Definition negation := d (K@K) @ (d (K@KI) @ Id).
 Definition bi_implies := △@ (△@ Id @ negation)@△.
 
 
-Lemma conjunction_true : forall y, conjunction @ K @ y = y.
+Lemma conjunction_true : forall y, conjunction @ K @ y === y. 
 Proof.  tree_eq. Qed. 
  
 
@@ -114,10 +137,10 @@ Definition Pair := △ .
 Definition first p :=  △@ p@ △@ K.
 Definition second p := △ @p@ △@ KI.
 
-Lemma first_pair : forall x y, first (Pair @x@y) = x. 
-Proof.  tree_eq. Qed.  
+Lemma first_pair : forall x y, (first (Pair @x@y)) === x. 
+Proof.   tree_eq. Qed.  
 
-Lemma second_pair : forall x y, second (Pair @x@y) = y .
+Lemma second_pair : forall x y, second (Pair @x@y) === y .
 Proof.  tree_eq. Qed.  
 
 
@@ -132,10 +155,10 @@ Definition isZero := d (K@ (K@ (K@ KI))) @ (d (K@ K) @ △).
 Definition predecessor := d (K@ KI) @ (d (K@ △) @  △).
 
 
-Lemma isZero_zero : isZero @ △ = K.
+Lemma isZero_zero : isZero @ △ === K.
 Proof.  tree_eq. Qed.  
 
-Lemma isZero_successor : forall n, isZero @ (K@ n) = KI. 
+Lemma isZero_successor : forall n, isZero @ (K@ n) === KI. 
 Proof.  tree_eq. Qed.  
 
 
@@ -154,20 +177,22 @@ Definition isFork := query KI KI K.
 
 
 Lemma query_eq_0:
-  forall is0 is1 is2, query is0 is1 is2 @  △ = is0.
+  forall is0 is1 is2, query is0 is1 is2 @  △ === is0.
 Proof.   tree_eq. Qed. 
 
 Lemma query_eq_1: 
-  forall is0 is1 is2 P,  query is0 is1 is2 @ (△ @ P) = is0 @ KI @ is1.
+  forall is0 is1 is2 P,  query is0 is1 is2 @ (△ @ P) === is0 @ KI @ is1.
 Proof. tree_eq.  Qed. 
 
 Lemma query_eq_2:
-  forall is0 is1 is2 P Q,  query is0 is1 is2 @ (△@ P@ Q) = is2.
+  forall is0 is1 is2 P Q,  query is0 is1 is2 @ (△@ P@ Q) === is2.
 Proof. tree_eq. Qed. 
 
 
 Ltac unfold_op := unfold isLeaf, isStem, isFork, query, Sop, D, KI, Id, K.
-Ltac eqtac := unfold_op;  repeat (rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq).
+Ltac eqtac :=
+  unfold_op;
+  repeat (unfold quotient; fold quotient; rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq).
 
 Fixpoint term_size M :=
   match M with
@@ -182,57 +207,57 @@ Fixpoint term_size M :=
 
 Definition D_variant := Sop @ (K@(Sop @ Sop)) @ K.
 
-Lemma d_variant_eval: forall x y z, D_variant @ x @ y @ z = y@ z @ (x @ z).
+Lemma d_variant_eval: forall x y z, D_variant @ x @ y @ z === y@ z @ (x @ z).
 Proof. tree_eq. Qed. 
 
 (* 2 *)
-Lemma conjunction_false: forall y, conjunction @ KI @ y = K@Id.
+Lemma conjunction_false: forall y, conjunction @ KI @ y === K@Id.
 Proof.  tree_eq. Qed. 
 
 (* 3 *) 
-Lemma disjunction_true : forall y, disjunction @ K @y = K.
+Lemma disjunction_true : forall y, disjunction @ K @y === K.
 Proof.  tree_eq. Qed. 
  
-Lemma disjunction_false: forall y, disjunction @ KI @y = y. 
+Lemma disjunction_false: forall y, disjunction @ KI @y === y. 
 Proof.  tree_eq. Qed.  
 
-Lemma implies_true : forall y, implies @ K @ y = y. 
+Lemma implies_true : forall y, implies @ K @ y === y. 
 Proof.  tree_eq. Qed.  
 
-Lemma implies_false: forall y, implies @ KI @ y = K.
+Lemma implies_false: forall y, implies @ KI @ y === K.
 Proof.  tree_eq. Qed.  
 
-Lemma negation_true : negation @ K = KI.
+Lemma negation_true : negation @ K === KI.
 Proof.  tree_eq. Qed.  
 
-Lemma negation_false : negation @ (K@Id) = K.
+Lemma negation_false : negation @ (K@Id) === K.
 Proof.  tree_eq. Qed. 
 
-Lemma iff_true : forall y, bi_implies @K@y = y. 
+Lemma iff_true : forall y, bi_implies @K@y === y. 
 Proof.  tree_eq. Qed. 
 
-Lemma iff_false_true : bi_implies @ KI @K = K@Id.
+Lemma iff_false_true : bi_implies @ KI @K === K@Id.
 Proof.  tree_eq. Qed. 
 
-Lemma iff_false_false : bi_implies @ KI @ KI = K.
+Lemma iff_false_false : bi_implies @ KI @ KI === K.
 Proof.  tree_eq. Qed. 
 
 (* 4 *)
 Definition first0 := d (K@K) @ (d (K@ △) @ △).
 Definition second0 := d (K@(K@Id)) @ (d (K@ △) @ △).
 
-Lemma first0_first: forall p, first0 @ p = (first p).
+Lemma first0_first: forall p, first0 @ p === (first p).
 Proof.  tree_eq. Qed. 
 
-Lemma second0_second: forall p, second0 @ p = (second p).
+Lemma second0_second: forall p, second0 @ p === (second p).
 Proof.  tree_eq. Qed. 
 
 (* 5 *)
 
-Lemma predecessor_zero: predecessor @ △ = △. 
+Lemma predecessor_zero: predecessor @ △ === △. 
 Proof.  tree_eq. Qed.  
 
-Lemma predecessor_successor : forall n, predecessor @ (K@ n) = n.
+Lemma predecessor_successor : forall n, predecessor @ (K@ n) === n.
 Proof.  tree_eq. Qed.
 
 (* 6 *)
@@ -246,28 +271,28 @@ Definition predecessor_variant :=
         @ (d (d (K@ △) @ Id) @ (K@△))
      ).
 
-Lemma predecessor_variant_zero: predecessor_variant @ △ = △. 
+Lemma predecessor_variant_zero: predecessor_variant @ △ === △. 
 Proof.  tree_eq. Qed.  
 
-Lemma predecessor_successor_variant : forall n, predecessor_variant @ (successor_variant @ n) = n.
+Lemma predecessor_successor_variant : forall n, predecessor_variant @ (successor_variant @ n) === n.
 Proof.  tree_eq. Qed.
 
 
-Lemma isZero_variant_Zero : isZero_variant @ zero = K.
+Lemma isZero_variant_Zero : isZero_variant @ zero === K.
 Proof. tree_eq. Qed.
 
-Lemma isZero_variant_successor : forall n, isZero_variant @ (successor_variant @ n) = KI.
+Lemma isZero_variant_successor : forall n, isZero_variant @ (successor_variant @ n) === KI.
 Proof. tree_eq. Qed. 
 
 (* 7 *)
 
-Lemma isLeaf_node: isLeaf @ △ = K.
+Lemma isLeaf_node: isLeaf @ △ === K.
 Proof.  tree_eq. Qed. 
 
-Lemma isLeaf_K: isLeaf @ K = KI.
+Lemma isLeaf_K: isLeaf @ K === KI.
 Proof.  tree_eq. Qed. 
 
-Lemma isLeaf_Knode: isLeaf @ (K@△) = KI.
+Lemma isLeaf_Knode: isLeaf @ (K@△) === KI.
 Proof.  tree_eq. Qed. 
 
 (* 8 *)
