@@ -134,8 +134,8 @@ Ltac equaltac :=  unfold equal, eq_q; rewrite Y3_red; fold equal; eqtac; unfold 
 Theorem equal_programs: forall M,  program M -> equal @ M @ M === K. 
 Proof.
   intros M prM; induction prM; intros; equaltac;
-    unfold eq_q in *; unfold quotient in *; fold quotient in *;
-      rewrite IHprM1; rewrite IHprM2; eqtac; auto.
+    unfold eq_q in *; unquotient_tac; rewrite quotient_app; rewrite quotient_app;
+  rewrite IHprM1; rewrite IHprM2; eqtac; auto.
 Qed.
 
 Theorem unequal_programs:
@@ -506,10 +506,10 @@ Proof.   intros M N fac; inversion fac; cbv; eqtac; auto. Qed.
 
 Lemma size_succ: forall M,  size @ (K@ M) === K@(K@ (size @ M)).
 Proof.
-  intros; unfold_op; unfold eq_q; rewrite size_fork. rewrite quotient_app.
-  rewrite quotient_app. rewrite quotient_app.  rewrite size_leaf.
-  rewrite <- quotient_app. rewrite <- quotient_app. rewrite plus_successor.
-  rewrite quotient_app; rewrite plus_zero; auto.
+  intros; unfold_op; unfold eq_q; rewrite size_fork;
+    do 3 rewrite quotient_app; rewrite size_leaf;
+      do 2  rewrite <- quotient_app; rewrite plus_successor;
+        rewrite quotient_app; rewrite plus_zero; auto.
 Qed.
 
 Fixpoint nat_to_tree n :=
@@ -520,9 +520,11 @@ Fixpoint nat_to_tree n :=
 
 Lemma size_nat: forall n, size @ (nat_to_tree n) === nat_to_tree (S(2*n)).
 Proof.
-  induction n; intros; simpl; unfold eq_q; [ rewrite size_leaf; auto | rewrite size_succ ].
-  rewrite quotient_app.   rewrite quotient_app. rewrite IHn.  repeat rewrite <- quotient_app.
-eqtac.   repeat f_equal; lia. 
+  induction n; intros; simpl; unfold eq_q; [
+    rewrite size_leaf; auto |
+    rewrite size_succ; do 2 rewrite quotient_app; rewrite IHn; unquotient_tac; eqtac;
+    repeat f_equal; lia
+    ]. 
 Qed.
 
 
@@ -541,53 +543,6 @@ Lemma nat_to_nat : forall n, tree_to_nat (nat_to_tree n) = (n,Node).
 Proof. induction n; intros; simpl; auto. rewrite IHn; auto. Qed.
 
 
-Lemma size_W: size @ W === nat_to_tree 57. 
-Proof.
-  unfold W, bracket, d, eq_q; subst_tac;  starstac ("y" :: "x" :: nil).
-  replace Noq with (quotient Node) by auto. repeat rewrite <- quotient_app.
-  rewrite size_fork.
-  repeat (rewrite quotient_app; repeat (rewrite size_fork || rewrite size_stem || rewrite size_leaf)).
-  repeat rewrite <- quotient_app.
-  repeat   (repeat (  rewrite plus_successor || rewrite plus_zero); rewrite quotient_app).
-  repeat rewrite <- quotient_app.
-    repeat   (repeat (  rewrite plus_successor || rewrite plus_zero); rewrite quotient_app).
-    unfold nat_to_tree.
-    repeat rewrite quotient_app.     do 10 f_equal. do 8 f_equal.
-repeat rewrite <- quotient_app.
-   repeat   (repeat (  rewrite plus_successor || rewrite plus_zero); rewrite quotient_app).
-   f_equal; f_equal.  
-repeat rewrite <- quotient_app.
-   repeat   (repeat (  rewrite plus_successor || rewrite plus_zero); rewrite quotient_app).
-do 4   f_equal.  
-repeat rewrite <- quotient_app.
-   repeat   (repeat (  rewrite plus_successor || rewrite plus_zero); rewrite quotient_app).
-repeat f_equal. 
-Qed. 
-
- 
-
-(* 3 *)
-
-Lemma compare_succs: forall m n, m=n -> K@m = K@n.
-Proof. intros; subst; auto. Qed. 
-
-Ltac size_tac :=
-  unfold_op; unfold nat_to_tree; 
-  repeat (rewrite size_fork || rewrite size_stem || rewrite size_leaf);
-  repeat ((rewrite plus_successor || rewrite plus_zero); try apply compare_succs);  auto. 
-
-Lemma succ_nat: forall n, successor @ (nat_to_tree n) === nat_to_tree (S n).
-Proof. tree_eq. Qed. 
-
-Lemma succ_nat2:
-  forall n k, plus @ (nat_to_tree n) @ (successor @ k) === plus @ (nat_to_tree (S n)) @ k.
-Proof.
-  induction n; intros; simpl; unfold eq_q; 
-    [ rewrite plus_zero;  rewrite plus_successor;
-rewrite quotient_app; rewrite quotient_app;   rewrite plus_zero; auto | 
-      rewrite plus_successor; rewrite quotient_app; rewrite IHn;  rewrite plus_successor; auto
-      ]. 
-Qed. 
 
 Lemma plus_nat: forall m n, plus @ (nat_to_tree m) @ (nat_to_tree n) === nat_to_tree (m+ n).
 Proof.
@@ -597,15 +552,24 @@ Proof.
     ].
 Qed. 
 
-
 Lemma size_of_program: forall p, program p -> size @ p === nat_to_tree (term_size p).
 Proof.
-  intros p pr; induction pr; intros; unfold eq_q, term_size; fold term_size.
-  rewrite size_leaf; auto. 
-  rewrite size_stem. rewrite quotient_app. rewrite IHpr; simpl; auto.
-  rewrite size_fork. do 3 rewrite quotient_app. rewrite IHpr1; rewrite IHpr2.
-  repeat rewrite <- quotient_app. rewrite quotient_app. rewrite plus_nat. simpl; auto.
+  intros p pr; induction pr; intros; unfold eq_q, term_size; fold term_size; [
+  rewrite size_leaf; auto | 
+  rewrite size_stem; rewrite quotient_app; rewrite IHpr; simpl; auto |
+  rewrite size_fork; do 3 rewrite quotient_app; rewrite IHpr1; rewrite IHpr2;
+  unquotient_tac; rewrite quotient_app; rewrite plus_nat; simpl; auto
+  ].
 Qed.
+
+
+Lemma size_W: size @ W === nat_to_tree 57. 
+Proof.  unfold eq_q; rewrite size_of_program; auto; program_tac. Qed. 
+
+ 
+
+(* 3 *)
+
 
 (*
 Compute (term_size plus).  *) 

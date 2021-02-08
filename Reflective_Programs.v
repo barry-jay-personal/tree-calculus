@@ -147,8 +147,8 @@ Proof.  tree_eq. Qed.
 Lemma bf_fork_stem:
   forall x y z, bf @ (△@(△@x) @y) @ z === eager @ (bf @ x @ z) @ (bf @ (bf @ y @ z)). 
 Proof. 
-  intros; unfold eq_q; rewrite quotient_app; rewrite bf_fork.
-  rewrite quotient_app.  rewrite quotient_app.   rewrite triage_stem; unfold bfforkstem, Db, eager; eqtac;   
+  intros; unfold eq_q; rewrite quotient_app; rewrite bf_fork;
+  do 2 rewrite quotient_app; rewrite triage_stem; unfold bfforkstem, Db, eager; eqtac;   
     starstac ("f" :: "z" :: nil); auto. 
 Qed. 
 
@@ -166,29 +166,27 @@ Compute (term_size bf).
 Theorem branch_first_eval_to_bf:
   forall M N P, program M -> program N -> branch_first_eval M N P -> bf@M@N === P. 
 Proof.
-  intros M N P prM prN ev; induction ev; intros; simpl; subst; inv1 program; subst; unfold eq_q.   
-  rewrite quotient_app;  rewrite bf_leaf ; auto.
-  rewrite quotient_app; rewrite bf_stem ; auto. 
-   rewrite bf_fork_leaf ; auto. 
-   rewrite bf_fork_stem. rewrite quotient_app. rewrite quotient_app. rewrite IHev2; auto.
-   rewrite quotient_app;  rewrite IHev1; auto. 
-   rewrite <- quotient_app. rewrite <- quotient_app. rewrite <- quotient_app.
-   rewrite eager_of_factorable.  apply IHev3; auto.  
-    eapply branch_first_eval_program; eauto . 
-    eapply branch_first_eval_program; eauto . 
-    apply programs_are_factorable.     eapply branch_first_eval_program; eauto . 
-    rewrite bf_fork_fork. rewrite quotient_app. rewrite quotient_app. rewrite IHev1; auto.
-    rewrite <- quotient_app. rewrite <- quotient_app. rewrite IHev2; auto;
-    eapply branch_first_eval_program; eauto .
+  intros M N P prM prN ev; induction ev; intros; simpl; subst; inv1 program; subst; unfold eq_q;
+    [   
+      rewrite quotient_app;  rewrite bf_leaf ; auto |
+  rewrite quotient_app; rewrite bf_stem ; auto |
+   rewrite bf_fork_leaf ; auto | 
+   rewrite bf_fork_stem; do 2 rewrite quotient_app; rewrite IHev2; auto;
+   rewrite quotient_app;  rewrite IHev1; auto; 
+   unquotient_tac; rewrite eager_of_factorable; [
+     apply IHev3; auto; eapply branch_first_eval_program; eauto | 
+     apply programs_are_factorable;  eapply branch_first_eval_program; eauto
+   ] |
+    rewrite bf_fork_fork; do 2rewrite quotient_app; rewrite IHev1; auto;
+    unquotient_tac; rewrite IHev2; auto;  eapply branch_first_eval_program; eauto
+      ].
 Qed.
 
 Lemma bf_identity: forall z, bf @ Id @ z === z.
 Proof.
-  intros; unfold_op; unfold eq_q.  rewrite bf_fork_stem. rewrite quotient_app.
-  rewrite quotient_app.  rewrite quotient_app.
-  rewrite bf_leaf. rewrite quotient_app. rewrite quotient_app.  rewrite bf_stem.
-  repeat rewrite <- quotient_app.
-  rewrite eager_of_factorable; auto_t; rewrite bf_fork_leaf; auto. 
+  intros; unfold_op; unfold eq_q; rewrite bf_fork_stem; do 3 rewrite quotient_app;
+  rewrite bf_leaf; do 2 rewrite quotient_app; rewrite bf_stem;
+  unquotient_tac;   rewrite eager_of_factorable; auto_t; rewrite bf_fork_leaf; auto. 
 Qed.   
 
 
@@ -383,7 +381,7 @@ Proof.
   unfold wait, d, eq_q; starstac ("z" :: "f" :: "q" :: nil).
   rewrite <- quotient_app; rewrite ! quote_red; auto.
   rewrite <- quotient_app; rewrite ! quote_red; auto.  
-  replace Noq with (quotient Node) by auto. repeat rewrite <- quotient_app. 
+  unquotient_tac; 
   replace (△ @ (meta_quote M) @ (meta_quote N)) with (meta_quote (M@ N)) by auto.
   unfold rf_eval in *; apply rb_eval_implies_rb; auto;
   apply meta_quote_preserves_combinations; auto_t. 

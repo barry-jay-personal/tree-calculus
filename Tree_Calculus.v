@@ -45,6 +45,7 @@ Open Scope tree_scope.
   
 (* Section 3.3 Tree Calculus *)
 
+(* The type Tree supports inductive definitions *) 
 Inductive Tree:  Set :=
   | Ref : string -> Tree  (* variables are indexed by strings *) 
   | Node : Tree   
@@ -74,12 +75,13 @@ match goal with
 
 (* Equational Theory *)
 
+(* The type Tree_q is axiomatic, so no inductive definitions ... *) 
 Axiom Tree_q: Set.
 Axiom Req : string -> Tree_q. 
 Axiom Noq : Tree_q.
 Axiom Apq : Tree_q -> Tree_q -> Tree_q.
 
-
+(* ... but it does support axioms for equational reasoning *)
 Axiom k_eq : forall y z, Apq (Apq (Apq Noq Noq) y) z = y. 
 Axiom s_eq : forall x y z, Apq (Apq (Apq Noq (Apq Noq x)) y) z = Apq (Apq y z) (Apq x z). 
 Axiom f_eq : forall w x y z, Apq (Apq (Apq Noq (Apq (Apq Noq w) x)) y) z = Apq (Apq z w) x. 
@@ -87,7 +89,7 @@ Axiom f_eq : forall w x y z, Apq (Apq (Apq Noq (Apq (Apq Noq w) x)) y) z = Apq (
 Ltac tree_eq := intros; cbv; repeat (rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq); auto. 
 
 
-
+(* The two types are related by quotienting *) 
 Fixpoint quotient M :=
   match M with
   | Ref x => Req x
@@ -100,9 +102,14 @@ Definition eq_q x y := quotient x = quotient y.
 Notation "x === y" := (eq_q x y) (at level 85) : tree_scope.
 
 
+Lemma quotient_node: quotient Node = Noq. 
+  Proof. auto_t. Qed. 
+
 Lemma quotient_app: forall M1 M2, quotient (M1 @ M2) = Apq (quotient M1) (quotient M2).
   Proof. auto_t. Qed. 
 
+Ltac unquotient_tac := repeat rewrite <- quotient_node; repeat rewrite <- quotient_app.
+  
 
 (* Section 3.4: Programs *) 
 

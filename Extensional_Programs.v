@@ -119,7 +119,7 @@ Fixpoint star x M :=
                            then d (K@ (Ref y)) @ (star x M1)
                             else K@ (M1 @ (Ref y))
   | App M1 M2 => if occurs x (M1 @ M2)
-                 then d (star x M2) @ (star x M1)
+                 then Node @ (Node @ (star x M2)) @ (star x M1)
                  else K@ (M1 @ M2)
   end. 
 
@@ -201,8 +201,7 @@ Proof.
     caseEq (occurs x (M@△)); intros; [ 
     simpl; eqtac; auto; rewrite ! star_occurs_false; unfold star;eqtac; auto | 
     rewrite ! star_occurs_false; auto_t;  [
-      tree_eq |
-      inversion H; subst; rewrite orb_false_r; auto
+      tree_eq | simpl in *; rewrite orb_false_r in *; auto  
     ]] |
 
   caseEq (occurs x (M@(t@t0))); intros; eqtac; f_equal;
@@ -215,9 +214,8 @@ Proof.
   induction M; intros; unfold eq_q; 
     [ | | 
       rewrite star_app_red; eqtac;
-      replace (Apq (quotient (\ x M1)) (quotient N)) with (quotient (App (\x M1) N)) by auto; 
-      replace (Apq (quotient (\ x M2)) (quotient N)) with (quotient (App (\x M2) N)) by auto; 
-      rewrite IHM1;  rewrite IHM2
+      rewrite <- quotient_app; rewrite IHM1;
+      rewrite <- quotient_app; rewrite IHM2
     ];
     tree_eq.
 Qed. 
@@ -553,10 +551,10 @@ Proof.
    assert(combination(rf_to_tree r)). apply IHk.    simpl in *. rewrite fp in *. lia. 
    startac "x". combination_tac; auto.     
     (* 1 *)
-   assert(forall l m1 m2, m1<= m2 -> fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l m1 <=
+   assert(aux1: forall l m1 m2, m1<= m2 -> fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l m1 <=
                                   fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l m2).
   clear;   induction l; intros; simpl; try lia.  eapply IHl; lia. 
-    assert(forall l m,  m <=  fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l m).
+    assert(aux2: forall l m,  m <=  fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l m).
   clear;   induction l; intros; simpl; try lia.  elim IHl; intros; lia. 
 
 
@@ -583,19 +581,19 @@ Proof.
    simpl in *.
    assert(fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l (S (rf_size r0)) <=
          fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l (S (rf_size r0 + rf_size a))).
-  apply H. lia. lia. 
+  apply aux1. lia. lia. 
   starstac ("x" :: nil).
   rewrite eta_red. combination_tac. 
  apply IHk. simpl in r.
- assert(S(rf_size r0 + rf_size a) <= fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l (S (rf_size r0 + rf_size a)) ) by eapply H0; auto. 
+ assert(S(rf_size r0 + rf_size a) <= fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l (S (rf_size r0 + rf_size a)) ) by eapply aux2; auto. 
 lia.
 apply occurs_combination.
  apply IHk. simpl in r.
- assert(S(rf_size r0 + rf_size a) <= fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l (S (rf_size r0 + rf_size a)) ) by eapply H0; auto. 
+ assert(S(rf_size r0 + rf_size a) <= fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l (S (rf_size r0 + rf_size a)) ) by eapply aux2; auto. 
 lia.
 
 apply IHk. simpl in r. 
- assert(S(rf_size r0) <= fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l (S (rf_size r0)) ) by eapply H0; auto. 
+ assert(S(rf_size r0) <= fold_left (fun (n : nat) (h : recfun) => n + rf_size h) l (S (rf_size r0)) ) by eapply aux2; auto. 
 lia.
    (* 2 *)
 subst. unfold rf_to_tree; fold rf_to_tree. unfold rf_primrec. combination_tac.
@@ -669,29 +667,6 @@ Proof.
   induction xs; intros; simpl; auto; rewrite ! (substitute_combination (rf_to_tree _)); rewrite ? IHxs; auto_t.
   Qed. 
 
-(*
-
-Lemma minrec_red:
-  forall g x xs z, combination z -> 
-    rf_to_tree (Compose_fn (Minrec g) (x :: xs)) @ z = 
-       (isLeaf @ (rf_to_tree (Compose_fn g (x :: xs)) @ z) @ (rf_to_tree x @ z) @
-               (rf_to_tree (Compose_fn (Minrec g) (Compose_fn Succ_fn (x :: nil) :: xs)) @ z)).
-Proof.
-  intros. unfold rf_to_tree; fold rf_to_tree. unfold first. 
-  starstac ("xs1" :: "arg0" :: "args":: "f" :: nil). rewrite Y2_red. eqtac.
-  unfold fold_right. starstac ("x" :: nil). f_equal. 
-  rewrite star_occurs_true. 2: unfold occurs; rewrite orb_true_r; auto.
-  2: clear; induction xs; discriminate. eqtac. starstac ("x" :: nil).
-  apply sym_eq.
-  rewrite star_occurs_true. 2: unfold occurs; rewrite orb_true_r; auto.
-  2: clear; induction xs; discriminate. eqtac. starstac ("x" :: nil). f_equal.
-  unfold rf_to_tree; fold rf_to_tree. unfold first_c, succ_t.
-  unfold star at 2; unfold occurs; fold occurs; simpl; rewrite ? orb_true_r; unfold orb; simpl; eqtac. 
-  rewrite ! occurs_combination. unfold orb, d.  eqtac. f_equal. auto_t. 
-  rewrite ! occurs_combination. all: auto_t. 
-Qed.
-
-*)
 
 Lemma minrec_red:
   forall g x xs z, combination z -> 
@@ -699,14 +674,13 @@ Lemma minrec_red:
        (isLeaf @ (rf_to_tree (Compose_fn g (x :: xs)) @ z) @ (rf_to_tree x @ z) @
                (rf_to_tree (Compose_fn (Minrec g) (Compose_fn Succ_fn (x :: nil) :: xs)) @ z)).
 Proof.
-  intros. unfold rf_to_tree; fold rf_to_tree. unfold d, first, eq_q. eqtac. 
-  rewrite <- quotient_app.  rewrite <- quotient_app. rewrite Y2_red.
+  intros. unfold rf_to_tree; fold rf_to_tree. unfold d, first, eq_q; eqtac. 
+  unquotient_tac.  rewrite Y2_red.
   starstac ("xs1" :: "arg0" :: "args":: "f" :: nil). unfold d; eqtac.
   f_equal. f_equal.
   unfold fold_right. 
   rewrite star_occurs_true. 2: unfold occurs; rewrite orb_true_r; auto.
-  2: clear; induction xs; discriminate. replace Noq with (quotient Node) by auto.
-  repeat rewrite <- quotient_app.  starstac ("x" :: nil). auto. 
+  2: clear; induction xs; discriminate. unquotient_tac.  starstac ("x" :: nil); auto. 
 
   unfold fold_right; fold fold_right. 
   rewrite star_occurs_true. 2: unfold occurs; rewrite orb_true_r; auto.
@@ -760,8 +734,9 @@ Proof.
   induction xs; intro z; intros; unfold d; eqtac; simpl; auto.
   unfold eq_q; eqtac; auto.
   unfold d, eq_q; eqtac. rewrite <- quotient_app. rewrite <- star_to_bracket.
-  rewrite star_occurs_false.  2: simpl; rewrite occurs_combination; auto; apply rf_combination. eqtac.
-rewrite <- quotient_app.   rewrite <- quotient_app.   rewrite IHxs; auto.   
+  rewrite star_occurs_false.
+  2: simpl; rewrite occurs_combination; auto; apply rf_combination.
+  eqtac; rewrite <- quotient_app; rewrite <- quotient_app;   rewrite IHxs; auto.   
 Qed.  
        
 Theorem rf_to_tree_preserves_eval:
@@ -826,7 +801,7 @@ unfold rf_to_tree; fold rf_to_tree.  unfold d; eqtac.  auto.
 
   (* 4 *)
   unfold rf_to_tree; fold rf_to_tree.
-  unfold d, rf_primrec, eq_q; eqtac.  repeat rewrite <- quotient_app. rewrite Y2_red.
+  unfold d, rf_primrec, eq_q; eqtac.  unquotient_tac. rewrite Y2_red.
   starstac ("x1" :: "xs1" :: "x0" :: "xs" :: "f" :: nil).
   unfold fold_right; fold fold_right.
   rewrite star_occurs_true. 2: simpl; auto. 
@@ -889,14 +864,14 @@ unfold rf_to_tree; fold rf_to_tree.  unfold d; eqtac.  auto.
 
   (* 2 *)
   unfold eq_q.   rewrite minrec_red. 
-  rewrite quotient_app.   rewrite quotient_app. rewrite quotient_app. rewrite IHe.
+  rewrite quotient_app.   rewrite quotient_app. rewrite quotient_app. rewrite IHe; auto.
   repeat rewrite <- quotient_app. unfold rf_to_tree; fold rf_to_tree.
-  unfold isLeaf, zero_t, d, Id, d, eq_q. eqtac. unfold d; eqtac. auto.  auto. auto. 
+  unfold isLeaf, zero_t, d, Id, d, eq_q. eqtac. unfold d; eqtac; auto.  auto. 
 
   (* 1 *)
  unfold eq_q.   rewrite minrec_red. 
   rewrite quotient_app.   rewrite quotient_app. rewrite quotient_app. rewrite IHe; auto.
-  repeat rewrite <- quotient_app. unfold rf_to_tree; fold rf_to_tree.
+  unquotient_tac. unfold rf_to_tree; fold rf_to_tree.
   unfold isLeaf, zero_t, succ_t, d, Id, d, eq_q. eqtac. unfold d; eqtac. auto.  auto.
 Qed.
 
