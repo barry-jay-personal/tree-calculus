@@ -433,39 +433,34 @@ Proof. intros; cbv; eval_sf. Qed.
  
 (* Fixpoint Functions *) 
 
-Definition ω2 := \"w" (\"f" (App (Ref "f") ((wait (wait (Ref "w") (Ref "w"))) (Ref "f")))).
-Definition Y2 f  := wait (wait ω2 ω2) f.
+Definition self_apply := Eval cbv in (\"x" (Ref "x" @ (Ref "x"))). 
 
-Lemma Y2_program: forall f, program f -> program (Y2 f). 
-Proof. intros; cbv; auto 100 with SFHintDb.  Qed.
+Definition Z f := wait self_apply (Sop  @ (Kop @f) @ (wait1 self_apply)). 
 
-Definition ω3 :=
-  \"w" (\"f" (wait1 (App (Ref "f") (wait1 (wait (wait (Ref "w") (Ref "w")) (Ref "f")))))). 
-
-Definition Y3 f := wait1 (wait (wait ω3 ω3) f).
-
-Lemma Y3_program: forall f, program f -> program (Y3 f). 
-Proof. intros; cbv; auto 100 with SFHintDb. Qed.
-
-Lemma wait_red : forall f x y, sf_red (wait f x @ y) (f@x@y).
-Proof. intros; cbv; trtac. Qed.
+Lemma Z_program: forall f, program f -> program (Z f). 
+Proof. intros; program_tac. Qed.
 
 
-Lemma ω2_red : forall x f,  sf_red (ω2 @ x @ f) (f @ (wait (wait x x) f)).
-Proof.  intros; cbv;  eval_sf; eapply preserves_app_sf_red; eval_sf. Qed.
+Lemma Z_red : forall f x, sf_red (Z f @ x)  (f@ (Z f) @ x).
+Proof.  intros; cbv; eval_sf. Qed. 
 
-       
-Lemma Y2_red: forall f x, sf_red (Y2 f @ x) (f @ (Y2 f) @ x).
-Proof.
-  intros; unfold Y2 at 1; eapply transitive_red;
-    [eapply2 wait_red
-    | aptac; [ eapply2 wait_red | zerotac | aptac; [ eapply2  ω2_red | |]]];
-    zerotac.
-Qed.
 
-Lemma Y3_red: forall f x y, sf_red (Y3 f @ x@y) (f @ (Y3 f) @ x @y).
-Proof. intros; cbv; eval_sf; repeat  (eapply2 preserves_app_sf_red;  eval_sf). Qed.
 
+Definition swap f := Sop @ (Kop @ (Sop @ f)) @ Kop. 
+
+Lemma swap_red: forall f x y, sf_red (swap f @ x @ y) (f @ y @ x).
+Proof.  intros; cbv; eval_sf. Qed. 
+
+
+Definition Y2 f := Z (swap f).
+
+Theorem fixpoint_function : forall f x, sf_red (Y2 f @ x) (f @ x @ Y2 f).
+Proof. intros; unfold Y2. eapply transitive_red. apply Z_red. apply swap_red. Qed. 
+
+Definition Y2_red := fixpoint_function.
+
+Lemma Y2_program : forall f, program f -> program (Y2 f).
+Proof. intros; program_tac. Qed. 
 
 
 (* natural numbers  *) 
@@ -489,7 +484,7 @@ Proof. unfold isZero, zero; eval_sf. Qed.
 Lemma isZero_successor: forall n, sf_red (isZero (App successor n)) (App Kop Iop).
 Proof. unfold isZero, successor; eval_sf. Qed. 
 
-Definition plus_comb := Y2 (\"p" (\"n" (
+Definition plus_comb := Y2 (\"n" (\"p" (
 App (App (App Fop (Ref "n")) Iop) (App Kop (App (App Sop 
  (App (App Sop (App Kop Sop)) (App (App Sop (App Kop Kop)) (Ref "p"))))
  (App Kop successor)))))).
@@ -520,7 +515,7 @@ Qed.
 
 (* size *) 
 
-Definition size := Y2 (\"s" (\"x" 
+Definition size := Y2 (\"x" (\"s" 
   (App (App (App Fop (Ref "x")) (App successor zero))
        (\"x1" (\"x2" (App (App plus_comb (App (Ref "s") (Ref "x1"))) (App (Ref "s") (Ref "x2")))))))).
 
@@ -568,7 +563,7 @@ Proof. cbv; eval_sf. Qed.
 
 
 Definition equal :=
-  Y3 (\"e" (\"x" (\"y"
+  Y2 (\"x" (\"e" (\"y"
                    (Fop
                       @ (Ref "x")
                       @ (Fop
@@ -621,13 +616,14 @@ Lemma equal_red:
        (Fop @ Fop @
         (Fop @ Fop @ (Fop @ Fop @ (Fop @ Fop @ (Fop @ Fop @ (Sop @ (Fop @ Fop) @ (Fop @ Fop)))))))))). 
 Proof.
-  unfold equal; intros. eapply transitive_red. eapply Y3_red. fold equal. 
-  starstac ("y2" :: "y1" :: "x2" :: "x1" :: "y" :: "x" :: "e" :: nil).
+  unfold equal; intros. eapply transitive_red. eapply preserves_app_sf_red.  eapply Y2_red. eval_sf.
+  fold equal. 
+  starstac ("y2" :: "y1" :: "x2" :: "x1" :: "y" :: "e" :: "x" :: nil).
   eapply2 preserves_app_sf_red. eapply2 preserves_app_sf_red. zerotac. trtac.
   eapply2 preserves_app_sf_red. eapply2 preserves_app_sf_red. zerotac.
   unfold eqatom, if_and_only_if, isF;   starstac ("y" :: "x" :: nil).
    starstac ("y" :: "x" :: nil).
-  starstac ("y" :: "x" :: "e" :: nil).
+  starstac ("y" :: "e" :: "x" :: nil).
 Qed.
 
 
@@ -881,13 +877,13 @@ Definition d2 y x := △ @ (△ @ x) @ y.
 Definition d3 y x := d2 (d2 (K@△) (d2 (K@△) x)) y.
 
 
-Definition mypair x y := d2 (d2 Id (K@x)) (K@y). 
-Definition mythree w x y := d2 (d2 Id (d2 (K@w) (K@x))) (K@y). 
+Definition mypair x y := d2 (d2 I (K@x)) (K@y). 
+Definition mythree w x y := d2 (d2 I (d2 (K@w) (K@x))) (K@y). 
 
 Definition ternary_op_aux_aux f := 
   Eval cbv in
-   substitute ( \"op"
-       (\"x"
+   substitute ( \"x"
+       (\"op"
           (tag (△ @ (△ @ (tag K (Ref "op")) @ (Ref "x")))
                (\"y"
                   (tag
@@ -920,7 +916,7 @@ Lemma F_t_program: program F_t.
 Proof. program_tac. Qed.
 
 
-Lemma getTag_Y2: forall f, t_red (getTag @ (Y2 f)) Id. 
+Lemma getTag_Y2: forall f, t_red (getTag @ (Y2 f)) I. 
 Proof. intros; cbv; trtac. Qed.
 
 Lemma S_t_red: forall x y z, t_red (S_t @ x @y@z) (x@z@(y@z)).

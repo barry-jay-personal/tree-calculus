@@ -32,8 +32,8 @@
 
 
 Require Import Arith Lia Bool List String.
-Require Import Incompleteness_of_Combinatory_Logic.
 Require Import Reflective.Rewriting_partI.
+Require Import Incompleteness_of_Combinatory_Logic.
 
 Set Default Proof Using "Type".
 
@@ -598,18 +598,16 @@ Fixpoint ndx k :=
 Fixpoint env args := 
   match args with
   | nil => Lam @ Vop @ Lam 
-  | cons a args1 =>
-    Lam @ (Vop @ (Vop @ (Vop @ (Vop @ Lam) @ Vop) @ (Vop @ (env args1))) @ (Vop @ a))
-        @ (Lam @ Vop @ Lam)
+  | cons a args1 => Lam @ (Lam @ (env args1)) @ a
   end. 
 
-
+(* 
 Fixpoint env_comb args := 
   match args with
   | nil => Lam @ Vop @ Lam 
   | cons a args1 => Vop @ (Vop @ Lam @ (Vop @ Lam @ (env_comb args1))) @ a
   end. 
-
+*) 
 
 Lemma succ_ndx_red : forall M sigma N, va_red (Lam @ (Vop @ M)  @ sigma @ N) (sigma @ M).
 Proof. intros; cbv; succtac. Qed. 
@@ -622,32 +620,20 @@ Lemma env_cons_red :
   forall a args M, va_red (env(cons a args) @ (Vop @ M)) (env args @ M).
 Proof.  intros; unfold env; fold env; succtac. Qed. 
 
-Lemma env_zero_red : forall a args , occurs "" a = false -> va_red (env(cons a args) @ Vop) a.
+Lemma env_zero_red : forall a args , va_red (env(cons a args) @ Vop) a.
 Proof.  intros; unfold env; fold env; succtac. Qed. 
 
 Lemma env_succ_red: forall a args x , va_red (env(cons a args) @ (Vop@ x)) (env args @ x).
 Proof.  intros; unfold env; fold env; succtac. Qed. 
 
-
-
+                                      
 (* Combinators *)
 
 Definition Iop := Lam @ Vop @ Lam . 
 
 Definition Kop := Lam @ (Lam @ (v Vop) @ (Lam @ (Lam @ (Lam @ Vop @ Lam)) @ Vop)) @ Lam . 
 
-Definition Sop :=
-  Lam
-    @ (Lam
-         @
-         (Lam
-            @  (v (v (v (v  Vop)) @ Vop) @ (v (v  Vop) @ Vop))
-            @ (env_comb (Vop :: (v Vop) :: nil))
-         )
-         @  (env_comb (Vop :: nil))
-      )
-    @ Lam . 
-
+Definition Sop := Eval cbv in \"x" (\"y" (\"z" (Ref "x" @ Ref "z" @ (Ref "y" @ Ref "z")))). 
               
 Definition KI := Lam @ Iop @ Lam.
 
@@ -660,33 +646,14 @@ Proof. intros; cbv; succtac. Qed.
 Lemma k_red : forall M N, va_red (Kop @ M @ N) M. 
 Proof.  intros; cbv; succtac. Qed. 
 
-
+  
 Lemma sop_red: forall M N P, va_red (Sop @ M @ N @ P) (M@P@(N@P)). 
 Proof.
-  intros; cbv; succtac.
-  aptac;
-    [ aptac;
-      [ aptac;
-        [ aptac;
-          [ aptac; [ succtac | succtac | succtac]
-          | succtac
-          | zerotac]
-        | zerotac
-        | succtac]
-      | zerotac
-      | succtac]
-    | zerotac
-    | zerotac];
-    succtac; succtac; eapply2 preserves_app_va_red; aptac;
-      [ aptac;
-        [ aptac;
-          [ aptac;
-            [ zerotac | succtac | succtac]
-          | zerotac
-          | succtac]
-        | zerotac
-        | succtac] | |];
-      zerotac. 
+  intros; cbv; succtac. aptac. succtac. zerotac. aptac. aptac. aptac. aptac. zerotac.
+  aptac. aptac. succtac. succtac. zerotac. zerotac. zerotac. zerotac. zerotac. succtac.  zerotac.
+  succtac. zerotac.   succtac. aptac. succtac.  aptac. aptac. aptac. succtac. aptac. aptac. succtac.
+  succtac. all: zerotac. succtac. apply preserves_app_va_red. 2: zerotac. aptac. aptac. aptac. zerotac.
+  aptac. aptac. succtac. succtac. all: zerotac. succtac.
 Qed.
 
 
@@ -734,19 +701,22 @@ Proof.
   { exists Sop;   split; [ apply zero_red | cbv; auto; program_tac]. }
   {
   elim IHprM; intro x; split_all. repeat eexists. 
-  unfold Sop, v, env_comb. aptac. 2: eassumption. zerotac.
-  aptac. succtac.   zerotac. aptac.  aptac. aptac. zerotac. succtac. succtac. succtac. succtac.
-  succtac. eapply transitive_red.  succtac.
-  aptac. zerotac. succtac. succtac. program_tac.
-  }{
+  unfold Sop. aptac. 2: eassumption. succtac.
+  eapply transitive_red. 
+  succtac. eapply transitive_red. succtac. aptac.  aptac. zerotac. aptac. aptac. zerotac.
+  succtac. 1-5:  zerotac. aptac.  aptac. zerotac. aptac. aptac. zerotac. aptac. succtac.
+  aptac. aptac. zerotac. aptac. zerotac. aptac. succtac. succtac. all: zerotac.
+  program_tac.   }
+{
   elim IHprM1; intro x; split_all; elim IHprM2; intro x0; split_all. 
    red. repeat eexists.  aptac. aptac. zerotac. eassumption. zerotac. eassumption. 
-  unfold Sop, v, env_comb. aptac. aptac. aptac. aptac. zerotac. succtac. succtac. zerotac.
-  succtac.   zerotac. succtac. zerotac.
-  aptac. aptac. zerotac. aptac. aptac. zerotac. succtac. succtac. succtac. succtac. succtac. zerotac.
-  eapply transitive_red. succtac.  aptac. zerotac. aptac. aptac. zerotac. aptac. zerotac. aptac. succtac.
-  succtac. succtac. succtac. succtac. succtac. succtac. succtac. program_tac. 
-  }
+   unfold Sop. aptac.  succtac. zerotac.
+   eapply transitive_red. succtac.  
+   aptac. aptac. aptac. aptac. zerotac. succtac. succtac. zerotac. aptac.  aptac. zerotac. aptac.
+   zerotac. aptac. aptac. zerotac. aptac. zerotac. aptac.   succtac. succtac. 1-6:  zerotac. succtac.
+   zerotac. succtac. zerotac. succtac. zerotac.
+   aptac.  aptac. zerotac. aptac. zerotac. aptac. aptac. zerotac. aptac. succtac. succtac. 
+   1-8: zerotac.   program_tac. } 
   {exist Kop; unfold Kop, v; cbv; program_tac. }
   {
     elim IHprM; intro x; split_all; repeat eexists;
@@ -756,7 +726,7 @@ Qed.
 
 
 
-(* 9.5: Incompleteness *)
+(* 9.4: Incompleteness *)
 
 
 Definition is_equal eq :=
@@ -1010,9 +980,10 @@ Proof.
 Qed.
 
 
-(* 9.7: Tagging  *)
+(* 9.5 comes after 9.7, for convenience. *) 
 
-(* 9.6 comes after 9.8, for convenience. *) 
+(* 9.6: Tagging  *)
+
 
 
 Definition tag t f :=
@@ -1039,10 +1010,7 @@ Qed.
 
 
 Lemma getTag_tag : forall t f, va_red (getTag @ (tag t f)) t.
-Proof.
-  intros. cbv; succtac. aptac. aptac. aptac. aptac. aptac. succtac.  succtac. succtac.
-  succtac. succtac.  succtac. succtac.  succtac. succtac. succtac. succtac.
-Qed.
+Proof.  intros; cbv; succtac. Qed.
 
 Lemma tag_preserves_substitute:
   forall t f x N, substitute (tag t f) x N = tag (substitute t x N) (substitute f x N). 
@@ -1091,7 +1059,7 @@ Definition fork x y :=
   
 Lemma fork_red: forall w x y z, va_red (App (App (fork w x) y) z) (App (App z w) x).
 Proof.
-  intros; unfold fork, ndx, env_comb; succtac.
+  intros; unfold fork, ndx; succtac.
   eapply2 preserves_app_va_red. eapply2 preserves_app_va_red. all: cbv; succtac.
 Qed.  
 
@@ -1319,326 +1287,394 @@ Compute (term_size kernel). = 200
  *)
 
 
-(* 9.6 Translation to Tree Calculus *)
+(* 9.5 Translation to Tree Calculus *)
 
 
 Require Import Rewriting_partI.
 
-Lemma retag : forall t f,   △ @ (△ @ t) @ (△ @ (△ @ f) @ (Node @ Node @ (Node @ Node))) =  tag t f. 
-Proof. auto. Qed. 
+Definition normalisable (M: Tree) := exists Q, t_red M Q /\ program Q.
 
 
-Definition programmable (M: Tree) := exists Q, t_red M Q /\ program Q.
-
-
-Definition lamtag1 :=
+Definition zero_rule := Eval cbv in \"a" (\"y" (\"z" (Ref "z"))).
+Definition successor_rule := Eval cbv in \"x" (\"a" (\"y" (bracket "z" (Ref "y" @ Ref "x")))).
+Definition application_rule :=
   Eval cbv in
-    \"f" (\"x" (K @ (\"y1" (\"z1"((Ref "f") @ (Ref "z1") @ (Ref "x") @ (Ref "y1")))))).
-
-Definition lamtag2 :=
+    \"w" (\"x" (\"a" (\"y" (\"z" (Ref "a" @ Ref "w" @ Ref "y" @ Ref "z"
+                                      @ (Ref "a" @ Ref "x" @ Ref "y" @ Ref "z")))))).
+Definition empty_rule := Eval cbv in \"a" (\"y" (\"z" (Ref "a"))).
+Definition substitution_rule := Eval cbv in \"x" (\"a" (\"y" (\"z" (Ref "a" @ Ref "z" @ Ref "x" @ Ref "y")))).
+Definition abstraction_rule :=
   Eval cbv in
-    \"f" (\"x"(\"y" (K@ (\"y2"(\"z2"
-                                (wait (Ref "f") (Ref "x")
-                                      @ (wait (Ref "f") (Ref "y") @ (Ref "y2") @ (Ref "z2"))
-         )))))).
+    \"w" (\"x" (\"a" (\"y" (\"z" (Ref "a" @ Ref "w" @ (Ref "a" @ Ref "x" @ Ref "y" @ Ref "z")))))).
 
 
-Definition getTag1 x := △ @ (△ @ x @ △ @ (△ @ △) @ △) @ △ @ (△ @ △).
-
-Lemma getTag_red: forall x, t_red (getTag @ x) (getTag1 x). 
-Proof. intros; cbv; trtac. Qed.
-
-Lemma getTag1_preserves_t_red: forall x y, t_red x y -> t_red (getTag1 x) (getTag1 y).
-Proof. intros; cbv; ap2tac; zerotac. Qed. 
-
-Definition useTag :=
-  Eval cbv in
-    \"f" (\"x" (\"y" (getTag1 (Ref "x") @ (K@(K@ (Ref "f"))) @ (Ref "y")))). 
-
-Definition lamtagged2 :=
-  Eval cbv in
-    \"f" (\"x" ( \"y"
-          (tag
-             (lamtag2 @ Ref "f" @ Ref "x" @ Ref "y")
-             (useTag @ Ref "f" @ Ref "x" @ Ref "y")))).
-
-Definition Lam_0 :=
-  Eval cbv in
- \"f" (\"x"
-     (tag
-        (lamtag1 @ Ref "f" @ Ref "x") (lamtagged2 @ Ref "f" @ Ref "x"))).
-
-Definition Lam_t := Y2 Lam_0.
 
 
-Definition V_0 :=
-  Eval cbv in 
-  star
-       "f"
-       (\"x"
-          (tag
-             (K @ (\"y1" (d (K @ (Ref "x")) @ (K@ (Ref "y1")))))
-             (\"y"
-                (tag
-                   (\"lam"
-                      (\"y2"
-                         (d (Ref "lam" @ Node @ Node @ Ref "y" @ Ref "y2") @ 
-                            (Ref "lam" @ Node @ Node @ Ref "x" @ Ref "y2")
-                   )))
-                   (d Id
-                      @ (d (d (K @ Ref "y") @ (d (K@ Ref "x") @ (K @ (Ref "f"))))
-                           @ (K @ (Ref "f"))
-       )))))).
+Definition V_t :=
+  Y2_t 
+    zero_rule
+    (\"x"
+      (\"a"
+        (tag
+           (successor_rule @ Ref "x")
+           (\"y"
+             (tag
+                (application_rule @ Ref "x" @ Ref "y")
+                (bracket "z" (Ref "a" @ (Ref "a" @ Ref "x" @ Ref "y") @ Ref "z"))
+    ))))).
 
-Definition V_t := Y2_t (K@KI) V_0.
- 
+Definition A_t :=
+  Y2_t
+    empty_rule
+    (\"x"
+      (\"a"
+        (tag
+           (substitution_rule @ Ref "x")
+           (\"y"
+             (tag
+                (abstraction_rule @ Ref "x" @ Ref "y")
+                (getTag @ Ref "x" @ Ref "a" @ Ref "y")                
+    ))))).
 
+(* 
+Compute (term_size V_t).  (* 909 *) 
+Compute (term_size A_t).  (* 757 *)  
+*)
 
-Lemma Lam_t1_red: forall x, t_red  (Lam_t @ x) (tag (lamtag1 @ Lam_t @ x) (lamtagged2 @ Lam_t @x)).
+Lemma getTag_A0 : t_red (getTag @ A_t) empty_rule. 
+Proof. apply getTag_Y2_t.  Qed.
+
+Lemma getTag_A1 :  forall x, t_red (getTag @ (A_t @ x)) (substitution_rule @ x).
 Proof.
-  intros. eapply transitive_red. eapply2 Y2_red.  fold Lam_t.
-  replace Lam_0 with (\"f" (\"x"
-     (tag
-        (lamtag1 @ Ref "f" @ Ref "x") (lamtagged2 @ Ref "f" @ Ref "x")))) by auto.
-  unfold tag; starstac ("x" :: "f" :: nil). 
+  intros. aptac. zerotac. apply Y2_t_red. fold A_t. 
+  unfold getTag, tag, d, I; starstac ("y" :: "a" :: "x" :: nil).
+Qed.
+
+Lemma getTag_A2 :  forall x y, t_red (getTag @ (A_t @ x @ y)) (abstraction_rule @ x @ y).
+Proof.
+  intros. aptac. zerotac. aptac. apply Y2_t_red. zerotac. fold A_t. 
+  unfold getTag, tag, d, I; starstac ("y" :: "a" :: "x" :: nil).
+  unfold getTag, tag, d, I; trtac. 
 Qed.
 
 
-Lemma Lam_t2_red:
-  forall x y, t_red (Lam_t @ x @ y) (tag (lamtag2 @ Lam_t @ x @ y) (useTag @ Lam_t @ x @ y)).  
+Lemma getTag_V0 : t_red (getTag @ V_t) zero_rule. 
+Proof. apply getTag_Y2_t.  Qed.
+
+Lemma getTag_V1 :  forall x, t_red (getTag @ (V_t @ x)) (successor_rule @ x).
 Proof.
-  intros; aptac;
-    [ eapply2 Lam_t1_red
-    | zerotac
-    | eapply transitive_red;
-      [ eapply2 tag_apply
-      | replace lamtagged2  with
-            (\"f" (\"x" ( \"y"
-                           (tag
-                              (lamtag2 @ Ref "f" @ Ref "x" @ Ref "y")
-                              (useTag @ Ref "f" @ Ref "x" @ Ref "y"))))) by auto; 
-        unfold tag; starstac ("y" :: "x" :: "f" :: nil)]]. 
+  intros. aptac. zerotac. apply Y2_t_red. fold V_t. 
+  unfold getTag, tag, d, I; starstac ("y" :: "a" :: "x" :: nil).
 Qed.
 
-
-Lemma Lam_t3_red:
-  forall x y z, t_red (Lam_t @ x @ y @ z) (getTag1 x @ (K@(K@ Lam_t)) @ y @ z).
+Lemma getTag_V2 :  forall x y, t_red (getTag @ (V_t @ x @ y)) (application_rule @ x @ y).
 Proof.
-  intros. aptac. eapply2 Lam_t2_red. zerotac.
-  eapply transitive_red. eapply2 tag_apply.    unfold useTag; starstac ("y" :: "x" :: "f" :: nil). 
- Qed.
-
-
-Lemma programmable_Lamt1:
-  forall M, programmable M -> programmable (getTag1 M @(K@(K@Lam_t))) -> programmable (Lam_t @ M).
-Proof.
-  unfold programmable; split_all; repeat eexists;  
-    [ eapply transitive_red;
-      [ eapply2 Y2_red
-      | eapply transitive_red;
-        [ fold Lam_t;  unfold Lam_0; trtac
-        | unfold getTag1 in *;  ap2tac; zerotac]]
-    | program_tac].
-Qed. 
-
-
-Lemma programmable_Lamt2:
-  forall M N, programmable M -> programmable N -> programmable (getTag1 M @ (K @ (K @ Lam_t)) @ N) ->
-              programmable (Lam_t @ M @ N).
- Proof.
-   unfold programmable; split_all;  repeat eexists.  
-   eapply transitive_red. eapply2 Lam_t2_red.
-   eapply transitive_red.
-   unfold tag. aptac. zerotac. aptac. aptac. zerotac. aptac. zerotac. aptac. 
-   instantiate(1:=getTag1 M @ (K @ (K @ Lam_t))). unfold useTag; trtac. 
-   zerotac. eassumption. zerotac. zerotac. zerotac. zerotac.
-   unfold lamtag2; starstac ("y" :: "x" :: "f" :: nil).
-   ap2tac; zerotac.  program_tac.
-Qed. 
- 
-
-
-Lemma programmable_getTag1_Lamt1:
-  forall M, programmable M -> programmable (getTag1 (Lam_t @ M) @ (K @ (K @ Lam_t))).
-Proof.
-  unfold programmable; split_all; repeat eexists.
-  aptac. eapply getTag1_preserves_t_red.   eapply Lam_t1_red. zerotac.
-eapply transitive_red. unfold getTag1, tag, lamtag1; trtac. ap2tac; zerotac. program_tac.    
-Qed. 
-
-Lemma programmable_getTag1_Lamt1_app:
-  forall M N, programmable M -> programmable N -> programmable (getTag1 (Lam_t @ M) @ (K @ (K @ Lam_t)) @N).
-Proof.
-  unfold programmable; split_all; repeat eexists.
-  aptac. aptac. eapply getTag1_preserves_t_red.   eapply Lam_t1_red. zerotac.
-  eapply transitive_red. unfold getTag1, tag, lamtag1; trtac. ap2tac; zerotac. eassumption.  trtac.
-  program_tac.    
-Qed. 
-
-
-Lemma programmable_getTag1_Lamt2:
-  forall M N, programmable M -> programmable N -> programmable (Lam_t @ M) -> programmable (Lam_t @ N) ->
-              programmable (getTag1 (Lam_t @ M@N) @ (K @ (K @ Lam_t))).
-Proof.
-  unfold programmable; split_all; repeat eexists;
-      [ eapply transitive_red;
-        [unfold getTag1; eapply transitive_red;
-           [aptac;
-            [aptac;
-             [ aptac;
-               [ aptac;
-                 [ zerotac
-                 | aptac;
-                   [ aptac;
-                     [ aptac;
-                       [ aptac;
-                         [ zerotac
-                         | aptac; [ eapply2 Y2_red | zerotac | zerotac]; trtac
-                         | fold Lam_t;  unfold Lam_0; trtac]                 
-                       | | ]
-                     | |]
-                   | |]
-                 | ]
-               | |]
-             | |]
-            | |]; 
-            zerotac; trtac
-           | aptac; [ trtac | zerotac | zerotac]]  
-        | aptac;  [ trtac | zerotac | eapply transitive_red; [ trtac | ap2tac; zerotac]]
-        ]
-      | program_tac].
+  intros. aptac. zerotac. aptac. apply Y2_t_red. zerotac. fold V_t. 
+  unfold bracket. unfold eqb, Ascii.eqb, Bool.eqb.
+  unfold getTag, tag, d, I; starstac ("y" :: "a" :: "x" :: nil).
+  unfold getTag, tag, d, I; trtac. 
 Qed.
-
-Lemma programmable_getTag1_Lamt2_app:
-  forall M N P, programmable M -> programmable (Lam_t @ M @P) -> programmable (Lam_t @ N @P) -> 
-                programmable (getTag1 (Lam_t @ M@N) @ (K @ (K @ Lam_t)) @P).
-Proof.
-  unfold programmable; split_all; repeat eexists;
-    [ aptac;
-     [aptac; 
-      [ eapply getTag1_preserves_t_red;  eapply Lam_t2_red
-      | zerotac
-      | aptac; [ unfold tag, getTag1; trtac | zerotac | unfold lamtag2; trtac] ]
-     | zerotac
-     | eapply transitive_red; [trtac | ap2tac; zerotac]]
-    | program_tac].
-Qed. 
-
-
-
-
-
-
-
-
-Lemma V_t0_red :  forall f sigma,   t_red (getTag1 V_t @ f @ sigma) Id.
-Proof. intros; cbv; trtac. Qed. 
-
-
-Lemma V_t1_red :
-  forall x f sigma,
-    t_red (getTag1 (V_t @ x) @ f @ sigma) (d (K@ x) @ (K@sigma)). 
-Proof.
-  intros; unfold getTag1; trtac;
-    aptac;
-    [aptac;
-     [aptac;
-      [ aptac;
-        [ aptac;
-          [ zerotac
-          | aptac;
-            [ aptac;
-              [ aptac;
-                [ aptac;
-                  [ zerotac
-                  | eapply2 Y2_t_red
-                  | fold V_t;  unfold V_0; trtac]                 
-                | | ]
-              | |]
-            | |]
-          | ]
-        | |]
-      | |]
-     | |]
-    | |]; 
-    zerotac; trtac. 
-Qed.
-
-Lemma V_t2_red :
-  forall x y sigma,
-    t_red (getTag1 (V_t @ x @ y) @ (K@(K@ Lam_t)) @ sigma)
-          (d (Lam_t @ y @ sigma) @ (Lam_t @ x @ sigma)). 
-Proof.
-  intros; unfold getTag1; trtac;
-    aptac;
-    [aptac;
-     [aptac;
-      [ aptac;
-        [ aptac;
-          [ zerotac
-          | aptac;
-            [ aptac;
-              [ aptac;
-                [ aptac;
-                  [ zerotac
-                  | aptac;
-                    [ eapply2 Y2_t_red
-                    | zerotac
-                    | fold V_t;  unfold V_0; trtac]
-                  |]
-                | | ]
-              | |]
-            | |]
-          | ]
-        | |]
-      | |]
-     | |]
-    | |]; 
-    zerotac; trtac. 
-Qed.
-
-
-Lemma V_t3_red: forall x y z, t_red (V_t @ x @ y @ z) (V_t @ (V_t @ x @ y) @ z). 
-Proof.
-  intros. aptac. aptac. eapply2 Y2_t_red. zerotac.  fold V_t. unfold V_0. 
-  do 5 (eapply transitive_red; [eapply2 succ_red | ]).
-  aptac. aptac. aptac. aptac. zerotac. trtac. all: zerotac.  trtac.
-Qed.
-
-
-Lemma Lam_t_V_t0_red : forall y z, t_red (Lam_t @ V_t @ y @ z) z.
-Proof.  intros. eapply transitive_red. eapply2 Lam_t3_red. unfold V_t, Y2_t, tag, getTag1, d;  trtac. Qed.
-
-Lemma Lam_t_V_t_red : forall x y z, t_red (Lam_t @ (V_t @ x) @ y @ z) (y@x).
-Proof.
-  intros. eapply transitive_red. eapply2 Lam_t3_red.  unfold V_t, Y2_t, getTag1, tag, d.  trtac.
-    aptac. aptac. aptac. aptac. aptac. aptac. zerotac. aptac. aptac. aptac. aptac. zerotac.
-    eapply2 wait_red. unfold self_apply. trtac. all: zerotac.
-    unfold V_0 at 1; unfold tag_wait; trtac.
-    aptac. aptac. aptac. aptac. aptac. aptac. zerotac. trtac. all: zerotac. trtac.
-Qed.
-
-Lemma Lam_t_V_t2_red :
-  forall x y z w, t_red (Lam_t @ (V_t @ w @ x) @ y @ z) (Lam_t @ w @ y @ z @ (Lam_t @ x @ y @ z)).
-Proof.
-  intros. eapply transitive_red. eapply2 Lam_t3_red.  unfold V_t, Y2_t, getTag1, tag, d.  trtac.
-    aptac. aptac. aptac. aptac. aptac. aptac. zerotac. aptac. aptac. aptac. aptac. zerotac.
-    aptac.  eapply2 wait_red. all: zerotac.  unfold self_apply.  starstac ("x" :: nil).
-     unfold V_0 at 1; unfold tag_wait; trtac.
-    aptac. aptac. aptac. aptac. aptac. aptac. zerotac. trtac. all: zerotac. trtac.
-Qed.
-
 
 
 Fixpoint va_to_tree M :=
   match M with
   | Lambda_Abstraction_in_VA_Calculus.Ref i => Ref i
   | Vop => V_t
-  | Lam  => Lam_t
+  | Lam  => A_t
   | Lambda_Abstraction_in_VA_Calculus.App M1 M2 => (va_to_tree M1) @ (va_to_tree M2)
   end.
 
-    
+
+Lemma V_t3_red: forall x y z, t_red (V_t @ x @ y @ z) (V_t @ (V_t @ x @ y) @ z). 
+Proof.
+  intros. aptac. aptac. eapply2 Y2_t_red. zerotac.  fold V_t. all: zerotac. 
+  unfold bracket. unfold eqb, Ascii.eqb, Bool.eqb.
+  unfold tag, wait, d, I, K.   starstac ("y" :: "a" :: "x" :: nil).  
+Qed.
+
+
+Lemma V_t0_red :  forall f sigma,   t_red (getTag @ V_t @ f @ sigma) I.
+Proof. tree_red. Qed.
+
+Lemma AV_t0_red : forall y z,   t_red (A_t @ V_t @ y @ z) z.
+Proof. 
+  intros; unfold A_t. aptac. aptac. apply Y2_t_red. all: zerotac. fold A_t. 
+  unfold tag; startac "x"; trtac. startac "x"; trtac. 
+  starstac ("y" :: "a" :: "x" :: nil). aptac. aptac. aptac. apply getTag_Y2_t. all: zerotac.
+  unfold zero_rule; trtac.
+Qed.
+
+
+Lemma AV_t1_red : forall x y z,   t_red (A_t @ (V_t @ x) @ y @ z) (y @ x).
+Proof. 
+  intros; unfold A_t. aptac. aptac. apply Y2_t_red. all: zerotac. fold A_t. 
+  unfold tag; startac "x"; trtac. startac "x"; trtac. 
+  starstac ("y" :: "a" :: "x" :: nil). aptac. aptac. aptac. aptac. 1, 3-8:zerotac.
+  unfold V_t. apply Y2_t_red. fold V_t. 
+  unfold getTag, tag, successor_rule; starstac ("x" :: "a" :: nil).
+Qed.
+
+
+
+Lemma AV_t2_red : forall w x y z, t_red (A_t @ (V_t @ w @ x) @ y @ z) (A_t @ w @ y @ z @ (A_t @ x @ y @ z)).
+Proof. 
+  intros; unfold A_t. aptac. aptac. apply Y2_t_red. all: zerotac. fold A_t. 
+  unfold tag; startac "x"; trtac. startac "x"; trtac. 
+  starstac ("y" :: "a" :: "x" :: nil). aptac. aptac. aptac. aptac. 1, 3-8:zerotac.
+  unfold V_t. aptac. apply Y2_t_red. zerotac. fold V_t. zerotac. 
+  unfold getTag, tag, wait, d, I, K, application_rule; starstac ("x" :: "a" :: "y" :: nil). 
+Qed.
+
+Lemma AA_t0_red : forall y z,   t_red (A_t @ A_t @ y @ z) A_t.
+Proof. 
+  intros; unfold A_t at 1. aptac. aptac. apply Y2_t_red. all: zerotac. fold A_t. 
+  unfold tag; startac "x"; trtac. startac "x"; trtac. 
+  starstac ("y" :: "a" :: "x" :: nil). aptac. aptac. aptac. apply getTag_Y2_t. all: zerotac.
+  unfold empty_rule; trtac.
+Qed.
+
+
+Lemma AA_t1_red : forall x y z,   t_red (A_t @ (A_t @ x) @ y @ z) (A_t @ z @ x @ y).
+Proof. 
+  intros; unfold A_t at 1. aptac. aptac. apply Y2_t_red. all: zerotac. fold A_t. 
+  unfold tag; startac "x"; trtac. startac "x"; trtac. 
+  starstac ("y" :: "a" :: "x" :: nil). aptac. aptac. aptac. aptac. 1, 3-8:zerotac.
+  unfold A_t. apply Y2_t_red. fold A_t. 
+  unfold getTag, tag, substitution_rule; starstac ("y" :: "a" ::"x" :: nil). 
+Qed.
+
+
+
+Lemma AA_t2_red : forall w x y z, t_red (A_t @ (A_t @ w @ x) @ y @ z) (A_t @ w @ (A_t @ x @ y @ z)).
+Proof. 
+  intros; unfold A_t. aptac. aptac. apply Y2_t_red. all: zerotac. fold A_t. 
+  unfold tag; startac "x"; trtac. startac "x"; trtac. 
+  starstac ("y" :: "a" :: "x" :: nil). aptac. aptac. aptac. aptac. 1, 3-8:zerotac.
+  unfold A_t. aptac. apply Y2_t_red. zerotac. fold A_t. zerotac. 
+  unfold getTag, tag, abstraction_rule; starstac ("y" :: "a" :: "x" :: nil).
+Qed.
+
+
+Lemma A_t_program: program A_t.
+Proof. program_tac. Qed. 
+
+Lemma V_t_program: program V_t.
+Proof. program_tac. Qed. 
+
+
+Lemma normalisable_Vt1: forall M, normalisable M -> normalisable (V_t @ M).
+Proof.
+  intros M prM; inversion prM as [M1 (?&?)]; repeat eexists.
+  eapply transitive_red. apply Y2_t_red. fold V_t.  unfold bracket. unfold eqb, Ascii.eqb, Bool.eqb. 
+  eapply transitive_red. unfold tag, wait, d, I, K; starstac ("y" :: "a" :: "x" :: nil).
+  eapply transitive_red. ap2tac; zerotac; trtac. 
+  unfold successor_rule, application_rule; trtac. program_tac. 
+Qed. 
+
+Lemma normalisable_Vt2: forall M N, normalisable M -> normalisable N -> normalisable (V_t @ M @ N).
+Proof.
+  intros M N prM prN; inversion prM as [M1 (?&?)]; inversion prN as [N1 (?&?)]; repeat eexists.
+  aptac. apply Y2_t_red. zerotac. fold V_t.  unfold bracket. unfold eqb, Ascii.eqb, Bool.eqb.
+  eapply transitive_red. unfold tag, wait, d, I, K; starstac ("y" :: "a" :: "x" :: nil).
+  eapply transitive_red. ap2tac; zerotac; trtac. 
+  unfold application_rule; trtac. program_tac. 
+Qed. 
+
+Lemma normalisable_At1:
+  forall M, normalisable M -> normalisable (getTag @ M @ A_t) -> normalisable (A_t @ M).
+Proof.
+  intros M prM prT; inversion prM as [M1 (?&?)].
+  inversion prT.   inversion H1.
+  repeat eexists.
+  eapply transitive_red. apply Y2_t_red. fold A_t.  
+  eapply transitive_red. unfold tag, wait, d, I, K; starstac ("y" :: "a" :: "x" :: nil).
+ eapply transitive_red. ap2tac; zerotac.
+  unfold substitution_rule, abstraction_rule; trtac. program_tac. 
+Qed. 
+
+Lemma normalisable_At2:
+  forall M N, normalisable M -> normalisable N -> normalisable (getTag @ M @ A_t @N) ->
+              normalisable (A_t @ M @ N).
+Proof.
+  intros M N prM prN prT; inversion prM as [M1 (?&?)]. inversion prN as [N1 (?&?)].
+  inversion prT as [AMN (?&?)]. 
+  repeat eexists.
+  aptac. apply Y2_t_red. zerotac. fold A_t.  
+  eapply transitive_red. unfold tag, wait, d, I, K; starstac ("y" :: "a" :: "x" :: nil).
+ eapply transitive_red. ap2tac; zerotac.
+  unfold abstraction_rule; trtac. program_tac. 
+Qed. 
+
+Require Import Rewriting_theorems.
+
+Lemma preserves_programs_va_to_tree: 
+  forall M, Lambda_Abstraction_in_VA_Calculus.program M ->
+            normalisable (va_to_tree M)   /\
+            normalisable (getTag @ (va_to_tree M) @ A_t) /\
+            forall x, normalisable x ->
+                        normalisable (getTag @ (va_to_tree M) @ A_t @ x)                           
+.
+Proof.
+  intros M pr; induction pr;  simpl.
+  (* 6 *)   
+  split.
+  exists V_t; split; [zerotac |program_tac].
+  split.
+  repeat eexists. aptac. apply getTag_V0. zerotac. unfold zero_rule; trtac.  program_tac. 
+  repeat eexists. aptac. aptac. apply getTag_V0. zerotac. unfold zero_rule; trtac.  zerotac. trtac.
+  program_tac.
+  (* 5 *)
+  split.
+  apply normalisable_Vt1; auto. tauto. 
+  split.
+  inversion IHpr. inversion H. inversion H1. 
+  repeat eexists.  aptac. apply getTag_V1. zerotac.
+  eapply transitive_red. ap2tac; zerotac.   unfold successor_rule; trtac. program_tac.
+  intros.
+  inversion IHpr. inversion H0. inversion H2.  inversion H. inversion H5. 
+  repeat eexists.  aptac. aptac. apply getTag_V1. zerotac.
+  eapply transitive_red. ap2tac; zerotac.   unfold successor_rule; trtac. apply H6. trtac. program_tac.
+  (* 4 *)
+  split.
+  apply normalisable_Vt2; auto; tauto. 
+  split.
+  inversion IHpr1. inversion H. inversion H1. 
+  inversion IHpr2. inversion H4. inversion H6. 
+
+  assert(normalisable (A_t @ x)). apply normalisable_At1. 
+  exists x; split; auto. zerotac. 
+  inversion H0. inversion H9. inversion H11. 
+  elim(confluence_tree_calculus _ _ H12 (getTag @ x @ A_t)); intros; auto. 
+  inversion H14.
+  assert(x2 = x1). apply programs_are_stable2; auto.  apply t_red_to_s_red; auto. subst.
+  exists x1; split; auto. ap2tac; zerotac.
+
+  assert(normalisable (A_t @ x0)). apply normalisable_At1. 
+  exists x0; split; auto. zerotac. 
+  inversion H5. inversion H10. inversion H12. 
+  elim(confluence_tree_calculus _ _ H13 (getTag @ x0 @ A_t)); intros; auto. 
+  inversion H15.
+  assert(x2 = x1). apply programs_are_stable2; auto.  apply t_red_to_s_red; auto. subst.
+  exists x1; split; auto. ap2tac; zerotac.
+
+   inversion H9; inversion H10. inversion H11; inversion H12. 
+
+  repeat eexists.  aptac. apply getTag_V2. zerotac.
+  eapply transitive_red. ap2tac; zerotac.
+  eapply transitive_red. unfold application_rule; trtac.
+  ap2tac; zerotac.
+  program_tac.
+
+  intros.
+  
+  inversion IHpr1. inversion H0. inversion H2.  inversion H. inversion H5. inversion H1.
+  inversion IHpr2. inversion H10. inversion H11. inversion H12.  (* inversion H11. inversion H15.  *) 
+
+ assert(normalisable (A_t @ x2 @ x1)). apply normalisable_At2. 
+  exists x2; split; auto. zerotac. 
+  exists x1; split; auto. zerotac. 
+  elim (H14 x1); intros; auto.   2:   exists x1; split; auto; zerotac. 
+  inversion H17. 
+  elim(confluence_tree_calculus _ _ H18 (getTag @ x2 @ A_t @ x1)); intros; auto. 
+  2: ap2tac; zerotac.   inversion H20.
+  assert(x4 = x3). apply programs_are_stable2; auto.  apply t_red_to_s_red; auto. subst.
+  exists x3; split; auto. ap2tac; zerotac.
+
+ assert(normalisable (A_t @ x0 @ x1)). apply normalisable_At2. 
+  exists x0; split; auto. zerotac. 
+  exists x1; split; auto. zerotac. 
+  elim (H9 x1); intros; auto.   2:   exists x1; split; auto; zerotac. 
+  inversion H18. 
+  elim(confluence_tree_calculus _ _ H19 (getTag @ x0 @ A_t @ x1)); intros; auto. 
+  2: ap2tac; zerotac.   inversion H21.
+  assert(x4 = x3). apply programs_are_stable2; auto.  apply t_red_to_s_red; auto. subst.
+  exists x3; split; auto.
+
+  inversion H17; inversion H18. inversion H19; inversion H20. 
+  
+  repeat eexists.  aptac. aptac. apply getTag_V2. zerotac.
+  eapply transitive_red. ap2tac; zerotac.   unfold application_rule; trtac. apply H6.
+  eapply transitive_red. trtac. ap2tac; zerotac. program_tac.
+
+  (* 3 *)
+  split.
+  exists A_t; split; [zerotac |program_tac].
+  split.
+  repeat eexists. aptac. apply getTag_A0. zerotac. unfold empty_rule; trtac.  program_tac. 
+  repeat eexists. aptac. aptac. apply getTag_A0. zerotac. unfold empty_rule; trtac.  zerotac. trtac.
+  program_tac.
+  (* 2 *)
+  split.
+  apply normalisable_At1; auto; tauto. 
+  split.
+  inversion IHpr. inversion H. inversion H1. 
+  repeat eexists.  aptac. apply getTag_A1. zerotac.
+  eapply transitive_red. ap2tac; zerotac.   unfold substitution_rule; trtac. program_tac.
+  intros.
+  inversion IHpr. inversion H0. inversion H2.  inversion H. inversion H5. 
+  repeat eexists.  aptac. aptac. apply getTag_A1. zerotac.
+  eapply transitive_red. ap2tac; zerotac.   unfold substitution_rule; trtac. apply H6. trtac. program_tac.
+  (* 1 *)
+  split.
+  apply normalisable_At2; auto. tauto.  tauto. apply IHpr1. tauto. 
+  split.
+  inversion IHpr1. inversion H. inversion H1. 
+  inversion IHpr2. inversion H4. inversion H6. 
+
+  assert(normalisable (A_t @ x)). apply normalisable_At1. 
+  exists x; split; auto. zerotac. 
+  inversion H0. inversion H9. inversion H11. 
+  elim(confluence_tree_calculus _ _ H12 (getTag @ x @ A_t)); intros; auto. 
+  inversion H14.
+  assert(x2 = x1). apply programs_are_stable2; auto.  apply t_red_to_s_red; auto. subst.
+  exists x1; split; auto. ap2tac; zerotac.
+
+  assert(normalisable (A_t @ x0)). apply normalisable_At1. 
+  exists x0; split; auto. zerotac. 
+  inversion H5. inversion H10. inversion H12. 
+  elim(confluence_tree_calculus _ _ H13 (getTag @ x0 @ A_t)); intros; auto. 
+  inversion H15.
+  assert(x2 = x1). apply programs_are_stable2; auto.  apply t_red_to_s_red; auto. subst.
+  exists x1; split; auto. ap2tac; zerotac.
+
+   inversion H9; inversion H10. inversion H11; inversion H12. 
+
+  repeat eexists.  aptac. apply getTag_A2. zerotac.
+  eapply transitive_red. ap2tac; zerotac.
+  eapply transitive_red. unfold abstraction_rule; trtac.
+  ap2tac; zerotac.
+  program_tac.
+
+  intros.
+  
+  inversion IHpr1. inversion H0. inversion H2.  inversion H. inversion H5. inversion H1.
+  inversion IHpr2. inversion H10. inversion H11. inversion H12.  (* inversion H11. inversion H15.  *) 
+
+ assert(normalisable (A_t @ x2 @ x1)). apply normalisable_At2. 
+  exists x2; split; auto. zerotac. 
+  exists x1; split; auto. zerotac. 
+  elim (H14 x1); intros; auto.   2:   exists x1; split; auto; zerotac. 
+  inversion H17. 
+  elim(confluence_tree_calculus _ _ H18 (getTag @ x2 @ A_t @ x1)); intros; auto. 
+  2: ap2tac; zerotac.   inversion H20.
+  assert(x4 = x3). apply programs_are_stable2; auto.  apply t_red_to_s_red; auto. subst.
+  exists x3; split; auto. ap2tac; zerotac.
+
+  assert(normalisable (A_t @ x0)). apply normalisable_At1. 
+  exists x0; split; auto. zerotac. 
+  inversion H8.   inversion H18.
+  elim(confluence_tree_calculus _ _ H19 (getTag @ x0 @ A_t)); intros; auto. 
+  2: ap2tac; zerotac.   inversion H21.
+  assert(x4 = x3). apply programs_are_stable2; auto.  apply t_red_to_s_red; auto. subst.
+  exists x3; split; auto.
+
+  inversion H17; inversion H18. inversion H19; inversion H20. 
+  
+  repeat eexists.  aptac. aptac. apply getTag_A2. zerotac.
+  eapply transitive_red. ap2tac; zerotac.   unfold abstraction_rule; trtac. apply H6.
+  eapply transitive_red. trtac. ap2tac; zerotac. program_tac.
+Qed.
+
 Lemma preserves_combination_ac_to_tree:
   forall M, Lambda_Abstraction_in_VA_Calculus.combination M -> combination (va_to_tree M).
 Proof.  intros M c; induction c; zerotac; cbv; auto 1000 with *. Qed.
@@ -1651,167 +1687,12 @@ Proof.
     try (eapply2 preserves_app_t_red; zerotac; fail).
   (* 7 *)
   eapply2 V_t3_red. 
-  eapply2 Lam_t_V_t0_red.
-  eapply2 Lam_t_V_t_red.
-  eapply2 Lam_t_V_t2_red.
-  (* 3 *) 
-  eapply transitive_red. eapply2 Lam_t3_red. aptac. aptac. aptac. instantiate(1:= Id). cbv; trtac.
-  zerotac. trtac.  trtac. trtac. trtac. trtac.
-  (* 2 *)
-  eapply transitive_red. eapply2 Lam_t3_red. aptac. aptac. aptac. aptac. aptac. aptac.
-  zerotac. aptac. aptac. aptac. aptac. zerotac. 
-  eapply2 Y2_red.   fold Lam_t. unfold Lam_0; trtac. all: zerotac. trtac.
-  (* 1 *)
-  eapply transitive_red. eapply2 Lam_t3_red. aptac. aptac. aptac. aptac. aptac. aptac.
-  zerotac. aptac. aptac. aptac. aptac. zerotac.  aptac. 
-  eapply2 Y2_red.   zerotac. fold Lam_t. unfold Lam_0; trtac. all: zerotac. trtac.
-Qed.
-
-Ltac prog_aux_tac :=  repeat eexists;
-    [ eapply transitive_red;
-      [eapply2 Y2_red
-      | fold Lam_t; eapply transitive_red;
-        [ unfold Lam_0; trtac | unfold getTag1 in *; ap2tac; zerotac]
-      ]
-    | program_tac].
-
-Lemma programmable_Vt1: forall M, programmable M -> programmable (V_t @ M).
-Proof.
-  intros M prM; inversion prM as [M1 (?&?)]; repeat eexists;  
-    [ ap2tac;
-      [zerotac
-      | eapply transitive_red; [ eapply2 Y2_t_red | fold V_t; unfold V_0; trtac]]
-    | program_tac ]. 
-Qed. 
-
-Lemma programmable_getTag1_Vt1:
-  forall M, programmable M -> programmable (getTag1 (V_t @ M) @ (K @ (K @ Lam_t))).
-Proof.
-  intros M prM; inversion prM as [M1 (?&?)]; repeat eexists; 
-    [ unfold getTag1; eapply transitive_red;
-      [ap2tac; zerotac  
-      | eapply transitive_red;
-        [aptac;
-         [aptac;
-          [ aptac;
-            [ aptac;
-              [ zerotac
-              | aptac;
-                [ aptac;
-                  [ aptac;
-                    [ aptac;
-                      [ zerotac
-                      | eapply2 Y2_t_red
-                      | fold V_t;  unfold V_0; trtac]                 
-                    | | ]
-                  | |]
-                | |]
-              | ]
-            | |]
-          | |]
-         | |]; 
-         zerotac; trtac
-        | aptac; [ trtac | zerotac | trtac]]]
-    | program_tac]. 
-Qed. 
-
-
-Lemma programmable_getTag1_Vt1_app:
-  forall M N, programmable M -> programmable N -> programmable (getTag1 (V_t @ M) @ (K @ (K @ Lam_t)) @N).
-Proof.
-  intros M N prM prN; inversion prM as [M1 (?&?)]; inversion prN as [N1 (?&?)]; repeat eexists;
-    [eapply transitive_red; [ eapply V_t1_red | unfold d; ap2tac; zerotac] | program_tac].
-Qed. 
-
-Lemma programmable_Vt2: forall M N, programmable M -> programmable N -> programmable (V_t @ M@ N).
-Proof.
-  intros M N prM prN; inversion prM as [M1 (?&?)]; inversion prN as [N1 (?&?)]; repeat eexists;  
-    [ ap2tac;
-      [zerotac
-      |zerotac  
-      | eapply transitive_red;
-        [ aptac;
-          [ eapply2 Y2_t_red | zerotac | fold V_t; unfold V_0; trtac]
-        | aptac; [ trtac | zerotac | trtac]
-      ] ]
-    |  program_tac ]. 
-Qed. 
-
-
-Lemma programmable_getTag1_Vt2:
-  forall M N, programmable (Lam_t @ M) -> programmable (Lam_t @ N) ->
-              programmable (getTag1 (V_t @ M@N) @ (K @ (K @ Lam_t))).
-Proof.
-  intros M N prM prN;
-    inversion prM as [M1 (?&?)]; inversion prN as [N1 (?&?)]; repeat eexists;
-      [ eapply transitive_red;
-        [unfold getTag1; eapply transitive_red;
-         [ap2tac; zerotac  
-         | eapply transitive_red;
-           [aptac;
-            [aptac;
-             [ aptac;
-               [ aptac;
-                 [ zerotac
-                 | aptac;
-                   [ aptac;
-                     [ aptac;
-                       [ aptac;
-                         [ zerotac
-                         | aptac; [ eapply2 Y2_t_red | zerotac | zerotac]; trtac
-                         | fold V_t;  unfold V_0; trtac]                 
-                       | | ]
-                     | |]
-                   | |]
-                 | ]
-               | |]
-             | |]
-            | |]; 
-            zerotac; trtac
-           | aptac; [ trtac | zerotac | zerotac]]]  
-        | aptac;  [ trtac | zerotac | eapply transitive_red; [ trtac | ap2tac; zerotac]]
-        ]
-      | program_tac].
-Qed. 
-
-Lemma programmable_getTag1_Vt2_app:
-  forall M N P, programmable (Lam_t @ M @P) -> programmable (Lam_t @ N @P) ->
-                programmable (getTag1 (V_t @ M@N) @ (K @ (K @ Lam_t)) @P).
-Proof.
-  intros M N P prM prN;
-    inversion prM as [M1 (?&?)]; inversion prN as [N1 (?&?)];  repeat eexists;
-      [ eapply transitive_red; [ eapply V_t2_red | unfold d; ap2tac; zerotac]
-      | program_tac].
-Qed.
-
-
-Lemma preserves_programs_va_to_tree: 
-  forall M, Lambda_Abstraction_in_VA_Calculus.program M ->
-            programmable (va_to_tree M) /\
-            programmable (getTag1 (va_to_tree M) @ (K@(K@ Lam_t))) /\
-            forall x, programmable x ->
-                        programmable (getTag1 (va_to_tree M) @ (K@(K@ Lam_t)) @ x).
-Proof.
-  intros M pr; induction pr;  simpl; (split ; [ | split ; [| intros x prx; split_all ]]); split_all;
-  [ repeat eexists; zerotac; program_tac
-  | repeat eexists; [ aptac; [ cbv; trtac |  zerotac | trtac] | program_tac]
-  | repeat eexists; [aptac; [ aptac; [ cbv; trtac | zerotac | trtac] | zerotac |  trtac] | program_tac]
-  | eapply2 programmable_Vt1   
-  | eapply2 programmable_getTag1_Vt1
-  | eapply2 programmable_getTag1_Vt1_app; repeat eexists; eauto
-  | eapply2 programmable_Vt2   
-  | eapply2 programmable_getTag1_Vt2; eapply2 programmable_Lamt1
-  | eapply2 programmable_getTag1_Vt2_app; eapply2 programmable_Lamt2 
-  | repeat eexists; zerotac; program_tac
-  | repeat eexists; [ aptac; [ cbv; trtac |  zerotac | trtac] | program_tac]
-  | repeat eexists; [aptac; [ aptac; [ cbv; trtac | zerotac | trtac] | zerotac |  trtac] | program_tac]
-  | eapply2 programmable_Lamt1   
-  | eapply2 programmable_getTag1_Lamt1
-  | eapply2 programmable_getTag1_Lamt1_app; repeat eexists; eauto
-  | eapply2 programmable_Lamt2; repeat eexists; eauto
-  | eapply2 programmable_getTag1_Lamt2;  eapply2 programmable_Lamt1 
-  | eapply2 programmable_getTag1_Lamt2_app; eapply2 programmable_Lamt2
-  ].
+  eapply2 AV_t0_red.
+  eapply2 AV_t1_red.
+  eapply2 AV_t2_red.
+  eapply2 AA_t0_red.
+  eapply2 AA_t1_red.
+  eapply2 AA_t2_red.
 Qed.
 
   
@@ -1819,7 +1700,7 @@ Definition meaningful_translation_ac_to_tree (f: VA -> Tree) :=
   (forall M N, va_red1 M N -> t_red (f M) (f N)) /\ (* strong version *) 
   (forall M N, f(Lambda_Abstraction_in_VA_Calculus.App M N) = (f M) @ (f N)) /\  (* applications *) 
   (forall i, f (Lambda_Abstraction_in_VA_Calculus.Ref i) = Ref i) /\              (* variables *) 
-  (forall M, Lambda_Abstraction_in_VA_Calculus.program M -> programmable (f M)).
+  (forall M, Lambda_Abstraction_in_VA_Calculus.program M -> normalisable (f M)).
 
 
   

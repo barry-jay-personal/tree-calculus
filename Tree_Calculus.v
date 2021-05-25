@@ -45,21 +45,21 @@ Open Scope tree_scope.
   
 (* Section 3.3 Tree Calculus *)
 
-(* The type Tree supports inductive definitions *) 
-Inductive Tree:  Set :=
-  | Ref : string -> Tree  (* variables are indexed by strings *) 
-  | Node : Tree   
-  | App : Tree -> Tree -> Tree   
+(* The type Tree0 supports inductive definitions *) 
+Inductive Tree0:  Set :=
+  | Ref : string -> Tree0  (* variables are indexed by strings *) 
+  | Node : Tree0   
+  | App : Tree0 -> Tree0 -> Tree0   
 .
 
-Hint Constructors Tree : TreeHintDb.
+Hint Constructors Tree0 : TreeHintDb.
 
 Notation "△" := Node : tree_scope.
 Notation "x @ y" := (App x y) (at level 65, left associativity) : tree_scope.
 
 Definition K := △ @ △. 
-Definition Id := △ @ (△ @ △) @ (△ @ △).
-Definition KI := K@Id. 
+Definition I := △ @ (△ @ △) @ (△ @ △).
+Definition KI := K@I. 
 Definition D := △ @ (△ @ △) @ (△ @ △ @ △).
 Definition d x := △ @ (△@x).
 Definition Sop := d (K @ D)@(d K @(K@D)).
@@ -75,18 +75,11 @@ match goal with
 
 (* Equational Theory *)
 
-(* The type Tree_q is axiomatic, so no inductive definitions ... *) 
-Axiom Tree_q: Set.
-Axiom Req : string -> Tree_q. 
-Axiom Noq : Tree_q.
-Axiom Apq : Tree_q -> Tree_q -> Tree_q.
-
-(* ... but it does support axioms for equational reasoning *)
-Axiom k_eq : forall y z, Apq (Apq (Apq Noq Noq) y) z = y. 
-Axiom s_eq : forall x y z, Apq (Apq (Apq Noq (Apq Noq x)) y) z = Apq (Apq y z) (Apq x z). 
-Axiom f_eq : forall w x y z, Apq (Apq (Apq Noq (Apq (Apq Noq w) x)) y) z = Apq (Apq z w) x. 
-
-Ltac tree_eq := intros; cbv; repeat (rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq); auto. 
+(* The type Tree is axiomatic, so no inductive definitions ... *) 
+Axiom Tree: Set.
+Axiom Req : string -> Tree. 
+Axiom Noq : Tree.
+Axiom Apq : Tree -> Tree -> Tree.
 
 
 (* The two types are related by quotienting *) 
@@ -102,18 +95,50 @@ Definition eq_q x y := quotient x = quotient y.
 Notation "x === y" := (eq_q x y) (at level 85) : tree_scope.
 
 
+(* ... but it does support axioms for equational reasoning *)
+Axiom k_eq : forall y z, Apq (Apq (Apq Noq Noq) y) z = y. 
+Axiom s_eq : forall x y z, Apq (Apq (Apq Noq (Apq Noq x)) y) z = Apq (Apq y z) (Apq x z). 
+Axiom f_eq : forall w x y z, Apq (Apq (Apq Noq (Apq (Apq Noq w) x)) y) z = Apq (Apq z w) x.
+
+Hint Resolve Req Noq Apq k_eq s_eq f_eq : TreeHintDb. 
+
+Ltac ktac := rewrite ? k_eq.
+Ltac stac := rewrite ? k_eq.
+Ltac ftac := rewrite ? k_eq.
+
+Ltac tree_eq := intros; cbv; repeat (rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq); auto. 
+
 Lemma quotient_node: quotient Node = Noq. 
   Proof. auto_t. Qed. 
 
 Lemma quotient_app: forall M1 M2, quotient (M1 @ M2) = Apq (quotient M1) (quotient M2).
-  Proof. auto_t. Qed. 
+Proof. auto_t. Qed.
+
+Lemma eq_q_refl: forall x, x===x.
+Proof. unfold eq_q; auto. Qed. 
+
+Lemma eq_q_sym: forall x y, x=== y -> y ===x.
+Proof. unfold eq_q; auto. Qed. 
+
+Lemma eq_q_trans: forall x y z, x===y -> y===z -> x === z.
+Proof.  unfold eq_q; intros; eapply eq_trans; eauto. Qed. 
+
+
+Ltac f_equal_q := rewrite quotient_app; apply eq_sym; rewrite quotient_app; apply eq_sym; f_equal.
+
 
 Ltac unquotient_tac := repeat rewrite <- quotient_node; repeat rewrite <- quotient_app.
   
 
+Ltac qtac e :=
+  unfold eq_q; repeat ((rewrite e || auto_t) || rewrite quotient_app);
+  rewrite ? quotient_node;
+  repeat (rewrite ? s_eq || rewrite ? k_eq || rewrite ? f_eq); unquotient_tac; auto_t. 
+
+
 (* Section 3.4: Programs *) 
 
-Inductive program : Tree -> Prop :=
+Inductive program : Tree0 -> Prop :=
 | pr_leaf : program △
 | pr_stem : forall M, program M -> program (△ @ M)
 | pr_fork : forall M N, program M -> program N -> program (△ @ M @ N)
@@ -127,10 +152,10 @@ Ltac program_tac := cbv; repeat (apply pr_fork || apply pr_stem || apply pr_leaf
 (* Booleans *)
 
 Definition conjunction := d (K@KI).
-Definition disjunction := d (K@K) @Id.
+Definition disjunction := d (K@K) @I.
 Definition implies := d (K@K). 
-Definition negation := d (K@K) @ (d (K@KI) @ Id).
-Definition bi_implies := △@ (△@ Id @ negation)@△.
+Definition negation := d (K@K) @ (d (K@KI) @ I).
+Definition bi_implies := △@ (△@ I @ negation)@△.
 
 
 Lemma conjunction_true : forall y, conjunction @ K @ y === y. 
@@ -178,8 +203,8 @@ Definition query is0 is1 is2 :=
          @(d (K@(K@(K@ is0)))@△))).
 
 
-Definition isLeaf := query K (K @ Id) (K @ Id).
-Definition isStem := query (K @ Id) K KI.
+Definition isLeaf := query K (K @ I) (K @ I).
+Definition isStem := query (K @ I) K KI.
 Definition isFork := query KI KI K.
 
 
@@ -196,10 +221,11 @@ Lemma query_eq_2:
 Proof. tree_eq. Qed. 
 
 
-Ltac unfold_op := unfold isLeaf, isStem, isFork, query, Sop, D, KI, Id, K.
-Ltac eqtac :=
-  unfold_op;
+Ltac unfold_op := unfold isLeaf, isStem, isFork, query, Sop, D, KI, I, K, d, first, second.
+Ltac eqtac := unfold_op; qtac s_eq; auto_t. 
+(* 
   repeat (unfold quotient; fold quotient; rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq).
+ *)
 
 Fixpoint term_size M :=
   match M with
@@ -218,7 +244,7 @@ Lemma d_variant_eval: forall x y z, D_variant @ x @ y @ z === y@ z @ (x @ z).
 Proof. tree_eq. Qed. 
 
 (* 2 *)
-Lemma conjunction_false: forall y, conjunction @ KI @ y === K@Id.
+Lemma conjunction_false: forall y, conjunction @ KI @ y === K@I.
 Proof.  tree_eq. Qed. 
 
 (* 3 *) 
@@ -237,13 +263,13 @@ Proof.  tree_eq. Qed.
 Lemma negation_true : negation @ K === KI.
 Proof.  tree_eq. Qed.  
 
-Lemma negation_false : negation @ (K@Id) === K.
+Lemma negation_false : negation @ (K@I) === K.
 Proof.  tree_eq. Qed. 
 
 Lemma iff_true : forall y, bi_implies @K@y === y. 
 Proof.  tree_eq. Qed. 
 
-Lemma iff_false_true : bi_implies @ KI @K === K@Id.
+Lemma iff_false_true : bi_implies @ KI @K === K@I.
 Proof.  tree_eq. Qed. 
 
 Lemma iff_false_false : bi_implies @ KI @ KI === K.
@@ -251,7 +277,7 @@ Proof.  tree_eq. Qed.
 
 (* 4 *)
 Definition first0 := d (K@K) @ (d (K@ △) @ △).
-Definition second0 := d (K@(K@Id)) @ (d (K@ △) @ △).
+Definition second0 := d (K@(K@I)) @ (d (K@ △) @ △).
 
 Lemma first0_first: forall p, first0 @ p === (first p).
 Proof.  tree_eq. Qed. 
@@ -275,7 +301,7 @@ Definition isZero_variant := d (K @ KI) @ (d (K@K) @ △).
 Definition predecessor_variant :=
  d (K@K)
    @ (d (K@ (K@(K@ △)))
-        @ (d (d (K@ △) @ Id) @ (K@△))
+        @ (d (d (K@ △) @ I) @ (K@△))
      ).
 
 Lemma predecessor_variant_zero: predecessor_variant @ △ === △. 

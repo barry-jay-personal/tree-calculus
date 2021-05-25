@@ -40,38 +40,109 @@ Set Default Proof Using "Type".
 (* 5.2: Size *)
 
 
-Definition size:=
-  Y2
-    (\"s"
-       (\"x"
-          (isStem
+Definition size_aux :=
+  Eval cbv in 
+    \"x"
+       (isStem
              @ (Ref "x")
-             @ (△
+             @ (\"s"
+                 (△
                   @ (Ref "x" @ △)
                   @ zero
                   @ (\"x1" (K @ (successor @ ((Ref "s") @ (Ref "x1")))))
-               )
+               ))
              @ (△
                   @ (Ref "x")
-                  @ (successor @ zero)
+                  @ (K @ (successor @ zero))
                   @ (\"x1"
                        (\"x2"
-                          (successor
-                             @ (plus
-                                  @ ((Ref "s") @ (Ref "x1"))
-                                  @ ((Ref "s") @ (Ref "x2"))
-    )))))))).
+                          (\"s"
+                            (successor
+                               @ (Ref "plus"
+                                      @ ((Ref "s") @ (Ref "x1"))
+                                      @ ((Ref "s") @ (Ref "x2"))
+       ))))))).
+
+Set Printing Depth 1000.
+Print size_aux.
+
+
+Definition size := Y2 (△ @
+(△ @
+ (△ @
+  (△ @
+   (△ @ △ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+            (△ @
+             (△ @
+              (△ @
+               (△ @
+                (△ @
+                 (△ @
+                  (△ @ △ @
+                   (△ @
+                    (△ @
+                     (△ @
+                      (△ @
+                       (△ @ (△ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))) @
+                        (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+                      (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                 (△ @
+                  (△ @
+                   (△ @
+                    (△ @
+                     (△ @
+                      (△ @
+                       (△ @ (△ @ (△ @ △ @ (△ @ △ @ plus))) @
+                        (△ @
+                         (△ @
+                          (△ @
+                           (△ @
+                            (△ @ (△ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))) @
+                             (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                           (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ (△ @ △)))) @ 
+                    (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+          (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △))))))))) @
+  (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ △)))) @ △))) @
+(△ @
+ (△ @
+  (△ @
+   (△ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ △)) @
+       (△ @ (△ @ (△ @ (△ @ (△ @ △ @ △)) @ (△ @ (△ @ △) @ (△ @ △)))) @ (△ @ △ @ △)))) @
+     (△ @ △ @ (△ @ △)))) @
+   (△ @ △ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+       (△ @
+        (△ @
+         (△ @ (△ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @ (△ @ (△ @ △) @ (△ @ △ @ △)))) @
+          (△ @ △ @ △))) @ (△ @ △ @ △)))))))) @
+ (△ @ (△ @ (△ @ △ @ (△ @ △))) @
+  (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))) @
+   (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))))))) @
+    (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))))) @ △)))))
+                      ).
 
 
 Lemma size_program: program size.
-Proof. cbv; program_tac. Qed. 
+Proof. program_tac. Qed. 
 
 Ltac sizetac :=
-  intros; unfold eq_q; unfold size; rewrite Y2_red; fold size; 
-  starstac ("x2" :: "x1" :: "x" :: "s" :: nil);  unfold d; eqtac; auto.
+  intros; unfold size, eq_q; rewrite Y2_red; fold size; unfold size_aux; eqtac; auto.
 
 Lemma size_leaf: size @ △ === successor @ zero. 
-Proof. unfold eq_q. sizetac. Qed. 
+Proof. sizetac. Qed. 
 
 
 Lemma size_fork:
@@ -84,70 +155,71 @@ Proof. sizetac. Qed.
 
 (* 5.3: Equality *)
 
+
 Definition equal_aux := 
   Eval cbv in 
-  \"e"
-       (\"x"
-          (\"y"
-             (isStem
-                @ (Ref "x")
-                @ (isStem
-                     @ (Ref "y")
-                     @ ((Ref "e")
-                          @ (△ @ ((Ref "x") @ △) @ △ @ K)
-                          @ (△ @ ((Ref "y") @ △) @ △ @ K)
-                       )
-                     @ KI
-                  )
-                @ (△
-                     @ (Ref "x")
-                     @ (isLeaf @ (Ref "y"))
-                     @ (\"x1"
-                          (\"x2"
-                             (isFork
-                                @ (Ref "y")
-                                @ (△
-                                     @ (Ref "y")
-                                     @ △
-                                     @ (\"y1"
-                                          (\"y2"
-                                             ((Ref "e")
-                                                @ (Ref "x1")
-                                                @ (Ref "y1")
-                                                @ ((Ref "e")
-                                                     @ (Ref "x2")
-                                                     @ (Ref "y2")
-                                                  )
-                                                @ KI
-                                  ))))
-                                @ KI
-       ))))))).
+    \"x"
+     (isStem
+        @ (Ref "x")
+        @ (\"e" (\"y" (isStem
+                         @ (Ref "y")
+                         @ ((Ref "e")
+                              @ (△ @ ((Ref "x") @ △) @ △ @ K)
+                              @ (△ @ ((Ref "y") @ △) @ △ @ K)
+                           )
+                         @ KI
+                      )))
+        @ (△
+             @ (Ref "x")
+             @ (\"e" (\"y" (isLeaf @ (Ref "y"))))
+             @ (\"x1"
+                 (\"x2"
+                   (\"e"
+                     (\"y" (isFork
+                              @ (Ref "y")
+                              @ (△
+                                   @ (Ref "y")
+                                   @ △
+                                   @ (\"y1"
+                                       (\"y2"
+                                         ((Ref "e")
+                                            @ (Ref "x1")
+                                            @ (Ref "y1")
+                                            @ ((Ref "e")
+                                                 @ (Ref "x2")
+                                                 @ (Ref "y2")
+                                              )
+                                            @ KI
+                                ))))
+                              @ KI
+     ))))))).
 
-Definition equal := Y3 equal_aux. 
+Definition equal := Y2 equal_aux.
+
+(* Compute (term_size equal). 1145 *) 
 
 Lemma equal_program: program equal.
 Proof. program_tac. Qed.
 
-Ltac equaltac :=  unfold equal, eq_q; rewrite Y3_red; fold equal; eqtac; unfold equal_aux; eqtac; auto.
+Ltac equaltac :=
+  unfold eq_q, equal at 1; rewrite quotient_app; rewrite Y2_red; fold equal;
+  unfold equal_aux; eqtac; auto.
 
 
 Theorem equal_programs: forall M,  program M -> equal @ M @ M === K. 
 Proof.
-  intros M prM; induction prM; intros; equaltac;
-    unfold eq_q in *; unquotient_tac; rewrite quotient_app; rewrite quotient_app;
-  rewrite IHprM1; rewrite IHprM2; eqtac; auto.
+  intros M prM; induction prM; intros; equaltac. qtac IHprM1; qtac IHprM2. 
 Qed.
 
 Theorem unequal_programs:
   forall M,  program M -> forall N, program N -> M<> N -> equal @ M @ N === KI. 
 Proof.
   intros M prM; induction prM; intros P prP neq; inversion prP; intros; subst;
-    try congruence; equaltac. 
+    try congruence; equaltac. (* slow *) 
   apply IHprM; congruence.
-  assert(d: M = M0 \/ M<> M0) by repeat decide equality;   inversion d; subst; [ 
-    rewrite <- quotient_app; rewrite <- quotient_app; rewrite equal_programs; auto;
-    eqtac; apply IHprM2; congruence |  
-    rewrite <- quotient_app; rewrite <- quotient_app; rewrite IHprM1; auto; eqtac; auto
+  assert(d: M = M0 \/ M<> M0) by repeat decide equality;   inversion d; subst ;[   
+    qtac equal_programs;  qtac IHprM2;    congruence |
+    qtac IHprM1; eqtac
     ]. 
 Qed.
 
@@ -185,14 +257,14 @@ Definition tag_wait t :=
 
 
 
-Definition Y2_t t f := tag t (wait self_apply (d (tag_wait t) @ (K@f))). 
+Definition Y2_t t f := tag t (wait self_apply (d (tag_wait t) @ (K@ (swap f)))). 
 
 
 Lemma Y2_t_program: forall t f, program t -> program f -> program (Y2_t t f). 
 Proof. intros; program_tac. Qed.
 
 
-Theorem fixpoint_function : forall t f x, Y2_t t f @ x === f@ (Y2_t t f) @ x.
+Theorem fixpoint_function : forall t f x, Y2_t t f @ x === f@ x @ (Y2_t t f).
 Proof. tree_eq. Qed.
 
 Theorem getTag_Y2_t: forall t f, getTag @ (Y2_t t f) === t.
@@ -212,21 +284,126 @@ Definition Fun_ty U T := △@ U @ T.
 
 Definition typed T t := tag T t.
 
-Definition type_check := (* maps U -> T and V to T or error *) 
-  \"x"
-       (\"v"
-             (isFork @(Ref "x") @
-                     (△@(Ref "x") @△@
-                       (\"u" (\"t" (equal @ (Ref "u") @ (Ref "v")@ error_ty @ (Ref "t"))))
-                       @ error_ty
-       ))).
+Definition type_check_aux := (* maps U -> T and V to T or error *) 
+  Eval cbv in
+    \"x"
+     (isFork @(Ref "x")
+             @ (△@(Ref "x") @△
+                 @ (\"u" (\"t" (\"v" (Ref "equal" @ (Ref "u") @ (Ref "v") @ (Ref "t") @ error_ty))))
+               )
+             @ error_ty
+       ).
+
+Print type_check_aux.
+
+Definition type_check :=
+  △ @ (△ @ (△ @ △ @ △)) @
+(△ @
+ (△ @
+  (△ @
+   (△ @
+    (△ @ △ @
+     (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ (△ @ △ @ △)))))) @
+      (△ @
+       (△ @
+        (△ @
+         (△ @
+          (△ @ (△ @ (△ @ △ @ (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+           (△ @ (△ @ (△ @ (△ @ (△ @ (△ @ equal) @ (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @
+            (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △))))) @ (△ @ (△ @ (△ @ △ @ △)) @ △))) @
+ (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))) @
+  (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))) @
+   (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △))))))) @
+    (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))))) @ △)))))
+.
+  
+Lemma type_check_red: forall U T, program U -> type_check @ (Fun_ty U T) @ U === T.
+Proof. intros; unfold type_check, Fun_ty; eqtac; qtac equal_programs. Qed. 
+  
+Definition typed_app_aux :=
+  Eval cbv in
+    \"f"
+       (\"x"
+             (tag (Ref "type_check" @ (Ref "getTag" @ (Ref "f")) @ (Ref "getTag" @ (Ref "x")))
+                  (untag @ (Ref "f") @  (untag @ (Ref "x")))
+       )).
+
+Print typed_app_aux.
 
 Definition typed_app :=
-  \"f"
-       (\"x"
-             (tag (type_check @ (getTag @ (Ref "f")) @ (getTag @ (Ref "x")))
-                  (untag @ (Ref "f") @  untag @ (Ref "x"))
-       )).
+△ @
+(△ @
+ (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+  (△ @
+   (△ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @
+            (△ @ (△ @ (△ @ (△ @ (△ @ getTag) @ (△ @ △ @ type_check))) @ (△ @ △ @ (△ @ △)))) @
+            (△ @ △ @ (△ @ (△ @ getTag))))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+     (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+(△ @
+ (△ @
+  (△ @
+   (△ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+            (△ @
+             (△ @
+              (△ @
+               (△ @
+                (△ @
+                 (△ @
+                  (△ @
+                   (△ @
+                    (△ @ (△ @ (△ @ △ @ (△ @ △))) @
+                     (△ @ (△ @ (△ @ △ @ △)) @
+                      (△ @
+                       (△ @
+                        (△ @ (△ @ (△ @ △ @ △)) @
+                         (△ @ (△ @ (△ @ △ @ (△ @ △))) @
+                          (△ @ (△ @ (△ @ △ @ △)) @
+                           (△ @
+                            (△ @
+                             (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))) @
+                              (△ @ (△ @ (△ @ △ @ △)) @ △))) @ (△ @ △ @ △)))))) @ 
+                       (△ @ △ @ △))))) @ (△ @ △ @ (△ @ △)))) @
+                 (△ @ △ @
+                  (△ @
+                   (△ @
+                    (△ @ (△ @ (△ @ △ @ (△ @ △))) @
+                     (△ @ (△ @ (△ @ △ @ △)) @
+                      (△ @
+                       (△ @
+                        (△ @ (△ @ (△ @ △ @ △)) @
+                         (△ @ (△ @ (△ @ △ @ (△ @ △))) @
+                          (△ @ (△ @ (△ @ △ @ △)) @
+                           (△ @
+                            (△ @
+                             (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))) @
+                              (△ @ (△ @ (△ @ △ @ △)) @ △))) @ (△ @ △ @ △)))))) @ 
+                       (△ @ △ @ △))))))))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+          (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))))))) @
+   (△ @ △ @ △))) @ (△ @ △ @ △))
+.
+
+Lemma typed_app_red:
+  forall U T f u, program U -> typed_app @ (tag (Fun_ty U T) f) @ (tag U u) === tag T (f @ u).
+Proof.  intros; unfold typed_app; eqtac; qtac getTag_tag; qtac type_check_red; tree_eq. Qed. 
+
+
+  
 
 (* 5.6: More Queries *)
 
@@ -309,27 +486,25 @@ Proof. tree_eq. Qed.
 
 Definition size_variant :=
   Y2
-    (\"s"
-       (triage
-          (K@ △)
-          (\"y" (K@ (Ref "s" @ Ref "y")))
-          (\"y" (\"z" (K@ (plus@ (Ref "s" @ Ref "y") @ (Ref "s" @ Ref "z")))))
-    )).
-
+    (triage
+          (K @ (K@ △))
+          (\"y" (\"s" (K@ (Ref "s" @ Ref "y"))))
+          (\"y" (\"z" (\"s" (K@ (plus@ (Ref "s" @ Ref "y") @ (Ref "s" @ Ref "z"))))))
+    ).
 
 Definition equal_variant :=
-  Y3
-    (\"e"
-       (triage
-          (triage K KI KI)
-          (\"y" (triage KI (Ref "e" @ Ref "y") (K@(K@KI))))
+  Y2
+    (triage
+       (\"e" (triage K KI KI))
+         (\"y" (\"e" (triage KI (Ref "e" @ Ref "y") (K@(K@KI)))))
           (\"y1"
              (\"y2"
-                (triage
-                   KI
-                   (K@KI)
-                   (\"z"
-                      (\"z2"
+                (\"e"
+                  (triage
+                     KI
+                     (K@KI)
+                     (\"z"
+                       (\"z2"
                          (Ref "e"
                               @ Ref "y1"
                               @ Ref "z1"
@@ -407,7 +582,7 @@ Fixpoint tree_case p s :=
   | △ => leaf_case s
   | △@ p => stem_case (tree_case p s)
   | △@ p @ q => fork_case (tree_case p (wait (tree_case q (K@s)) (fork_case_r2 p)))
-  | _ => Id
+  | _ => I
   end.
           
 
@@ -450,8 +625,7 @@ Lemma extension_fork: forall p q s r t u,
 Proof. 
   intros;  unfold extension; fold extension; unfold tree_case; fold tree_case;
     unfold fork_case, fork_case_r1, fork_case_r2; unfold eq_q; 
-  rewrite ! wait_red;  unfold wait; unfold_op;
-  starstac ("r1" :: "r2" :: "x2" :: "x1" :: "x" :: "r" :: nil); unfold d;  subst_tac; eqtac; f_equal.   
+  rewrite ! wait_red;  unfold wait; unfold_op; unfold d; eqtac; f_equal.   
 Qed.
 
 
@@ -461,43 +635,31 @@ Proof.
   intros p pr; induction pr; intros; unfold eq_q;   
   [ apply extension_leaf    
   | rewrite extension_stem; rewrite IHpr; auto | 
-  rewrite extension_fork; rewrite quotient_app; rewrite quotient_app; rewrite IHpr1;
-  rewrite <- quotient_app; rewrite IHpr2; tree_eq
+  rewrite extension_fork; qtac IHpr1; qtac IHpr2
     ]. 
 Qed.
 
 Ltac extensiontac :=
   repeat ((rewrite extension_fork || rewrite extension_stem || rewrite extension_leaf); eqtac). 
 
+Ltac rule_tac :=
+  unfold quotient; fold quotient; repeat (rewrite ? s_eq; rewrite ? k_eq; rewrite ? f_eq).
 
 Lemma pattern_matching_example:
-  extension (Y2 (Ref "xe")) (Ref "xe") Id @ (Y2 K) === K.
-Proof. 
-  unfold Y2, wait, wait1, self_apply, d;  starstac ("x":: nil);  extensiontac;
-  unfold extension at 1; unfold eq_q; rewrite wait_red; unfold tree_case; eqtac;  tree_eq. (* slow *) 
+  extension (Y2 (Ref "xe")) (Ref "xe") I @ (Y2 K) === K.
+Proof.
+  unfold Y2, Z, wait, wait1, self_apply, d;  starstac ("x":: nil);  extensiontac. 
+  unfold extension at 1; qtac wait_red; unfold tree_case.
+  unfold stem_case; rule_tac.
+  unfold fork_case; rule_tac.
+  unfold leaf_case; rule_tac.
+  unfold wait; unfold_op; rule_tac.
+  unfold extension at 1; qtac wait_red; unfold tree_case.
+  unfold wait; unfold_op; rule_tac.
+  unfold fork_case; rule_tac.
+  unfold stem_case; rule_tac.
+  tree_eq.
 Qed.
-
-(* 5.9 Eager Function Application *) 
-
-
-Inductive factorable: Tree -> Prop :=
-| factorable_leaf : factorable △
-| factorable_stem: forall M, factorable (△@ M)
-| factorable_fork: forall M N, factorable (△@ M @ N)
-.
-
-Hint Constructors factorable :TreeHintDb. 
-
-Lemma programs_are_factorable: forall p, program p -> factorable p.
-Proof. intros p pr; inversion pr; auto_t. Qed. 
-
-
-
-Definition eager := \"z" (\"f" (△ @ (Ref "z") @ Id @ (K@KI) @ Id @ (Ref "f") @ (Ref "z"))). 
-
-
-Lemma eager_of_factorable : forall M N, factorable M -> eager @ M @ N === N @ M.
-Proof.   intros M N fac; inversion fac; cbv; eqtac; auto. Qed.
 
 
 (* Exercises *)
@@ -571,43 +733,96 @@ Proof.  unfold eq_q; rewrite size_of_program; auto; program_tac. Qed.
 (* 3 *)
 
 
-(*
-Compute (term_size plus).  *) 
 
-Lemma size_plus: size @ plus === nat_to_tree 212.
+(* Compute (term_size plus).  *) 
+
+Lemma size_plus: size @ plus === nat_to_tree 156.
 Proof.  unfold eq_q; rewrite size_of_program; auto; program_tac. Qed. 
 
 
-(*
-Compute (term_size size).  *) 
+(* Compute (term_size size).  *) 
 
-Lemma size_size: size @ size === nat_to_tree 560.
+Lemma size_size: size @ size === nat_to_tree 510.
 Proof.  unfold eq_q; rewrite size_of_program; auto; program_tac. Qed. 
+
+
+(* 4 *)
+
+Lemma not_equal_K_KN: equal @ K @ (K @ Node) === KI.
+Proof. apply unequal_programs; try discriminate; program_tac.  Qed.
+
+(* 5 *)
+
+Lemma equal_equal_equal: equal @ equal @ equal === K. 
+Proof. apply equal_programs; program_tac.  Qed.
 
 
 (* 6 *)
 (* see the lemmas above *)
 
 (* 7 *)
- (* see the definitions above *) 
+
+
+Definition typed_true := tag Bool_ty K.
+Definition typed_false := tag Bool_ty KI.
+Definition typed_conjunction :=
+  tag (Fun_ty Bool_ty (Fun_ty Bool_ty Bool_ty)) (Node @ (Node @ (K @ KI))).
+
+Lemma type_check_and_true_false :
+  getTag @ (typed_app @ (typed_app @typed_conjunction @ typed_true) @ typed_false) === Bool_ty.
+Proof.
+  unfold typed_conjunction, typed_true, typed_false. repeat qtac typed_app_red; try (program_tac; fail).
+  qtac getTag_tag.
+Qed.
+
 
 (* 8 *) 
 
 
-Definition size_aux:=
-  Y3 (\"s"
-           (\"x"
-                 (isStem
-                    @ (Ref "x")
-                    @ (△
-                         @ ((Ref "x") @ △)
-                         @ △
-                         @ (\"x1" (K @ (Ref "s" @ (successor @ Ref "x") @ (Ref "x1"))))
-                      )
-                    @ (△ 
-                         @ (Ref "y")
-                         @ (successor @ Ref "x")
-                         @ (\"y1" (Ref "s" @ (Ref "s" @ (Ref "x") @ (Ref "y1"))))
-     )))).
+Lemma size_variant_K: size_variant @ K === K @ (K @ Node).
+Proof. unfold size_variant, K; qtac Y2_red; qtac triage_stem; tree_eq. Qed. 
+  
+(* 9 *)
 
- 
+
+Lemma equal_variant_K_KN: equal_variant @ K @ (K @ Node) === KI. 
+Proof. unfold equal_variant, K; qtac Y2_red; qtac triage_stem;  tree_eq. Qed. 
+
+(* 10 *) 
+
+Definition size_pm :=
+  Y2 (extension
+        (Node @ Ref "x" @ Ref "y") (\"s" (K @ (Ref "plus" @ (Ref "s" @ Ref "x") @ (Ref "s" @ Ref "y"))))
+        (extension
+           (Node @ Ref "x") (\"s" (K @ (Ref "s" @ Ref "x")))
+           (\"x" (\"s" (K @ Node)))
+        )).
+
+Lemma size_pm_K : size_pm @ K === K @ (K @ Node).
+Proof.
+  unfold size_pm. qtac Y2_red. unfold K. qtac extension_fork_stem. 
+  qtac extension_stem. unfold extension at 1. qtac wait_red.
+  unfold tree_case. qtac k_eq. rewrite (star_occurs_true _ _ "s"); auto; try discriminate.
+ rewrite (star_occurs_true _ _ "s"); auto; try discriminate.
+ rewrite (star_occurs_false _ "s"); auto; try discriminate.
+ rewrite star_occurs_true; auto; try discriminate. qtac s_eq. 
+ rewrite star_occurs_true; auto; try discriminate. qtac s_eq. 
+ unfold star at 1; qtac k_eq.
+ rewrite star_occurs_true; auto; try discriminate. qtac s_eq. 
+ unfold star at 1; qtac k_eq.
+ rewrite (star_occurs_false _ "s"); auto; try discriminate.
+ rewrite (star_occurs_false _ "x"); auto; try discriminate.
+ repeat qtac k_eq.
+ rewrite star_occurs_true; auto; try discriminate. qtac s_eq.
+ rewrite star_occurs_true; auto; try discriminate. qtac s_eq. 
+ rewrite star_occurs_true; auto; try discriminate. qtac s_eq. 
+ rewrite (star_occurs_false _ "x"); auto; try discriminate.
+ repeat qtac k_eq.
+ rewrite star_id.
+ rewrite (star_occurs_false _ "x"); auto; try discriminate.
+ repeat qtac k_eq.
+ unfold I; qtac s_eq. qtac Y2_red. qtac extension_fork_leaf. qtac extension_stem_leaf.
+ rewrite (star_occurs_false _ "s"); auto; try discriminate.
+ rewrite (star_occurs_false _ "x"); auto; try discriminate.
+ repeat qtac k_eq.
+Qed.

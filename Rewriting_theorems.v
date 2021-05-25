@@ -347,7 +347,7 @@ Proof. intros; repeat (apply diamond_multi_ranked; apply diamond_flip); auto_t. 
 
 Definition valuable M := exists P, t_red M P /\ program P.
 
-Definition omega := △ @ (△ @ Id) @ Id.
+Definition omega := △ @ (△ @ I) @ I.
 
 Ltac stable_tac := inv1 program; match goal with | H : s_red1 ?Q ?R |- _ =>   assert(R=Q) by 
                                 (apply programs_are_stable; cbv; program_tac); clear H end.
@@ -541,7 +541,9 @@ Proof.
   assert(redexes (M1 @ N1 @ N0 @ N2) >0) . eapply quaternary_redexes; eauto. lia. 
 Qed.
 
-(* ready combinations *) 
+(* ready combinations *)
+
+(* The proof of standardisation is adapted from the work of Ryo Kashima on lambda-calculus. *)
 
 Inductive ready : Tree -> Prop :=
 | kernelready: forall M, ready (△ @ △ @ M)
@@ -1288,14 +1290,14 @@ Proof.
   induction n; intros h M N P r prM prN fac hn; [lia |]. 
   inversion prM as [| | M0 M1 prM0 prM1]; clear prM.
   { (* M is a leaf *)
-  assert(bf1: t_red (bf @ M @ N) (M @ N)) by (subst; aptac; [apply bf_leaf | zerotac | zerotac]);  
+  assert(bf1: t_red (bf @ M @ N) (M @ N)) by (subst; aptac; [apply bf_leaf_red | zerotac | zerotac]);  
   assert(dp1: exists Q, s_red P Q /\ s_red (M @ N) Q) by
   (eapply diamond_s_red; [eapply2 multi_ranked_iff_multi_red | eapply2 t_red_to_s_red]);
   elim dp1; clear dp1; intros P1 (?&?);
     assert(P1 = M @ N) by (subst; apply programs_are_stable2; eauto; eapply pr_stem; eauto);
     subst;  exist (△ @ N).
   }{ (* M is a stem *) 
-  assert(bf1: t_red (bf @ M @ N) (M @ N)) by (subst; aptac; [apply bf_stem | zerotac | zerotac]);   
+  assert(bf1: t_red (bf @ M @ N) (M @ N)) by (subst; aptac; [apply bf_stem_red | zerotac | zerotac]);   
   assert(dp1: exists Q, s_red P Q /\ s_red (△ @ M0 @ N) Q) by
   (subst; eapply diamond_s_red; [eapply2 multi_ranked_iff_multi_red | eapply2 t_red_to_s_red]);
   elim dp1; clear dp1; intros P1 (?&?);
@@ -1309,7 +1311,7 @@ Proof.
   exist M1; 
   assert(dp1: exists Q, s_red P Q /\ s_red M1 Q) by 
       (eapply diamond_s_red;
-       [eapply multi_ranked_iff_multi_red | eapply t_red_to_s_red; apply bf_fork_leaf]; eauto); 
+       [eapply multi_ranked_iff_multi_red | eapply t_red_to_s_red; apply bf_fork_leaf_red]; eauto); 
   elim dp1; clear dp1; intros P1 (?&?);  
   assert(P1 = M1) by (apply programs_are_stable2; auto); subst; auto. 
   }
@@ -1318,7 +1320,7 @@ Proof.
   inversion r as [ | ? ? P0 ? ? s0]; clear r; subst; inv1 factorable. 
   elim(program_application2_s_red1 _ _ s0 bf (△ @ (△ @ M2 @ M3) @ M1) N); clear s0; intros; auto; subst;
   [ eapply2 IHn; program_tac | | apply program_bf | program_tac]. 
-  assert(bf1: t_red (bf @ (△ @ (△@ M2@M3) @ M1) @ N) (bf@ (bf @ N@M2)@M3 )) by apply bf_fork_fork. 
+  assert(bf1: t_red (bf @ (△ @ (△@ M2@M3) @ M1) @ N) (bf@ (bf @ N@M2)@M3 )) by apply bf_fork_fork_red. 
   assert(mr1: exists n, multi_ranked t_red1 n  (bf @ (△ @ (△ @ M2 @ M3) @ M1) @ N) (bf @ (bf @ N @ M2) @ M3))
     by (eapply multi_ranked_iff_multi_red; eauto).
   elim mr1; clear mr1; intros k bfr1. 
@@ -1360,7 +1362,7 @@ Proof.
   elim(program_application2_s_red1 _ _ s0 bf (△ @ (△ @ M2) @ M1) N);  intros; clear s0; eauto; subst; 
     [eapply2 IHn; program_tac |  | apply program_bf | program_tac].   
   assert(bf1: t_red (bf @ (△ @ (△@ M2) @ M1) @ N) (eager @ (bf @ M2 @ N) @ (bf @ (bf @ M1 @ N))))
-    by apply bf_fork_stem.
+    by apply bf_fork_stem_red.
   assert(mr1: exists n, multi_ranked t_red1 n (bf @ (△ @ (△@ M2) @ M1) @ N) (eager @ (bf @ M2 @ N) @ (bf @ (bf @ M1 @ N))))
     by (eapply multi_ranked_iff_multi_red; eauto).
   elim mr1; clear mr1; intros k mr2. 
@@ -1452,14 +1454,22 @@ Qed.
 
 Lemma root_needy: forall M, needs (root @ M) M. 
 Proof.
-  intros; repeat eexists; 
-    [ eapply t_red_to_s_red; unfold root; eapply transitive_red;
+  intros; repeat eexists; [
+    eapply t_red_to_s_red; unfold root; eapply transitive_red;
       [ apply Y2_red
-      | fold root; starstac ("f" :: "a" :: "r" :: nil)]
+      | fold root]; unfold root_aux; trtac 
     | eapply2 active_one].
 Qed.
 
-  
+
+Lemma root_aux_red :
+  forall M1 M2, t_red(root_aux @ (Node @ M1 @ M2) @ root) (onFork root1 @ (root @ M1) @ root @ M2).
+Proof.
+  replace root_aux with  (\"a"(\"r"(△ @ Ref "a" @ △ @ (\"f"(onFork root1 @ (Ref "r" @ Ref "f") @ (Ref "r")))))) by auto.
+  intros. starstac ("f" :: "r" :: "a" :: nil). 
+Qed.
+
+
 Theorem root_to_root_eval_factorable:
   forall M P, t_red (root @ meta_quote M) P -> combination M -> factorable P ->
                             exists Q, root_eval (meta_quote M) Q /\ t_red P Q .
@@ -1490,9 +1500,9 @@ Proof.
   elim(program_application_s_red1 _ _ s0 root (meta_quote (M0 @ N))); clear s0; intros; eauto; subst;
   [eapply2 IHn | | program_tac | eapply2 meta_quote_of_combination_is_program]. 
   assert(eval0: exists k, multi_ranked s_red1 k (root @ (△ @ meta_quote M0 @ meta_quote N))
-                                       (onFork root1 @ (root @ meta_quote M0) @ root @ meta_quote N)) by 
+                                       (onFork root1 @ (root @ meta_quote M0) @ root @ meta_quote N)) .  
     (apply multi_ranked_iff_multi_red; apply t_red_to_s_red; 
-    unfold root; eapply transitive_red; [apply Y2_red | fold root; starstac ("f" :: "a" :: "r" :: nil)]). 
+    unfold root; eapply transitive_red; [apply Y2_red | fold root]). apply root_aux_red.
     elim(eval0); clear eval0; intros k r1.
   caseEq k; [intros | intros k' ?]; subst; inversion r1 as [ | ? ? Q1 ? ? s1]; subst.
   elim(program_application_multi _ _ _ r1 root (△ @ meta_quote M0 @ meta_quote N)); clear r1;
@@ -1639,7 +1649,7 @@ Lemma rb_red :
                    (triage (△ @ △ @ △) (\"y" (\"r" (△ @ (Ref "r" @ Ref "y"))))
        (\"y" (\"z" (\"r" (△ @ (Ref "r" @ Ref "y") @ (Ref "r" @ Ref "z"))))) @ 
        (root @ M) @ rb).
-Proof. intro M; unfold rb,Y2s; eapply transitive_red; [ apply Y2_red | unfold swap; starstac ("x"::nil)]. Qed.
+Proof. intro M; unfold rb,Y2; eapply transitive_red; [ apply Y2_red | unfold d; trtac]. Qed.
 
 
 Lemma active_trans: forall M N, active M N -> forall P, active N P -> active M P.

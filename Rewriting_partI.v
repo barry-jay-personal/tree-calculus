@@ -73,12 +73,12 @@ Notation "x @ y" := (App x y) (at level 65, left associativity) : tree_scope.
 
 
 Definition K := △ @ △. 
-Definition Id := △ @ (△ @ △) @ (△ @ △).
-Definition KI := K@Id. 
+Definition I := △ @ (△ @ △) @ (△ @ △).
+Definition KI := K@I. 
 Definition D := △ @ (△ @ △) @ (△ @ △ @ △).
 Definition d x := △ @ (△@x).
 Definition Sop := △@(△@(△ @ △ @ D))@(△@(△@K)@(K@D)). 
-Ltac unfold_op := unfold Sop, D, KI, Id, K.
+Ltac unfold_op := unfold Sop, D, KI, I, K.
 
 
 Fixpoint term_size M :=
@@ -274,10 +274,10 @@ Ltac program_tac := cbv; repeat (apply pr_stem || apply pr_fork || apply pr_leaf
 (* 3.5: Propositional Logic *)
 
 Definition conjunction := d (K@KI).
-Definition disjunction := d (K@K) @Id.
+Definition disjunction := d (K@K) @I.
 Definition implies := d (K@K). 
-Definition negation := d (K@K) @ (d (K@KI) @ Id).
-Definition bi_implies := △@ (△@ Id @ negation)@△.
+Definition negation := d (K@K) @ (d (K@KI) @ I).
+Definition bi_implies := △@ (△@ I @ negation)@△.
 
 
 Lemma conjunction_true : forall y, t_red (conjunction @ K @ y) y.
@@ -289,13 +289,13 @@ Proof.  tree_red. Qed.
 Lemma disjunction_true : forall y, t_red (disjunction @ K @y) K.
 Proof.  tree_red. Qed. 
  
-Lemma disjunction_false: forall y, t_red (disjunction @ (K@Id) @y) y. 
+Lemma disjunction_false: forall y, t_red (disjunction @ (K@I) @y) y. 
 Proof.  tree_red. Qed.  
 
 Lemma implies_true : forall y, t_red (implies @ K @ y) y. 
 Proof.  tree_red. Qed.  
 
-Lemma implies_false: forall y, t_red (implies @ (K@Id) @ y) K.
+Lemma implies_false: forall y, t_red (implies @ (K@I) @ y) K.
 Proof.  tree_red. Qed.  
 
 Lemma negation_true : t_red (negation @ K) KI.
@@ -383,11 +383,11 @@ Lemma query_eq_2:
 Proof. tree_red. Qed. 
 
 
-Definition isLeaf := query K (K @ Id) (K @ Id).
-Definition isStem := query (K @ Id) K KI.
+Definition isLeaf := query K (K @ I) (K @ I).
+Definition isStem := query (K @ I) K KI.
 Definition isFork := query KI KI K.
 
-Ltac unfold_op ::= unfold isLeaf, isStem, isFork, query, Sop, D, KI, Id, K.
+Ltac unfold_op ::= unfold isLeaf, isStem, isFork, query, Sop, D, KI, I, K.
 
 
 (* Chapter 4: Extensional Programs *)
@@ -456,7 +456,7 @@ Qed.
   
 Fixpoint bracket x M := 
 match M with 
-| Ref y =>  if eqb x y then Id else (K@ (Ref y))
+| Ref y =>  if eqb x y then I else (K@ (Ref y))
 | △ => K@ △ 
 | App M1 M2 => d (bracket x M2) @ (bracket x M1)
 end
@@ -507,11 +507,11 @@ Qed.
 
 Fixpoint star x M :=
   match M with
-  | Ref y =>  if eqb x y then Id else (K@ (Ref y))
+  | Ref y =>  if eqb x y then I else (K@ (Ref y))
   | △ => K@ △ 
   | App M1 (Ref y) => if eqb x y
                       then if occurs x M1
-                           then d Id @ (star x M1)
+                           then d I @ (star x M1)
                            else M1
                       else  if occurs x M1
                            then d (K@ (Ref y)) @ (star x M1)
@@ -534,7 +534,7 @@ Lemma star_leaf: forall x, \x △ = K@ △.
 Proof. auto. Qed.
 
 
-Lemma star_id: forall x, \x (Ref x) = Id.
+Lemma star_id: forall x, \x (Ref x) = I.
 Proof. intro; unfold star, occurs; rewrite eqb_refl; auto. Qed.
 
 Lemma star_occurs_false: forall M x, occurs x M = false -> \x M = K@ M. 
@@ -561,7 +561,7 @@ Proof.
 Qed.
 
 Lemma star_occurs_twice:
-  forall M1 x, occurs x M1 = true ->  \x (M1@ (Ref x)) = △@ (△@ Id)@ (\x M1).
+  forall M1 x, occurs x M1 = true ->  \x (M1@ (Ref x)) = △@ (△@ I)@ (\x M1).
 Proof. intros M1 x occ; unfold star at 1; fold star; rewrite eqb_refl; rewrite occ; auto. Qed.
 
 
@@ -638,15 +638,12 @@ Qed.
 (* 4.4: Fixpoints *) 
 
 
-Definition ω := \"w" (\"f" ((Ref "f")@ ((Ref "w")@ (Ref "w")@ (Ref "f")))).
+Definition ω := Eval cbv in \"w" (\"f" ((Ref "f")@ ((Ref "w")@ (Ref "w")@ (Ref "f")))).
 Definition Y := ω @ ω. 
 
 
 Lemma y_red: forall f, t_red (Y@f) (f@ (Y@f)).
-Proof.
-  intros; unfold Y at 1; unfold ω at 1; startac "f";
-    unfold star, d, occurs; subst_tac; simpl; trtac; auto.
-Qed. 
+Proof. intros; unfold Y at 1; unfold ω at 1; trtac; auto. Qed. 
 
 
 (* 4.5 Waiting *)
@@ -656,7 +653,7 @@ Definition W_0 := \"x" (\"y" (\"z" ((Ref "x") @ (Ref "y") @ (Ref "z")))).
 Definition W := \"x" (\"y" (bracket "z" ((Ref "x") @ (Ref "y") @ (Ref "z")))).
 
 
-Definition wait M N := d Id @ (d (K@ N) @ (K@ M)).
+Definition wait M N := d I @ (d (K@ N) @ (K@ M)).
 Definition wait1 M :=
   d
     (d (K @ (K @ M))
@@ -680,275 +677,437 @@ Lemma w_red : forall M N P, t_red (W@M@N@P) (M@N@P).
 Proof.  tree_red. Qed. 
 
 
-
-Definition wait2 M N := d (d (K@ (d (K@N) @(K@M)))
-                             @ (d (d K @ (K@ △))
-                                  @ (K@ △)))
-                          @ (K @ (d Id)). 
-
-Lemma wait2_red : forall M N x y,  t_red (wait2 M N @ x @ y) (M @ N @ x @ y).
-Proof. intros; cbv; trtac. Qed.
-
-Definition wait2_1 M  := △ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ (△ @ (△ @ △) @ (△ @ △))))))) @
-       (△ @
-        (△ @
-         (△ @
-          (△ @
-           (△ @ (△ @ (△ @ △ @ (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
-            (△ @
-             (△ @
-              (△ @
-               (△ @
-                (△ @
-                 (△ @
-                  (△ @ (△ @ (△ @ △ @ (△ @ △ @ M))) @
-                   (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
-                 (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ 
-        (△ @ △ @ △)).
-
-
-Lemma wait2_1_red: forall M N, t_red (wait2_1 M @ N) (wait2 M N).
-Proof. intros; cbv; trtac. Qed. 
-
-
-
-Definition wait3 M N := 
-d (K @ (K @ (d(△ @K @K)))) @
-       (△ @
-        (△ @
-         (△ @
-          (△ @
-           (△ @ (△ @ (K @ (△ @ (△ @ (△ @ (△ @K) @ (K @ △))) @ (K @ △)))) @
-            (△ @
-             (△ @
-              (△ @
-               (△ @
-                (△ @
-                 (△ @
-                  (△ @ (△ @ (K @ (△ @ (△ @ (K @ N)) @ (K @ M)))) @
-                   (△ @ (△ @ (△ @ (△ @K) @ (K @ △))) @ (K @ △)))) @ 
-                 (K @K))) @ (K @ △))) @ (K @ △)))) @ (K @ △))) @ 
-        (K @ △)). 
-
-
-Lemma wait3_red : forall M N x y z, t_red (wait3 M N @ x @ y @ z) (M @ N @ x @ y @ z).
-Proof. intros; cbv; trtac. Qed.
-
-Definition wait31 M N x :=
-  d (d (K @ (d (K @ x) @ (d (K @ N) @ (K @ M))))
-       @ (d (d K @ (K @ △)) @ (K @ △)))
-    @ (K @ (d (△ @ K @ K))).
-
-
-Lemma wait31_red : forall M N x,  t_red (wait3 M N @ x) (wait31 M N x). 
-Proof. intros; cbv; trtac. Qed. 
-  
-Definition wait32 M N x y := d Id @ (d (K@ y) @ (d (K @ x) @ (d (K @ N) @ (K @ M)))).
-
-Lemma wait32_red : forall M N x y,  t_red (wait3 M N @ x @ y) (wait32 M N x y). 
-Proof. intros; cbv; trtac. Qed.
-
-Definition stem x := △ @ (x @ △) @ △ @ K. 
-
-Definition first_d x := stem (first x). 
-
-Definition first_wait3 x :=
-  second ((first_d (first_d (first_d (first_d(second (first_d (first_d (second x)))))))) @ △) @ △.
-
-Definition wait3_1 M :=
-  Eval cbv in
-    substitute (\"n" (wait3 (Ref "m") (Ref "n"))) "m" M.
-
 (* 4.6: Fixpoint Functions *)
 
 
 Definition self_apply := Eval cbv in \"x" (Ref "x" @ (Ref "x")).
 
-Definition Y2 f := wait self_apply (d (wait1 self_apply) @ (K@f)). 
+Definition Z f := wait self_apply (d (wait1 self_apply) @ (K@f)). 
 
 
-Lemma Y2_program: forall f, program f -> program (Y2 f). 
+Lemma Z_program: forall f, program f -> program (Z f). 
 Proof. intros; program_tac. Qed.
 
 
-Theorem fixpoint_function : forall f x, t_red (Y2 f @ x) (f@ (Y2 f) @ x).
-Proof.
-  intros; unfold Y2 at 1; eapply transitive_red; [ apply wait_red | unfold self_apply at 1; 
-  starstac ("x":: nil);  unfold d; trtac]; aptac;[ aptac; [ zerotac | apply wait1_red |] | |]; zerotac. 
-Qed. 
+Lemma Z_red : forall f x, t_red (Z f @ x) (f@ (Z f) @ x).
+Proof. tree_red. Qed. 
+
+Definition swap f := d (K @ f) @ (d (d K @ (K @ △)) @ (K @ △)).
+
+Lemma swap_red: forall f x y, t_red (swap f @ x @ y) (f @ y @ x).
+Proof. tree_red. Qed.
+
+Definition Y2 f := Z (swap f).
+
+Theorem fixpoint_function : forall f x, t_red (Y2 f @ x) (f @ x @ Y2 f).
+Proof. tree_red. Qed. 
 
 Definition Y2_red := fixpoint_function.
 
-Definition swap f := △ @ (△ @ (K @ f)) @ (△ @ (△ @ (△ @ (△ @K) @ (K @ △))) @ (K @ △)). 
-Definition Y2s f := Y2 (swap f).
-
-(* Y3 *)
-
-Definition Y3 f := wait2 self_apply (d (wait2_1 self_apply) @ (K@f)).
-
-Lemma Y3_program: forall f, program f -> program (Y3 f). 
-Proof. intros; cbv; program_tac. Qed.
-
-
-Theorem Y3_red : forall f x y, t_red(Y3 f @ x @ y) (f@ (Y3 f) @ x @ y).
-Proof. intros; cbv; trtac. Qed.
-
-
-
-(* Y4 *)
-
-Definition Y4 f := wait3 self_apply (d (wait3_1 self_apply) @ (K@f)).
-
-
-
-Lemma Y4_program: forall f, program f -> program (Y4 f). 
-Proof. intros; program_tac. Qed.
-
-
-
-Theorem Y4_red : forall f x y z, t_red (Y4 f @ x @ y @ z) (f@ (Y4 f) @ x @ y @ z).
-Proof. intros; cbv; trtac. Qed.
+Lemma Y2_program : forall f, program f -> program (Y2 f).
+Proof. intros; program_tac. Qed. 
 
 
 
 (* 4.7: Arithmetic *)
 
-
-Definition plus :=
-  Y3 (\"p"
-           (\"m"
-                 (△@ (Ref "m") @ Id @
+Definition plus_aux :=
+  Eval cbv in  (\"m"
+           (\"p"
+                 (△@ (Ref "m") @ I @
                    (K@ (\"m1" (\"n" (K@ ((Ref "p") @ (Ref "m1") @ (Ref "n"))))))
-           ))).
-
-
+               ))).
+Definition plus := Y2 plus_aux. 
 
 Lemma plus_zero: forall n, t_red (plus @ zero @ n) n. 
 Proof. tree_red. Qed.
 
 Lemma plus_successor:
   forall m n,  t_red (plus @ (successor @ m) @ n) (successor @ (plus @ m@ n)). 
-Proof.
-  intros; unfold plus at 1;
-    eapply transitive_red; [ apply Y3_red |
-                             fold plus; unfold successor; starstac ("m1" :: "n" :: "m" :: "p" :: nil)]. 
+Proof. 
+  intros; unfold plus at 1; aptac; [  apply Y2_red | trtac | unfold plus_aux, successor; trtac]. 
 Qed.
 
-Definition times :=
-  Y3 (\"t"
-           (\"m"
-                 (\"n"
-                       (△@ (Ref "n") @ △ @
-                            (K@ (\"x" (plus @(Ref "m") @
-                                                    ((Ref "t") @ (Ref "m")@ (Ref "x")))))
-     )))).
+Definition times_aux :=
+  Eval cbv in
+    \"m"
+     (\"times"
+       (\"n"
+         (App (App (△@ (Ref "n")) △)
+              (K@ (\"x" (App (App (Ref "plus") (Ref "m"))
+                             (App (App (Ref "times") (Ref "m")) (Ref "x")))))
+     ))).
 
+Print times_aux.
 
-Lemma times_zero: forall m, t_red (times @ m@ zero) zero.
+Definition times := Y2 (
+                        △ @
+(△ @
+ (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+  (△ @
+   (△ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+            (△ @
+             (△ @
+              (△ @
+               (△ @
+                (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+                 (△ @
+                  (△ @
+                   (△ @
+                    (△ @
+                     (△ @
+                      (△ @
+                       (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+                        (△ @
+                         (△ @
+                          (△ @
+                           (△ @
+                            (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+                             (△ @
+                              (△ @
+                               (△ @
+                                (△ @
+                                 (△ @ (△ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))) @
+                                  (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                                (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ 
+                         (△ @ △ @ △)))) @
+                      (△ @
+                       (△ @
+                        (△ @
+                         (△ @
+                          (△ @ (△ @ (△ @ (△ @ plus) @ (△ @ △ @ (△ @ △)))) @
+                           (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+                    (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+          (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+(△ @ △ @ (△ @ (△ @ (△ @ △ @ (△ @ (△ @ (△ @ △ @ △)) @ △)))))
+).
+
+Lemma times_zero: forall m, t_red (times @ m @ zero) zero.
 Proof. tree_red. Qed.
 
 
 Lemma times_successor:
-  forall m n,  t_red (times @ m @ (successor @ n))
-                      (plus @ m @ (times @ m @ n)).
-Proof.
-  intros; unfold times at 1; eapply transitive_red;
-    [apply Y3_red | ];
-     fold times; unfold successor;
-     rewrite (star_occurs_true _ _ "x");
-     [rewrite eta_red; auto | unfold occurs; rewrite !orb_true_r; auto; discriminate | discriminate]; 
-     rewrite (star_occurs_false _ "x"); [ |cbv; auto];
-       rewrite (star_occurs_true _ _ "n"); [| cbv; auto| discriminate]; 
-         starstac ("n" :: "m" :: "t" :: nil). 
-  Qed.
+  forall m n,  t_red (times @ m @ (successor @ n)) (plus @ m @ (times @ m @ n)). 
+Proof.   intros; unfold times at 1; aptac. apply Y2_red. trtac. unfold successor; trtac. Qed. 
+
+(* 6 *)
+
+Definition minus := 
+  Y2 (\"m"
+           (\"minus"
+                 (\"n"
+                       (App (App (△@ (Ref "n")) (Ref "m"))
+                            (K@ (App (Ref "minus") (App predecessor (Ref "m")))))
+                  ))).
+
 
 (* 4.8: Lists and Strings *)
 
 
 Definition t_nil := △. 
 Definition t_cons h t := △@ h@ t.
-Definition t_head := \"xs" (△@ (Ref "xs") @ (K@ Id) @ K).
-Definition t_tail := \"xs" (△@ (Ref "xs") @ (K@ Id) @ (K@ Id)).
+Definition t_head := \"xs" (△@ (Ref "xs") @ (K@ I) @ K).
+Definition t_tail := \"xs" (△@ (Ref "xs") @ (K@ I) @ (K@ I)).
 
 Lemma head_red: forall h t, t_red (t_head @ (t_cons h t)) h.
 Proof. tree_red. Qed. 
 Lemma tail_red: forall h t, t_red (t_tail @ (t_cons h t)) t.
 Proof. tree_red. Qed. 
 
-(* 4.9: Mapping and Folding *) 
+(* 4.9: Mapping and Folding *)
 
-Definition list_map :=
-  Y3 (\"m"
-          (\"f"
-                (\"xs"
-                      (△@ (Ref "xs") @ t_nil @
-                           (\"h" (\"t" (t_cons ((Ref "f") @ (Ref "h"))
-                                                       ((Ref "m") @ (Ref "f") @ (Ref "t"))
-          ))))))).
+Definition swap_comb := Eval cbv in \"f" (swap (Ref "f")).
 
-Lemma map_nil: forall f, t_red (list_map @ f @ t_nil) t_nil.
+Lemma swap_comb_red: forall f, t_red (swap_comb @ f) (swap f). 
+Proof. tree_red. Qed.
+
+
+Definition list_map_swap_aux :=
+  (* the list argument xs then the recursion argument map and finally the function f, to  exploit Y2 *) 
+  Eval cbv in
+    \"xs"
+     (Node @ Ref "xs"
+           @ (K @ (K @ t_nil))
+           @ (\"h"
+               (\"t"
+                 (\"map"
+                   (\"f"
+                     (t_cons
+                        (Ref "f" @ Ref "h") 
+                        (Ref "swap" @ (Ref "map") @ Ref "f" @ Ref "t")
+          )))))).
+
+Set Printing Depth 1000.
+Print list_map_swap_aux.
+
+Definition list_map_swap := (Y2 (△ @
+(△ @
+ (△ @ △ @
+  (△ @
+   (△ @
+    (△ @
+     (△ @
+      (△ @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @
+            (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+             (△ @
+              (△ @
+               (△ @
+                (△ @
+                 (△ @ (△ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))) @
+                  (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+                (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ 
+       (△ @ △ @ △))) @ (△ @ △ @ (△ @ △)))) @
+   (△ @ △ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+            (△ @
+             (△ @
+              (△ @
+               (△ @
+                (△ @
+                 (△ @
+                  (△ @ (△ @ (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △))) @
+                   (△ @ △ @ (△ @ △)))) @ (△ @ △ @ (△ @ (△ @ swap_comb))))) @ 
+               (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △))))))))) @
+(△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ △)))) @ △)
+                            )).
+
+Definition list_map := swap list_map_swap. 
+
+Lemma map_nil: forall f, t_red(list_map @ f @ t_nil) t_nil.
 Proof.  tree_red. Qed. 
 
 Lemma map_cons :
-  forall f h t, t_red(list_map @ f @ (t_cons h t)) (t_cons (f@ h) (list_map @ f @ t)).
+  forall f h t, t_red (list_map @ f @ (t_cons h t)) (t_cons (f @ h) (list_map @ f@ t)).
 Proof. 
-  intros; unfold list_map at 1; eapply transitive_red;
-    [apply Y3_red | fold list_map; unfold t_cons, t_nil; starstac ("t" :: "h" :: "xs" :: "f" :: "m" :: nil)].
+  intros; unfold list_map at 1. eapply transitive_red. apply swap_red.  aptac.
+  unfold list_map_swap. apply Y2_red. zerotac. fold list_map_swap. 
+  trtac. unfold t_cons. trtac. aptac. zerotac. aptac. aptac. apply swap_comb_red. all: zerotac.
 Qed.
 
 
+Definition swap3 := Eval cbv in \"fold" (\"f" (\"x" (\"ys" (Ref "fold" @ Ref "ys" @ Ref "f" @ Ref "x")))).
 
-Definition list_foldleft := 
-  Y4 (\"fd"
-           (\"f" 
-                 (\"x"
-                       (\"ys"
-                             (△@ (Ref "ys") @ (Ref "x") @
-                                  (D@ ((Ref "f") @(Ref "x")) @ (K@ ((Ref "fd") @ (Ref "f"))))
-     ))))).
+Lemma swap3_red : forall g f x y, t_red (swap3 @ g @ f @ x @ y) (g @ y @ f @ x).
+Proof. tree_red. Qed. 
 
+Definition list_foldleft_aux := 
+  Eval cbv in
+    \"ys"
+     ( Node @ Ref "ys" @ (K @ (K @ I))
+            @ (\"h"
+                (\"t"
+                  (\"fold" 
+                    (\"f"
+                      (\"x"
+                        (Ref "swap3" @ Ref "fold" @ Ref "f" @ (Ref "f" @ Ref "h" @ Ref "x") @ Ref "t")
+     )))))).
+
+Print list_foldleft_aux.
+
+Definition list_foldleft_swap := Y2 (
+                                     △ @
+(△ @
+ (△ @ △ @
+  (△ @
+   (△ @
+    (△ @ △ @
+     (△ @
+      (△ @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @ (△ @ (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △))) @ (△ @ △ @ (△ @ △)))) @
+          (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+   (△ @
+    (△ @
+     (△ @
+      (△ @
+       (△ @
+        (△ @
+         (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+          (△ @
+           (△ @
+            (△ @
+             (△ @
+              (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+               (△ @
+                (△ @
+                 (△ @
+                  (△ @
+                   (△ @
+                    (△ @
+                     (△ @ △ @
+                      (△ @
+                       (△ @
+                        (△ @
+                         (△ @
+                          (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+                           (△ @ (△ @ (△ @ (△ @ swap3) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                         (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                    (△ @
+                     (△ @
+                      (△ @
+                       (△ @
+                        (△ @
+                         (△ @
+                          (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+                           (△ @
+                            (△ @
+                             (△ @
+                              (△ @
+                               (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+                                (△ @
+                                 (△ @
+                                  (△ @
+                                   (△ @
+                                    (△ @ (△ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))) @
+                                     (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                                   (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ 
+                            (△ @ △ @ △)))) @ (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ 
+                     (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ 
+           (△ @ △ @ △)))) @ (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △))))) @
+(△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))))) @ △)
+). 
+
+Definition list_foldleft := swap3 @ list_foldleft_swap. 
 
 Lemma list_foldleft_nil:
   forall f x, t_red (list_foldleft @ f @ x @ t_nil) x. 
-Proof.
-  intros; unfold list_foldleft; 
-  eapply transitive_red; [apply Y4_red | fold list_foldleft; starstac ("ys" :: "x" :: "f" :: "fd" :: nil)].
-Qed. 
-
-
+Proof. tree_red. Qed. 
 
 Lemma list_foldleft_cons:
-  forall f x h t, t_red (list_foldleft @ f @ x @ (t_cons h t)) (list_foldleft @ f @ (f @ x @ h) @ t). 
+  forall f x h t, t_red (list_foldleft @ f @ x @ (t_cons h t)) (list_foldleft @ f @ (f @ h @ x) @ t). 
 Proof.
-  intros; unfold list_foldleft; eapply transitive_red;
-    [ apply Y4_red | fold list_foldleft; unfold t_cons; starstac ("ys" :: "x" :: "f" :: "fd" :: nil)]. 
-Qed. 
+  intros; unfold list_foldleft at 1. eapply transitive_red. apply swap3_red.
+    unfold list_foldleft_swap. aptac. aptac. apply Y2_red. zerotac. fold list_foldleft_swap. 
+    unfold list_foldleft_aux.   trtac. zerotac. unfold t_cons. trtac. 
+Qed.
 
-Definition list_foldright := 
-  Y4 (\"fd"
-           (\"f" 
-                 (\"x"
-                       (\"ys"
-                             (△@ (Ref "ys") @ (Ref "x") @
-                                  (\"h" (\"t" ((Ref "f") @ (Ref "h") @
-                                                           ((Ref "fd") @ (Ref "f") @
-                                                                     (Ref "x") @
-                                                                (Ref "t")))))))))).
 
-Lemma list_foldright_nil:  forall f x, t_red (list_foldright @ f @ x@ t_nil) x.
-Proof.
-  intros; unfold list_foldleft; eapply transitive_red;
-    [ apply Y4_red |
-      fold list_foldleft; unfold t_nil; starstac ("t" :: "h" :: "ys" :: "x" :: "f" :: "fd" :: nil)]. 
-Qed. 
+Definition list_foldright_aux := 
+  Eval cbv in
+    \"ys"
+     (Node @ Ref "ys" @ (K @ (K @ I))
+           @ (\"h"
+                (\"t"
+                  (\"fold" 
+                    (\"f"
+                      (\"x"
+                        (Ref "f" @ Ref "h" @ (Ref "swap3" @ Ref "fold" @ Ref "f" @ Ref "x" @ Ref "t" ))
+     )))))).
 
+
+Print list_foldright_aux.
+
+Definition list_foldright_swap := Y2 (
+                                      △ @
+(△ @
+ (△ @ △ @
+  (△ @
+   (△ @
+    (△ @ △ @
+     (△ @
+      (△ @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+            (△ @
+             (△ @
+              (△ @
+               (△ @
+                (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+                 (△ @
+                  (△ @
+                   (△ @
+                    (△ @
+                     (△ @
+                      (△ @
+                       (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+                        (△ @
+                         (△ @
+                          (△ @
+                           (△ @
+                            (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+                             (△ @
+                              (△ @
+                               (△ @
+                                (△ @
+                                 (△ @
+                                  (△ @
+                                   (△ @ △ @
+                                    (△ @ (△ @ (△ @ (△ @ swap3) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                                  (△ @
+                                   (△ @
+                                    (△ @
+                                     (△ @
+                                      (△ @
+                                       (△ @
+                                        (△ @
+                                         (△ @ (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △))) @
+                                         (△ @ △ @ (△ @ △)))) @ (△ @ △ @ (△ @ △)))) @ 
+                                     (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ 
+                              (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                      (△ @ △ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))))))) @ (△ @ △ @ △))) @ 
+                  (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+          (△ @ △ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))))))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+   (△ @
+    (△ @
+     (△ @
+      (△ @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @
+            (△ @
+             (△ @
+              (△ @
+               (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+                (△ @
+                 (△ @
+                  (△ @
+                   (△ @
+                    (△ @ (△ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))) @
+                     (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+                   (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △))) @ 
+          (△ @ △ @ (△ @ △)))) @ (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △))))) @
+(△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))))) @ △)
+                                    ).
+
+Definition list_foldright := swap3 @ list_foldright_swap. 
+
+Lemma list_foldright_nil:  forall f x, t_red (list_foldright @ f @ x@ t_nil) x. 
+Proof. tree_red. Qed. 
 
 Lemma list_foldright_cons:
   forall f x h t, t_red (list_foldright @ f @ x @ (t_cons h t)) (f @ h @ (list_foldright @ f@ x @ t)). 
 Proof.
-  intros; unfold list_foldleft; eapply transitive_red;
-    [ apply Y4_red |
-      fold list_foldleft; unfold t_cons; starstac ("t" :: "h" :: "ys" :: "x" :: "f" :: "fd" :: nil)]. 
+  intros; unfold list_foldright at 1. eapply transitive_red. apply swap3_red.
+    unfold list_foldright_swap. aptac. aptac. apply Y2_red. zerotac. fold list_foldright_swap. 
+    unfold list_foldright_aux.   trtac. zerotac. unfold t_cons. trtac. 
 Qed. 
 
 
@@ -956,9 +1115,8 @@ Definition list_append xs ys :=
   list_foldright @ (\"h" (\"t" (t_cons (Ref "h") (Ref "t")))) @ ys @ xs.
 
 
-
 Lemma append_nil_r: forall xs, t_red (list_append t_nil xs) xs.
-Proof. intros; apply list_foldright_nil. Qed. 
+Proof. apply list_foldright_nil. Qed.
 
 
 
@@ -966,52 +1124,115 @@ Proof. intros; apply list_foldright_nil. Qed.
 
 (* 5.1: Size *)
 
-Definition size:=
-  Y2 
-    (\"s"
-       (\"x"
-          (isStem
+
+Definition size_aux :=
+  Eval cbv in 
+    \"x"
+       (isStem
              @ (Ref "x")
-             @ (△
+             @ (\"s"
+                 (△
                   @ (Ref "x" @ △)
                   @ zero
                   @ (\"x1" (K @ (successor @ ((Ref "s") @ (Ref "x1")))))
-               )
+               ))
              @ (△
                   @ (Ref "x")
-                  @ (successor @ zero)
+                  @ (K @ (successor @ zero))
                   @ (\"x1"
                        (\"x2"
-                          (successor
-                             @ (plus
-                                  @ ((Ref "s") @ (Ref "x1"))
-                                  @ ((Ref "s") @ (Ref "x2"))
-    )))))))).
+                          (\"s"
+                            (successor
+                               @ (Ref "plus"
+                                      @ ((Ref "s") @ (Ref "x1"))
+                                      @ ((Ref "s") @ (Ref "x2"))
+       ))))))).
+
+Set Printing Depth 1000.
+Print size_aux.
+
+
+Definition size := Y2 (△ @
+(△ @
+ (△ @
+  (△ @
+   (△ @ △ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+       (△ @
+        (△ @
+         (△ @
+          (△ @
+           (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+            (△ @
+             (△ @
+              (△ @
+               (△ @
+                (△ @
+                 (△ @
+                  (△ @ △ @
+                   (△ @
+                    (△ @
+                     (△ @
+                      (△ @
+                       (△ @ (△ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))) @
+                        (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+                      (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                 (△ @
+                  (△ @
+                   (△ @
+                    (△ @
+                     (△ @
+                      (△ @
+                       (△ @ (△ @ (△ @ △ @ (△ @ △ @ plus))) @
+                        (△ @
+                         (△ @
+                          (△ @
+                           (△ @
+                            (△ @ (△ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △)))) @
+                             (△ @ (△ @ (△ @ (△ @ (△ @ △)) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+                           (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ (△ @ △)))) @ 
+                    (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+          (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △))))))))) @
+  (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ △)))) @ △))) @
+(△ @
+ (△ @
+  (△ @
+   (△ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ △)) @
+       (△ @ (△ @ (△ @ (△ @ (△ @ △ @ △)) @ (△ @ (△ @ △) @ (△ @ △)))) @ (△ @ △ @ △)))) @
+     (△ @ △ @ (△ @ △)))) @
+   (△ @ △ @
+    (△ @
+     (△ @
+      (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+       (△ @
+        (△ @
+         (△ @ (△ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @ (△ @ (△ @ △) @ (△ @ △ @ △)))) @
+          (△ @ △ @ △))) @ (△ @ △ @ △)))))))) @
+ (△ @ (△ @ (△ @ △ @ (△ @ △))) @
+  (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))) @
+   (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))))))) @
+    (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ (△ @ (△ @ △) @ (△ @ △))))))) @ △)))))
+                      ).
 
 
 Lemma size_program: program size.
 Proof. cbv; program_tac. Qed. 
 
 Lemma size_leaf: t_red (size @ △) (successor @ zero).
-Proof. 
-  intros;  unfold size; eapply transitive_red; [ apply Y2_red | fold size;
-  starstac ("x2" :: "x1" :: "x" :: "s" :: nil); unfold d; trtac]. 
-Qed.
-
+Proof. tree_red. Qed. 
 
 Lemma size_fork:
   forall M N, t_red (size @ (△@ M@N)) (successor @(plus @ (size @ M) @ (size @ N))).
-Proof. 
-  intros;  unfold size; eapply transitive_red; [apply Y2_red | fold size;
-  starstac ("x2" :: "x1" :: "x" :: "s" :: nil);  unfold d; trtac]. 
-Qed.
+Proof. intros;  unfold size; eapply transitive_red; [apply Y2_red | trtac]. Qed.
 
 
 Lemma size_stem: forall M, t_red (size @ (△@ M)) (successor @ (size @ M)).
-Proof. 
-  intros;  unfold size; eapply transitive_red; [ apply Y2_red | fold size;
-  starstac ("x2" :: "x1" :: "x" :: "s" :: nil);  unfold d; trtac]. 
-Qed.
+Proof. intros;  unfold size; eapply transitive_red; [apply Y2_red | trtac]. Qed.
 
 
 
@@ -1020,70 +1241,69 @@ Qed.
 
 Definition equal_aux := 
   Eval cbv in 
-  \"e"
-       (\"x"
-          (\"y"
-             (isStem
-                @ (Ref "x")
-                @ (isStem
-                     @ (Ref "y")
-                     @ ((Ref "e")
-                          @ (△ @ ((Ref "x") @ △) @ △ @ K)
-                          @ (△ @ ((Ref "y") @ △) @ △ @ K)
-                       )
-                     @ KI
-                  )
-                @ (△
-                     @ (Ref "x")
-                     @ (isLeaf @ (Ref "y"))
-                     @ (\"x1"
-                          (\"x2"
-                             (isFork
-                                @ (Ref "y")
-                                @ (△
-                                     @ (Ref "y")
-                                     @ △
-                                     @ (\"y1"
-                                          (\"y2"
-                                             ((Ref "e")
-                                                @ (Ref "x1")
-                                                @ (Ref "y1")
-                                                @ ((Ref "e")
-                                                     @ (Ref "x2")
-                                                     @ (Ref "y2")
-                                                  )
-                                                @ KI
-                                  ))))
-                                @ KI
-       ))))))).
+    \"x"
+     (isStem
+        @ (Ref "x")
+        @ (\"e" (\"y" (isStem
+                         @ (Ref "y")
+                         @ ((Ref "e")
+                              @ (△ @ ((Ref "x") @ △) @ △ @ K)
+                              @ (△ @ ((Ref "y") @ △) @ △ @ K)
+                           )
+                         @ KI
+                      )))
+        @ (△
+             @ (Ref "x")
+             @ (\"e" (\"y" (isLeaf @ (Ref "y"))))
+             @ (\"x1"
+                 (\"x2"
+                   (\"e"
+                     (\"y" (isFork
+                              @ (Ref "y")
+                              @ (△
+                                   @ (Ref "y")
+                                   @ △
+                                   @ (\"y1"
+                                       (\"y2"
+                                         ((Ref "e")
+                                            @ (Ref "x1")
+                                            @ (Ref "y1")
+                                            @ ((Ref "e")
+                                                 @ (Ref "x2")
+                                                 @ (Ref "y2")
+                                              )
+                                            @ KI
+                                ))))
+                              @ KI
+     ))))))).
 
-Definition equal := Y3 equal_aux. 
+Definition equal := Y2 equal_aux.
+
+(* Compute (term_size equal). 1145 *) 
 
 Lemma equal_program: program equal.
-Proof. cbv; program_tac. Qed.
+Proof. program_tac. Qed.
 
 Ltac equaltac :=
-  unfold equal; eapply transitive_red; [apply Y3_red | fold equal; unfold equal_aux; trtac; auto].
+  aptac; [ unfold equal; apply Y2_red | zerotac | fold equal; unfold equal_aux; trtac].
+
 
 Theorem equal_programs: forall M,  program M -> t_red (equal @ M @ M) K.
 Proof.
-  intros M prM; induction prM; intros;  equaltac;
-        aptac; [ aptac;  [ apply IHprM1 | apply IHprM2 | ] | |]; zerotac; trtac.  
+  intros M prM; induction prM; intros; equaltac;
+  aptac; [ aptac; [ apply IHprM1 | apply IHprM2 | zerotac] | zerotac |  trtac].
 Qed.
 
 Theorem unequal_programs:
-  forall M,  program M -> forall N, program N -> M<> N -> t_red(equal @ M @ N) KI. 
+  forall M,  program M -> forall N, program N -> M<> N -> t_red (equal @ M @ N) KI. 
 Proof.
-  intros M prM; induction prM; intros P prP neq; inversion prP; intros; subst; try congruence; equaltac. 
-  {
-    apply IHprM; congruence.
-  }{
-    assert(d: M = M0 \/ M<> M0) by repeat decide equality; inversion d; subst.
-  aptac; [ aptac; [ apply equal_programs | | ] | |]; zerotac; trtac; apply IHprM2; congruence.
-    aptac; [ aptac; [ apply IHprM1 | | ] | | ]; zerotac; trtac. 
-  }
+  intros M prM; induction prM; intros P prP neq; inversion prP; intros; subst;
+    try congruence; equaltac. (* slow *) 
+  apply IHprM; congruence.
+  assert(d: M = M0 \/ M<> M0) by repeat decide equality;   inversion d; subst.
+  aptac. aptac. apply  equal_programs; auto. apply  IHprM2;    congruence.  zerotac. zerotac. trtac.
+  aptac. aptac. apply IHprM1;    congruence.  zerotac. zerotac. trtac. trtac. 
 Qed.
-
 
 
 (* 5.3: Tagging *)
@@ -1115,29 +1335,18 @@ Definition tag_wait t :=
     substitute (\"g" (tag (Ref "t") (wait self_apply (Ref "g")))) "t" t.
 
 
-Definition Y2_t t f := tag t (wait self_apply (d (tag_wait t) @ (K@f))). 
+Definition Y2_t t f := tag t (wait self_apply (d (tag_wait t) @ (K@ (swap f)))). 
 
 
 Lemma Y2_t_program: forall t f, program t -> program f -> program (Y2_t t f). 
 Proof. intros; program_tac. Qed.
 
 
-Theorem Y2_t_red : forall t f x, t_red(Y2_t t f @ x) (f@ (Y2_t t f) @ x).
-Proof.
-  intros; unfold Y2_t at 1; trtac; eapply transitive_red;
-    [apply tag_apply |
-     eapply transitive_red;
-     [ apply wait_red |
-       aptac;
-       [ unfold self_apply; starstac ("x" :: nil)
-       | zerotac
-       | unfold d; trtac; apply preserves_app_t_red;
-         [ apply preserves_app_t_red; [ zerotac | unfold tag_wait at 1; trtac]
-           | zerotac]]]].
-Qed. 
+Theorem Y2_t_red : forall t f x, t_red(Y2_t t f @ x) (f@ x @ (Y2_t t f)).
+Proof. tree_red. Qed. 
 
 Theorem getTag_Y2_t: forall t f, t_red (getTag @ (Y2_t t f)) t.
-Proof. intros; cbv; trtac.  Qed. 
+Proof. tree_red.  Qed. 
 
 (* More Queries *)
 
@@ -1149,30 +1358,17 @@ Definition isFork2 :=  (* maps forks to a leaf and others to a fork *)
   \"z" (△ @ (Ref "z") @ (K@K) @ (K@(K@ △))).
 
 Lemma isFork2_leaf: t_red (isFork2 @ △) (K@K).
-Proof. intros; cbv; trtac. Qed.
+Proof. tree_red. Qed.
 
 Lemma isFork2_stem: forall x, t_red(isFork2 @ (△@x)) (K@(x@(K@(K@△)))).
-Proof. intros; cbv; trtac.  Qed.
+Proof. tree_red.  Qed.
 
 
 Lemma isFork2_fork: forall x y, t_red(isFork2 @ (△@ x@ y)) △. 
-Proof. intros; cbv; trtac.  Qed.
+Proof. tree_red. Qed. 
 
 
 (* 5.5: Triage *)
-
-Definition triage_comb :=
-  \"m0"
-       (\"m1"
-             (\"m2"
-                   (\"x"
-                         (isStem @
-                                 (Ref "x") @
-                                 (△@((Ref "x") @△)@△ @ (\"y" (K@ ((Ref "m1") @ (Ref "y"))))) @
-                                 (△@ (Ref "x") @ (Ref "m0") @ (Ref "m2"))
-       )))).
-
-
 
 
 Definition triage f0 f1 f2  :=
@@ -1282,7 +1478,7 @@ Fixpoint tree_case p s :=
   | △ => leaf_case s
   | △@ p => stem_case (tree_case p s)
   | △@ p @ q => fork_case (tree_case p (wait (tree_case q (K@s)) (fork_case_r2 p)))
-  | _ => Id
+  | _ => I
   end.
           
 
@@ -1365,7 +1561,7 @@ Qed.
 Lemma programs_are_factorable: forall p, program p -> factorable p.
 Proof. intros p pr; inversion pr; auto_t. Qed. 
 
-Definition eager := \"z" (\"f" (△ @ (Ref "z") @ Id @ (K@KI) @ Id @ (Ref "f") @ (Ref "z"))). 
+Definition eager := \"z" (\"f" (△ @ (Ref "z") @ I @ (K@KI) @ I @ (Ref "f") @ (Ref "z"))). 
 
 Lemma eager_of_factorable : forall M N, factorable M -> t_red (eager @ M @ N)  (N @ M).
 Proof.   intros M N fac; inversion fac; cbv; trtac. Qed.
@@ -1400,31 +1596,31 @@ Proof. intros M N p; inv1 program; auto_t. Qed.
 
 
     
-Definition Db x := D @ (D @ (K @ x) @ Id) @ (K @ D).
+Definition Db x := D @ (D @ (K @ x) @ I) @ (K @ D).
 
 
-Definition bfforkleaf := Eval cbv in \"y" (K @ (K @ (Ref "y"))).
+Definition bf_leaf := Eval cbv in \"y" (K @ (K @ (Ref "y"))).
 
-Definition bfforkfork :=
+Definition bf_fork :=
   Eval cbv in 
     \"wf"
       (\"xf"
          (K
-            @ (D
-                 @ (d K
-                      @ (D @ (D @ (K @ Ref "wf")) @ (K@D))
+            @ (d
+                  (d K
+                      @ (d (d (K @ Ref "wf")) @ (K@D))
                    )
-                 @ (K @ (D @ (K @ Ref "xf")))
+                 @ (K @ (d (K @ Ref "xf")))
       ))). 
 
 
-Definition bfforkstem e  :=
+Definition bf_stem e  :=
   Eval cbv in 
     substitute
       (\"xs"
          (\"ys"
-            (D @ (d (K@(K@ Ref "e")) @ (Db (Ref "xs")))
-               @ (D @ (d K @ (Db (Ref "ys")))
+            (d (d (K@(K@ Ref "e")) @ (Db (Ref "xs")))
+               @ (d (d K @ (Db (Ref "ys")))
                     @ (K @ D)
       ))))
       "e" e. 
@@ -1442,50 +1638,50 @@ Definition onFork tr :=
       "triage" tr.
 
 
-Definition bf :=  Y2s (onFork (triage bfforkleaf (bfforkstem eager) bfforkfork)). 
+Definition bf :=  Y2 (onFork (triage bf_leaf (bf_stem eager) bf_fork)). 
 
 
 Ltac bf_tac :=
-  intros; unfold bf, Y2s; eapply transitive_red; [apply Y2_red | unfold swap, onFork, d; trtac].
+  intros; unfold bf, Y2; eapply transitive_red; [apply Y2_red | unfold swap, onFork, d; trtac].
 
 Lemma program_bf : program bf.
 Proof. program_tac. Qed.
 
 
-Lemma bf_leaf: t_red (bf @ △) △.  
+Lemma bf_leaf_red: t_red (bf @ △) △.  
 Proof.  bf_tac. Qed.
 
 
-Lemma bf_stem: forall x, t_red (bf @ (△ @ x)) (△ @ x).  
+Lemma bf_stem_red: forall x, t_red (bf @ (△ @ x)) (△ @ x).  
 Proof. bf_tac. Qed.
 
-Lemma bf_fork: forall x y, t_red (bf @ (△ @ x @ y))
-                                 ((triage bfforkleaf (bfforkstem eager) bfforkfork) @ x @ y @ bf).  
+Lemma bf_fork_red: forall x y, t_red (bf @ (△ @ x @ y))
+                                 ((triage bf_leaf (bf_stem eager) bf_fork) @ x @ y @ bf).  
 Proof. bf_tac. Qed.
 
          
 
-Lemma bf_fork_leaf:  forall y z, t_red(bf @ (△@△@y) @ z) y.
+Lemma bf_fork_leaf_red:  forall y z, t_red(bf @ (△@△@y) @ z) y.
 Proof.
-  intros; aptac; [apply bf_fork | zerotac |]; aptac; [ aptac; [aptac; [apply triage_leaf | |] | |] | |];
-  zerotac; unfold bfforkleaf; trtac.
+  intros; aptac; [apply bf_fork_red | zerotac |]; aptac; [ aptac; [aptac; [apply triage_leaf | |] | |] | |];
+  zerotac; unfold bf_leaf; trtac.
 Qed.
 
 
 
-Lemma bf_fork_stem:
+Lemma bf_fork_stem_red:
   forall x y z, t_red (bf @ (△@(△@x) @y) @ z) (eager @ (bf @ x @ z) @ (bf @ (bf @ y @ z))). 
 Proof.
-  intros; aptac; [ apply bf_fork | zerotac |]; aptac; [ aptac; [ aptac; [apply triage_stem | |] | |] | |];
-    zerotac;  unfold bfforkstem, Db; starstac ("zs" :: "bfs" :: "ys" :: "xs" :: nil).
+  intros; aptac; [ apply bf_fork_red | zerotac |]; aptac; [ aptac; [ aptac; [apply triage_stem | |] | |] | |];
+    zerotac;  unfold bf_stem, Db; trtac. 
 Qed.
 
 
-Lemma bf_fork_fork:
+Lemma bf_fork_fork_red:
   forall w x y z, t_red (bf @ (△@(△@w@x) @y) @ z) (bf @ (bf @ z @ w) @x).
 Proof.
-  intros; aptac; [apply bf_fork | zerotac |]; aptac; [ aptac; [ aptac; [apply triage_fork | |] | |] | |];
-  zerotac; unfold bfforkfork;  trtac.
+  intros; aptac; [apply bf_fork_red | zerotac |]; aptac; [ aptac; [ aptac; [apply triage_fork | |] | |] | |];
+  zerotac; unfold bf_fork;  trtac.
 Qed.
 
 
@@ -1498,18 +1694,18 @@ Theorem branch_first_eval_to_bf:
   forall M N P, program M -> program N -> branch_first_eval M N P -> t_red(bf@M@N) P. 
 Proof.
   intros M N P prM prN ev; induction ev; intros; subst; inv1 program; subst. 
-    {aptac; [apply bf_leaf | |]; zerotac. }
-    {aptac; [apply bf_stem | |]; zerotac. } 
-    {apply bf_fork_leaf. }
+    {aptac; [apply bf_leaf_red | |]; zerotac. }
+    {aptac; [apply bf_stem_red | |]; zerotac. } 
+    {apply bf_fork_leaf_red. }
   {
-  eapply transitive_red. apply bf_fork_stem.
+  eapply transitive_red. apply bf_fork_stem_red.
   aptac. aptac. zerotac. apply IHev2. all: zerotac.
   eapply transitive_red. apply eager_of_factorable.  apply programs_are_factorable.
   eapply branch_first_program; eauto.
   aptac.   aptac. zerotac. apply IHev1. all: zerotac.
   apply IHev3; eapply branch_first_program; eauto.
   }{
-  eapply transitive_red. apply bf_fork_fork. 
+  eapply transitive_red. apply bf_fork_fork_red. 
   aptac. aptac. zerotac. apply IHev1. all: zerotac. apply IHev2; auto. 
   eapply branch_first_program; eauto.
   }
@@ -1533,8 +1729,8 @@ Proof. split_all. Qed.
        
 Definition quote_aux :=
   Eval cbv in
-    \"q"
-       (\"x"
+    \"x"
+       (\"q"
           (isStem
              @ (Ref "x")
              @ (△ @ ((Ref "x") @ △)
@@ -1560,7 +1756,7 @@ Ltac quote_tac :=
   | fold quote; unfold quote_aux; trtac; repeat apply preserves_app_t_red; zerotac].
 
 Lemma quote_red: forall M, program M -> t_red(App quote M) (meta_quote M).
-Proof.  intros M prM; induction prM; intros; [ tree_red | |]; quote_tac.  Qed.
+Proof.  intros M prM; induction prM; intros; quote_tac.  Qed.
 
 Lemma meta_quote_of_combination_is_program: forall M, combination M -> program (meta_quote M).
 Proof.  induction M; intros; inv1 combination; [ apply pr_leaf | apply pr_fork]; auto. Qed. 
@@ -1647,9 +1843,10 @@ Definition root1 :=
   Eval cbv in
   \"t"(\"y"(\"r1"(triage rootl roots rootf @ (Ref "r1" @ Ref "t") @ (Ref "r1") @ (Ref "y")))).
 
-Definition root :=
-  Y2(\"r"(\"a"(△ @ Ref "a" @ △ @ (\"f"(onFork root1 @ (Ref "r" @ Ref "f") @ (Ref "r")))))).
+Definition root_aux :=
+  Eval cbv in (\"a"(\"r"(△ @ Ref "a" @ △ @ (\"f"(onFork root1 @ (Ref "r" @ Ref "f") @ (Ref "r")))))).
 
+Definition root := Y2 root_aux. 
                        
 Lemma root_program: program root.
 Proof. program_tac. Qed.
@@ -1660,13 +1857,10 @@ Proof. program_tac. Qed.
 
 Theorem root_eval_to_root: forall M P, root_eval M P -> t_red (root @ M) P.
 Proof.
-  intros M P ev; induction ev; intros;
-    (eapply transitive_red;
-     [ apply Y2_red | fold root; unfold onFork, d;  starstac ("f" :: "a" :: "r" :: nil);  auto]);
-  ap2tac; zerotac; trtac; unfold root1; starstac ("r1" :: "y" :: "t" :: nil);
-  ap2tac; zerotac; trtac.
-Qed. 
-
+  intros M P ev; induction ev; intros;  
+    (eapply transitive_red; [ apply Y2_red | fold root; unfold root_aux; trtac]);
+    repeat (ap2tac; try zerotac; trtac).
+Qed.
 
 
 (* Root-and-Branch Evaluation *)
@@ -1681,19 +1875,14 @@ Inductive rb_eval : Tree -> Tree -> Prop :=
 Hint Constructors rb_eval : TreeHIntDb. 
       
 
-Definition rb :=
-  Y2s
-    (\"x"
-       (triage
-          (K@△)
-          (\"y" (\"r" (△ @ (Ref "r" @ Ref "y"))))
-          (\"y" (\"z" (\"r" (△ @ (Ref "r" @ Ref "y")@ (Ref "r" @ Ref "z")))))
-          @ (root @ (Ref "x"))
-    )). 
+Definition rb_stem_case := Eval cbv in \"y" (\"r" (△ @ (Ref "r" @ Ref "y"))).
+Definition rb_fork_case := Eval cbv in \"y" (\"z" (\"r" (△ @ (Ref "r" @ Ref "y")@ (Ref "r" @ Ref "z")))). 
+Definition rb_aux := triage (K@△) rb_stem_case rb_fork_case.
+Definition rb :=   Y2 (d root @ (K @ rb_aux)).
 
 (*
 Compute term_size root. 
-Compute term_size rb. 1095
+Compute term_size rb. 942
 *) 
 
 
@@ -1702,35 +1891,28 @@ Compute term_size rb. 1095
 Lemma rb_eval_implies_rb :
   forall M P, rb_eval M P -> forall M0, M = meta_quote M0 -> combination M0 -> t_red (rb @ M) P. 
 Proof.
-  Ltac fold_tac :=   replace (Y2
-       (swap
-          (\"x"
-             (triage (K @ △) (\"y" (\"r" (△ @ (Ref "r" @ Ref "y"))))
-                (\"y" (\"z" (\"r" (△ @ (Ref "r" @ Ref "y") @ (Ref "r" @ Ref "z"))))) @
-              (root @ Ref "x"))))) with rb by auto; 
-  unfold swap; starstac ("x" :: nil). 
-
   intros M P e; induction e; intros M0 eqc c; subst. 
-  {
+  
   assert(t_red (root @ (meta_quote M0)) △) by (apply root_eval_to_root; auto). 
-  unfold rb. eapply transitive_red. apply Y2_red. fold_tac. 
-  ap2tac; zerotac; trtac; aptac; [ apply triage_leaf | |]; zerotac; trtac. 
-  }{
+  unfold rb. eapply transitive_red. apply Y2_red. unfold d; trtac.
+  unfold rb_aux at 1; trtac. ap2tac; zerotac; trtac.
+  aptac. apply triage_leaf.  zerotac. trtac. 
+
   assert(ex: exists Q, y = meta_quote Q /\ combination Q) by (eapply root_eval_produces_stem; eauto).
   elim ex; intros Q ([=] & c1); subst. 
   assert(t_red (root @ (meta_quote M0)) (△@ meta_quote Q)) by (eapply root_eval_to_root; eauto). 
-  unfold rb. eapply transitive_red. apply Y2_red. fold_tac. 
-  ap2tac; zerotac; trtac;  aptac; [ apply triage_stem | |]; zerotac;
-    starstac ("r" :: "y" :: nil);  aptac; [ zerotac | eapply IHe; eauto | zerotac].
-  }{
+  unfold rb. eapply transitive_red. apply Y2_red. fold rb.  unfold d; trtac.
+  ap2tac; zerotac; trtac. unfold rb_aux; trtac.  aptac. apply triage_stem.  zerotac.
+  unfold rb_stem_case; trtac. aptac. zerotac. eapply IHe; eauto. zerotac. 
+
   assert(ex: exists Q R , y = meta_quote Q /\ combination Q /\ z = meta_quote R /\ combination R)
     by (eapply root_eval_produces_fork; eauto).
   elim ex; intros Q ex2; elim ex2; intros R (e &c1 &e3 & c2); subst. 
   assert(t_red (root @ (meta_quote M0)) (△@ meta_quote Q @ meta_quote R)) by (apply root_eval_to_root; auto). 
-  unfold rb. eapply transitive_red. apply Y2_red. fold_tac.
-  ap2tac; zerotac; trtac.  aptac. apply triage_fork. zerotac.  starstac ("r" :: "z" :: "y" :: nil).
-  aptac. aptac. zerotac.  eapply IHe1; eauto. zerotac. eapply IHe2; eauto. zerotac.
-  }
+  unfold rb. eapply transitive_red. apply Y2_red. fold rb.  unfold d; trtac.
+  ap2tac; zerotac; trtac. unfold rb_aux; trtac.  aptac. apply triage_fork.  zerotac.
+  unfold rb_fork_case; trtac. aptac. zerotac. eapply IHe2; eauto. aptac. aptac. zerotac. 
+  eapply IHe1; eauto. all: zerotac.  
 Qed.
 
 

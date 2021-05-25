@@ -41,7 +41,7 @@ Set Default Proof Using "Type".
 
 (* Branch-first evaluation *)
 
-Inductive branch_first_eval: Tree -> Tree -> Tree -> Prop :=
+Inductive branch_first_eval: Tree0 -> Tree0 -> Tree0 -> Prop :=
 | e_leaf : forall x, branch_first_eval △ x (△ @ x)
 | e_stem : forall x y, branch_first_eval (△ @ x) y (△ @ x@ y)
 | e_fork_leaf: forall y z, branch_first_eval (△ @ △@ y) z y
@@ -64,36 +64,63 @@ Lemma branch_first_eval_program_red:
 Proof. intros M N p; inv1 program; subst; auto_t. Qed.
 
 
-    
-Definition Db x := D @ (D @ (K @ x) @ Id) @ (K @ D).
+
+(* 5.9 Eager Function Application *) 
 
 
-Definition bfforkleaf := Eval cbv in \"y" (K @ (K @ (Ref "y"))).
+Inductive factorable: Tree0 -> Prop :=
+| factorable_leaf : factorable △
+| factorable_stem: forall M, factorable (△@ M)
+| factorable_fork: forall M N, factorable (△@ M @ N)
+.
 
-Definition bfforkfork :=
+Hint Constructors factorable :TreeHintDb. 
+
+Lemma programs_are_factorable: forall p, program p -> factorable p.
+Proof. intros p pr; inversion pr; auto_t. Qed. 
+
+
+
+
+Definition eager :=
+  Eval cbv in
+    \"z" (\"f" (△ @ (Ref "z") @ I @ (K@KI) @ I @ (Ref "f") @ (Ref "z"))). 
+
+
+Lemma eager_of_factorable : forall M N, factorable M -> eager @ M @ N === N @ M.
+Proof.   intros M N fac; inversion fac; tree_eq. Qed.
+
+(* Compute (term_size eager).  46 *)
+
+Definition Db x := d (d (K @ x) @ I) @ (K @ D).
+
+Definition bf_leaf := Eval cbv in \"y" (K @ (K @ (Ref "y"))).
+
+Definition bf_fork :=
   Eval cbv in 
     \"wf"
       (\"xf"
          (K
-            @ (D
-                 @ (d K
-                      @ (D @ (D @ (K @ Ref "wf")) @ (K@D))
+            @ (d
+                  (d K
+                      @ (d (d (K @ Ref "wf")) @ (K@D))
                    )
-                 @ (K @ (D @ (K @ Ref "xf")))
+                 @ (K @ (d (K @ Ref "xf")))
       ))). 
 
 
-Definition bfforkstem e  :=
+Definition bf_stem e  :=
   Eval cbv in 
     substitute
       (\"xs"
          (\"ys"
-            (D @ (d (K@(K@ Ref "e")) @ (Db (Ref "xs")))
-               @ (D @ (d K @ (Db (Ref "ys")))
+            (d (d (K@(K@ Ref "e")) @ (Db (Ref "xs")))
+               @ (d (d K @ (Db (Ref "ys")))
                     @ (K @ D)
       ))))
       "e" e. 
-      
+
+Compute(term_size (bf_stem Node)). 
 
 
 (* onFork Node = K Node since it will be applied to an evaluator *) 
@@ -117,47 +144,42 @@ Lemma onFork_fork : forall tr x y, onFork tr @ (Node @ x @ y) === tr @ x @ y.
 Proof. tree_eq. Qed.
 
   
-Definition bf :=  Y2s (onFork (triage bfforkleaf (bfforkstem eager) bfforkfork)). 
+Definition bf :=  Y2 (onFork (triage bf_leaf (bf_stem eager) bf_fork)). 
 
 
 
 Lemma program_bf : program bf.
 Proof. program_tac. Qed.
 
-(* 
+
+
+(*
 Compute(term_size bf). 514. 
 *) 
 
 
-Lemma bf_leaf: bf @ △ === △.  
+Lemma bf_leaf_red: bf @ △ === △.  
 Proof. tree_eq. Qed.
 
 
-Lemma bf_stem: forall x, bf @ (△ @ x) === △ @ x.  
+Lemma bf_stem_red: forall x, bf @ (△ @ x) === △ @ x.  
 Proof. tree_eq. Qed.
 
-Lemma bf_fork:
-  forall x y, bf @ (△ @ x @ y) === (triage bfforkleaf (bfforkstem eager) bfforkfork) @ x @ y @ bf.  
+Lemma bf_fork_red:
+  forall x y, bf @ (△ @ x @ y) === (triage bf_leaf (bf_stem eager) bf_fork) @ x @ y @ bf.  
 Proof. tree_eq. Qed.
 
-Lemma bf_fork_leaf:  forall y z, bf @ (△@△@y) @ z === y.
+Lemma bf_fork_leaf_red:  forall y z, bf @ (△@△@y) @ z === y.
 Proof.  tree_eq. Qed. 
 
 
-Lemma bf_fork_stem:
+Lemma bf_fork_stem_red:
   forall x y z, bf @ (△@(△@x) @y) @ z === eager @ (bf @ x @ z) @ (bf @ (bf @ y @ z)). 
-Proof. 
-  intros; unfold eq_q; rewrite quotient_app; rewrite bf_fork;
-  do 2 rewrite quotient_app; rewrite triage_stem; unfold bfforkstem, Db, eager; eqtac;   
-    starstac ("f" :: "z" :: nil); auto. 
-Qed. 
+Proof. intros; qtac bf_fork_red; qtac triage_stem; unfold bf_stem, Db, eager; eqtac. Qed. 
 
-Lemma bf_fork_fork:
+Lemma bf_fork_fork_red:
   forall w x y z, bf @ (△@(△@w@x) @y) @ z === bf @ (bf @ z @ w) @x.
-Proof.
-  intros; unfold eq_q; rewrite quotient_app; rewrite bf_fork; rewrite quotient_app; rewrite quotient_app; rewrite triage_fork; unfold bfforkfork, d;
-    starstac ("xf"  :: "wf"  :: nil); auto.  
-Qed. 
+Proof.  intros; qtac bf_fork_red; qtac triage_fork; unfold bf_fork, d; eqtac. Qed. 
 
 (* 
 Compute (term_size bf).
@@ -168,25 +190,20 @@ Theorem branch_first_eval_to_bf:
 Proof.
   intros M N P prM prN ev; induction ev; intros; simpl; subst; inv1 program; subst; unfold eq_q;
     [   
-      rewrite quotient_app;  rewrite bf_leaf ; auto |
-  rewrite quotient_app; rewrite bf_stem ; auto |
-   rewrite bf_fork_leaf ; auto | 
-   rewrite bf_fork_stem; do 2 rewrite quotient_app; rewrite IHev2; auto;
-   rewrite quotient_app;  rewrite IHev1; auto; 
-   unquotient_tac; rewrite eager_of_factorable; [
-     apply IHev3; auto; eapply branch_first_eval_program; eauto | 
-     apply programs_are_factorable;  eapply branch_first_eval_program; eauto
-   ] |
-    rewrite bf_fork_fork; do 2rewrite quotient_app; rewrite IHev1; auto;
-    unquotient_tac; rewrite IHev2; auto;  eapply branch_first_eval_program; eauto
-      ].
+      qtac bf_leaf_red ; auto |
+      qtac bf_stem_red ; auto |
+      qtac bf_fork_leaf_red ; auto | 
+      qtac bf_fork_stem_red; qtac IHev2; qtac IHev1; rewrite eager_of_factorable; [
+     apply IHev3; auto | 
+     apply programs_are_factorable
+      ] |  qtac bf_fork_fork_red; qtac IHev1; qtac IHev2
+      ]; eapply branch_first_eval_program; eauto.
 Qed.
 
-Lemma bf_identity: forall z, bf @ Id @ z === z.
+Lemma bf_identity: forall z, bf @ I @ z === z.
 Proof.
-  intros; unfold_op; unfold eq_q; rewrite bf_fork_stem; do 3 rewrite quotient_app;
-  rewrite bf_leaf; do 2 rewrite quotient_app; rewrite bf_stem;
-  unquotient_tac;   rewrite eager_of_factorable; auto_t; rewrite bf_fork_leaf; auto. 
+  intros; unfold_op; qtac bf_fork_stem_red; qtac bf_leaf_red; qtac bf_stem_red;
+    rewrite eager_of_factorable; auto_t; qtac bf_fork_leaf_red; auto. 
 Qed.   
 
 
@@ -203,26 +220,29 @@ Lemma meta_quote_preserves_combinations:
   forall M, combination M -> combination (meta_quote M).
 Proof. induction M; simpl; auto; intro c; combination_tac; auto. Qed. 
 
-Definition quote :=
-  Y2
-    (\"q"
-       (\"x"
-          (isStem
+Definition quote_aux :=
+  Eval cbv in 
+    (\"x"
+       (isStem
              @ (Ref "x")
-             @ (△
-                  @ ((Ref "x") @ △)
-                  @ △
-                  @ (\"x1" (K@ (K @ ((Ref "q") @ (Ref "x1")))))
-               )
+             @ (\"q"
+                 (△
+                    @ ((Ref "x") @ △)
+                    @ △
+                    @ (\"x1" (K@ (K @ ((Ref "q") @ (Ref "x1")))))
+                 ))
              @ (△
                   @ (Ref "x")
-                  @ △
+                  @ (K @ △)
                   @ (\"x1"
                        (\"x2"
-                          (△
+                         (\"q"
+                           (△
                              @ (K@((Ref "q") @ (Ref "x1")))
                              @ ((Ref "q") @ (Ref "x2"))
     ))))))).
+
+Definition quote := Y2 quote_aux. 
 
 Ltac quote_tac :=
   unfold quote, eq_q; rewrite Y2_red; fold quote; starstac ("x2" :: "x1" :: "x" :: "q" :: nil);
@@ -230,20 +250,14 @@ Ltac quote_tac :=
 
 Lemma quote_red: forall M, program M -> App quote M === meta_quote M.
 Proof.
-  intros M prM; induction prM; intros; [
-    tree_eq |
-    quote_tac; rewrite <- quotient_app;  rewrite IHprM; auto |
-    quote_tac; rewrite <- quotient_app; rewrite <- quotient_app;
-    rewrite IHprM1; rewrite IHprM2; auto
-    ].  
+  intros M prM; induction prM; intros; unfold quote; qtac Y2_red; fold quote; unfold quote_aux; eqtac;
+  [ qtac IHprM | qtac IHprM1; qtac IHprM2]. 
 Qed.
-
-
 
 
 (* Root evaluation acts on meta_quotes *) 
 
-Inductive root_eval: Tree -> Tree -> Prop :=
+Inductive root_eval: Tree0 -> Tree0 -> Prop :=
 | sh_leaf : root_eval △ △
 | sh_fork_leaf : forall f z, root_eval f △ -> root_eval (△ @ f @ z) (△ @ z)
 | sh_fork_stem: forall f z t, root_eval f (△ @ t) ->
@@ -267,7 +281,10 @@ Hint Constructors root_eval : TreeHintDb.
 
 (* The Representation *)
 
-Definition rootl := \"r" (\"y" (\"z" (Ref "r" @ Ref "y"))). 
+Definition rootl :=
+  Eval cbv in
+    \"r" (\"y" (\"z" (Ref "r" @ Ref "y"))).
+
 Definition roots :=
   Eval cbv in
     \"x" (\"r" (\"y" (\"z" (Ref "r" @ (△ @ (△ @ Ref "y" @ Ref "z") @ (△ @ Ref "x" @ Ref "z")))))).
@@ -280,9 +297,10 @@ Definition root1 :=
   Eval cbv in
   \"t" (\"y" (\"r1" (triage rootl roots rootf @ (Ref "r1" @ Ref "t") @ (Ref "r1") @ (Ref "y")))).
 
-Definition root :=
-  Y2 (\"r"(\"a" (△ @ Ref "a" @ △ @ (\"f" (onFork root1 @ (Ref "r" @ Ref "f") @ (Ref "r")))))).
+Definition root_aux :=
+  Eval cbv in  (\"a"(\"r" (△ @ Ref "a" @ △ @ (\"f" (onFork root1 @ (Ref "r" @ Ref "f") @ (Ref "r")))))).
 
+Definition root := Y2 root_aux. 
 (* 
 Compute (term_size root). 
 *)
@@ -305,13 +323,7 @@ Qed.
 Theorem root_eval_to_root: forall M P, root_eval M P -> root @ M === P.
 Proof.
   intros M P ev; induction ev; intros;
-    unfold root, eq_q; rewrite Y2_red; fold root; unfold onFork, d;  starstac ("f" :: "a" :: "r" :: nil);  
-      eqtac; auto; rewrite ? IHev; eqtac; auto;
-  rewrite <- quotient_app; rewrite ? IHev; eqtac; auto;
-  rewrite <- quotient_app;   rewrite IHev1; eqtac; auto;
-  unfold root1; eqtac; rewrite <- quotient_app; rewrite IHev2; unfold triage, rootf; eqtac; auto. 
-
-
+    unfold root; qtac Y2_red; fold root; unfold root_aux; eqtac; qtac IHev; qtac IHev1; qtac IHev2.
 Qed.
 
 (* 
@@ -320,7 +332,7 @@ Compute(term_size root).
 
 (* Root-and-Branch Evaluation *)
 
-Inductive rb_eval : Tree -> Tree -> Prop :=
+Inductive rb_eval : Tree0 -> Tree0 -> Prop :=
 | rsh_leaf : forall x, root_eval x △ -> rb_eval x △
 | rb_stem : forall x y v, root_eval x (△ @ y) -> rb_eval y v -> rb_eval x (△ @ v)
 | rb_fork : forall x y z v w, root_eval x (△ @ y@ z) -> rb_eval y v -> rb_eval z w ->
@@ -329,14 +341,86 @@ Inductive rb_eval : Tree -> Tree -> Prop :=
 
 
           
-Definition rb :=
-  Y2 (\"r" (\"x" (triage
+Definition rb_aux :=
+  Eval cbv in (\"x" (\"r" (triage
                     △
                     (\"y" (△ @ ((Ref "r") @ (Ref "y"))))
                     (\"y" (\"z" (△ @ ((Ref "r") @ (Ref "y")) @ ((Ref "r") @ (Ref "z")))))
-                    @ (root @ (Ref "x"))
-     ))).
+                    @ (Ref "root" @ (Ref "x"))
+              ))).
 
+Set Printing Depth 1000.
+Print rb_aux.
+
+
+Definition rb := Y2 (
+                     △ @
+(△ @
+ (△ @ △ @
+  (△ @
+   (△ @
+    (△ @
+     (△ @
+      (△ @ △ @
+       (△ @ (△ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △ @ △)))) @ (△ @ (△ @ (△ @ △ @ △)) @ △))) @
+        (△ @ △ @ △)))) @
+     (△ @
+      (△ @
+       (△ @
+        (△ @
+         (△ @ (△ @ (△ @ △ @ (△ @ (△ @ (△ @ △ @ △)) @ △))) @
+          (△ @
+           (△ @
+            (△ @
+             (△ @
+              (△ @
+               (△ @
+                (△ @ (△ @ (△ @ (△ @ (△ @ (△ @ △) @ (△ @ △ @ △))) @ (△ @ △ @ (△ @ △)))) @
+                 (△ @
+                  (△ @
+                   (△ @
+                    (△ @
+                     (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+                      (△ @
+                       (△ @
+                        (△ @ (△ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @ (△ @ (△ @ △) @ (△ @ △ @ △)))) @
+                         (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ 
+                  (△ @ △ @ △)))) @ (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ 
+           (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+   (△ @
+    (△ @
+     (△ @
+      (△ @
+       (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+        (△ @
+         (△ @
+          (△ @
+           (△ @
+            (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+             (△ @
+              (△ @
+               (△ @
+                (△ @
+                 (△ @
+                  (△ @
+                   (△ @ △ @
+                    (△ @ (△ @ (△ @ △ @ △)) @
+                     (△ @ (△ @ (△ @ (△ @ (△ @ △ @ △)) @ (△ @ (△ @ △) @ (△ @ △)))) @ (△ @ △ @ △))))) @
+                  (△ @
+                   (△ @
+                    (△ @
+                     (△ @
+                      (△ @
+                       (△ @
+                        (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+                         (△ @
+                          (△ @
+                           (△ @ (△ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @ (△ @ (△ @ △) @ (△ @ △ @ △)))) @
+                            (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ (△ @ △)))) @ 
+                     (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+           (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △))))) @
+(△ @ (△ @ (△ @ (△ @ (△ @ (△ @ root) @ (△ @ △ @ (△ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △))
+). 
 
 
   
@@ -349,14 +433,11 @@ Proof.
     | assert(re: root @ x === △@ y@z) by (apply root_eval_to_root; auto)
     ]; 
   unfold rb; rewrite Y2_red; fold rb;
-  unfold triage; starstac ("z" :: "y" :: "x" :: "r" :: nil); 
-    rewrite <- quotient_app.
-  rewrite re;   eqtac; auto.  
+  unfold rb_aux; eqtac.  repeat  qtac re. 
  assert(combination (△ @ y)) by (eapply root_eval_combination; eauto); inv1 combination;
-  rewrite re;   eqtac; auto; rewrite <- quotient_app; rewrite IHe; auto.
+  qtac re; qtac IHe.
  assert(combination (△ @ y@z)) by (eapply root_eval_combination; eauto);inv1 combination; subst; 
-  rewrite re; eqtac; auto; rewrite <- quotient_app; rewrite IHe1; auto;   
-  rewrite <- quotient_app; rewrite IHe2; auto. 
+  qtac re; qtac IHe1; qtac IHe2.
 Qed.
 
 (* Root-First Evaluation *)
@@ -364,8 +445,42 @@ Qed.
 Definition rf_eval M N P := rb_eval (meta_quote (M@ N)) P. 
 
 
+Definition rf_aux :=
+  Eval cbv in
+    wait(\"q" (\"f" (\"z" (Ref "rb" @ (△ @ ((Ref "q") @ (Ref "f")) @ ((Ref "q") @ (Ref "z")))))))
+        (Ref "quote").
+
+Print rf_aux.
+
 Definition rf :=
-  wait(\"q" (\"f" (\"z" (rb @ (△ @ ((Ref "q") @ (Ref "f")) @ ((Ref "q") @ (Ref "z"))))))) quote.
+△ @ (△ @ (△ @ (△ @ △) @ (△ @ △))) @
+(△ @ (△ @ (△ @ △ @ quote)) @
+ (△ @ △ @
+  (△ @
+   (△ @
+    (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+     (△ @
+      (△ @
+       (△ @
+        (△ @
+         (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @
+          (△ @
+           (△ @
+            (△ @
+             (△ @
+              (△ @ (△ @ (△ @ (△ @ (△ @ (△ @ △) @ (△ @ △ @ △))) @ (△ @ △ @ (△ @ △)))) @
+               (△ @
+                (△ @
+                 (△ @
+                  (△ @
+                   (△ @ (△ @ (△ @ △ @ (△ @ △ @ (△ @ △)))) @
+                    (△ @
+                     (△ @
+                      (△ @ (△ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ △))) @ (△ @ (△ @ △) @ (△ @ △ @ △)))) @
+                       (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @ 
+             (△ @ △ @ △))) @ (△ @ △ @ △)))) @ (△ @ △ @ △))) @ (△ @ △ @ △)))) @
+   (△ @ △ @ (△ @ (△ @ (△ @ △ @ (△ @ △ @ rb))))))))
+.
 
 (* waiting saves a copy of quote which saves 400 nodes *) 
 
@@ -378,10 +493,8 @@ Proof.
   assert(combination M) by now apply programs_are_combinations;
   assert(combination N) by now apply programs_are_combinations;
   assert(combination rb) by (apply programs_are_combinations; program_tac)).  
-  unfold wait, d, eq_q; starstac ("z" :: "f" :: "q" :: nil).
-  rewrite <- quotient_app; rewrite ! quote_red; auto.
-  rewrite <- quotient_app; rewrite ! quote_red; auto.  
-  unquotient_tac; 
+  eqtac.
+  qtac quote_red; 
   replace (△ @ (meta_quote M) @ (meta_quote N)) with (meta_quote (M@ N)) by auto.
   unfold rf_eval in *; apply rb_eval_implies_rb; auto;
   apply meta_quote_preserves_combinations; auto_t. 
